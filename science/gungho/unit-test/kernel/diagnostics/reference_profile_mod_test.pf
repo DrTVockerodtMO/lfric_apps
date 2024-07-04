@@ -132,7 +132,7 @@ contains
 
     class(reference_profile_test_type), intent(inout) :: this
 
-    real(r_def), parameter :: tol = 1.0e-14
+    real(r_def), parameter :: tol = 1.0e-14_r_def
     real(r_def), parameter :: kappa = rd / cp
 
     real(kind=r_def) :: exner, theta, rho, x(3)

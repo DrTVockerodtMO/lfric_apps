@@ -498,12 +498,12 @@ contains
       end if
 
       ! Check the damping layer namelist
-      if ( dlayer_on .and. (dl_base < 0.0 .or. dl_base > domain_top) ) then
+      if ( dlayer_on .and. (dl_base < 0.0_r_def .or. dl_base > domain_top) ) then
         write( log_scratch_space, '(A,E16.8)' ) 'Damping layer base lies outside of domain: ',&
           dl_base
         call log_event( log_scratch_space, LOG_LEVEL_WARNING )
       end if
-      if ( dlayer_on .and. dl_str < 0.0 ) then
+      if ( dlayer_on .and. dl_str < 0.0_r_def ) then
         write( log_scratch_space, '(A,E16.8)' ) 'Damping layer strength is negative: ',&
           dl_str
         call log_event( log_scratch_space, LOG_LEVEL_WARNING )

@@ -89,7 +89,7 @@ subroutine enforce_crit_code(nlayers, field_out, field_in,    &
   do df = 1, ndf
 
     do k = 0, nlayers-1
-      levfac = MAX(0.1, LOG10(logscale*real(k+1,r_def)))
+      levfac = MAX(0.1_r_def, LOG10(logscale*real(k+1,r_def)))
       local_crit = crit/levfac
 
       ! Clip field

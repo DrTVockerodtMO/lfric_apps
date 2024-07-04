@@ -79,7 +79,7 @@ function analytic_streamfunction( chi, choice, num_options,    &
     psi(1) = 0.0_r_def
     psi(3) = 0.0_r_def
     psi(2) = - u0 * domain_top / pi *                                             &
-              sin(2.0_r_def * pi * (chi(1) / (2.0 * domain_max_x) + 0.5_r_def)) * &
+              sin(2.0_r_def * pi * (chi(1) / (2.0_r_def * domain_max_x) + 0.5_r_def)) * &
               sin(pi * chi(3) / domain_top)
   case ( profile_div_free_reversible )
     ! A deformational divergence-free time-varying flow

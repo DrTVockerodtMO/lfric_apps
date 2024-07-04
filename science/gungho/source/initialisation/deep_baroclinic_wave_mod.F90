@@ -36,7 +36,7 @@ module deep_baroclinic_wave_mod
 
   real(kind=r_def), parameter ::           &
        pertu0     = 0.5_r_def,             & ! Perturbation wind velocity (m/s)
-       pertr      = 1.0/6.0_r_def,         & ! Perturbation radius (Earth radii)
+       pertr      = 1.0_r_def/6.0_r_def,         & ! Perturbation radius (Earth radii)
        pertlon    = pi/9.0_r_def,          & ! Perturbation longitude
        pertlat    = 2.0_r_def*pi/9.0_r_def,& ! Perturbation latitude
        pertz      = 15000.0_r_def   ,      & ! Perturbation height cap

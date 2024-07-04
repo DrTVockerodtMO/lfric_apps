@@ -99,7 +99,7 @@ DO w = 1, weights%num_wgts
     l_on_dst_mask = dst_mask(dst_index)
 
     weight_value = ABS(weights%remap_matrix(w,l))
-    IF (weight_value > 0.0 .AND. l_on_dst_mask) THEN
+    IF (weight_value > 0.0_real64 .AND. l_on_dst_mask) THEN
 
       src_index1 = weights%src_address_2d(l,1)
       src_index2 = weights%src_address_2d(l,2)

@@ -206,7 +206,7 @@ contains
     if ( r_solver == real64 ) then
       use_tol = tol
     else
-      use_tol = max( 1.0E-7, 10.0_r_solver*spacing( maxval( q22(:,:,1) ) ) )
+      use_tol = max( 1.0E-7_r_solver, 10.0_r_solver*spacing( maxval( q22(:,:,1) ) ) )
     end if
 
     @assertEqual(answer, q22(:,:,1), use_tol)

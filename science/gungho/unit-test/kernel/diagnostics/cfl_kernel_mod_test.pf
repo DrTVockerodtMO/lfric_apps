@@ -31,8 +31,8 @@ module cfl_kernel_mod_test
   real(r_def), parameter :: DT = 600.0_r_def
   real(r_def), parameter :: DX = 1000.0_r_def
   real(r_def), parameter :: DZ = 100.0_r_def
-  real(r_def), parameter :: U0 = 1.0
-  real(r_def), parameter :: UFAST = 10.0
+  real(r_def), parameter :: U0 = 1.0_r_def
+  real(r_def), parameter :: UFAST = 10.0_r_def
 
 contains
 

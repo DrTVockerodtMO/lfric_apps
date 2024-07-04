@@ -119,7 +119,7 @@ contains
 
     real(kind=r_def) :: xyz(3)
     real(kind=r_def) :: streamfunction(3), answer
-    real(r_def), parameter :: tol = 1.0e-14
+    real(r_def), parameter :: tol = 1.0e-14_r_def
 
     ! Test at different latitudes (pi/2 and 0) and check longitude has no effect
     ! xyz is (long, lat, r)

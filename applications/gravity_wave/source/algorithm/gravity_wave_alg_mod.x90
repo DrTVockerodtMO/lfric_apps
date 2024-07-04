@@ -81,7 +81,7 @@ module gravity_wave_alg_mod
   class( abstract_iterative_solver_type), allocatable :: gw_mixed_solver
 
   !> Absolute solver tolerance (mixed solver)
-  real(kind=r_def), parameter :: gw_mixed_solver_a_tol = 1.E-12
+  real(kind=r_def), parameter :: gw_mixed_solver_a_tol = 1.E-12_r_def
 
   !> Operator, preconditioner and iterative solver for
   !> Helmholtz (pressure) problem
@@ -90,7 +90,7 @@ module gravity_wave_alg_mod
   class( abstract_iterative_solver_type ), allocatable :: gw_pressure_solver
 
   !> Absolute solver tolerance (pressure solver)
-  real(kind=r_def), parameter :: gw_pressure_solver_a_tol = 1.E-12
+  real(kind=r_def), parameter :: gw_pressure_solver_a_tol = 1.E-12_r_def
 
   public :: gravity_wave_alg_init
   public :: gravity_wave_alg_final

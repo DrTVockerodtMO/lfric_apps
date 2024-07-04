@@ -260,9 +260,9 @@ contains
     variable_function_spaces = (/W3 , Wtheta, W3/)
     variable_is_2d = (/.false., .false., .true./)
 
-    variable_initial_value_1 = (/1.0, 2.0, 3.0/)
-    variable_initial_value_2 = (/4.0, 5.0, 6.0/)
-    variable_initial_value_interp = (/0.0, -1.0, 2.0/)
+    variable_initial_value_1 = (/1.0_r_def, 2.0_r_def, 3.0_r_def/)
+    variable_initial_value_2 = (/4.0_r_def, 5.0_r_def, 6.0_r_def/)
+    variable_initial_value_interp = (/0.0_r_def, -1.0_r_def, 2.0_r_def/)
 
     ! Create collections
     call this%create_real_collection(                       &
@@ -279,7 +279,7 @@ contains
                   variable_initial_value_interp, 'interp_field_collection')
 
     ! -- Compare with the initial condition
-    expected_value = (/0.0, -1.0, 2.0/)
+    expected_value = (/0.0_r_def, -1.0_r_def, 2.0_r_def/)
     do i=1,nvars
       call interp_field_collection%get_field(variable_names(i), field_ptr)
       field_proxy = field_ptr%get_proxy()
@@ -287,9 +287,9 @@ contains
     end do
 
     ! -- Apply equal weights
-    t1_weight = 0.5
-    t2_weight = 0.5
-    expected_value = (/2.5, 3.5, 4.5/)
+    t1_weight = 0.5_r_def
+    t2_weight = 0.5_r_def
+    expected_value = (/2.5_r_def, 3.5_r_def, 4.5_r_def/)
 
     ! Interpolate
     call interpolate_fields( interp_field_collection, &
@@ -305,9 +305,9 @@ contains
     end do
 
     ! -- Apply unequal weights
-    t1_weight = 0.75
-    t2_weight = 0.25
-    expected_value = (/1.75, 2.75, 3.75/)
+    t1_weight = 0.75_r_def
+    t2_weight = 0.25_r_def
+    expected_value = (/1.75_r_def, 2.75_r_def, 3.75_r_def/)
 
     ! Interpolate
     call interpolate_fields( interp_field_collection, &
@@ -324,9 +324,9 @@ contains
     end do
 
     ! -- Apply unequal weights
-    t1_weight = 1.0
-    t2_weight = 0.0
-    expected_value = (/1.0, 2.0, 3.0/)
+    t1_weight = 1.0_r_def
+    t2_weight = 0.0_r_def
+    expected_value = (/1.0_r_def, 2.0_r_def, 3.0_r_def/)
 
     ! Interpolate
     call interpolate_fields( interp_field_collection, &
@@ -405,8 +405,8 @@ contains
     end do
 
     ! -- Apply equal weights
-    t1_weight = 0.5
-    t2_weight = 0.5
+    t1_weight = 0.5_r_def
+    t2_weight = 0.5_r_def
     expected_value = (/4, 5, 6/)
 
     ! Interpolate
@@ -423,8 +423,8 @@ contains
     end do
 
     ! -- Apply unequal weights
-    t1_weight = 0.75
-    t2_weight = 0.25
+    t1_weight = 0.75_r_def
+    t2_weight = 0.25_r_def
     expected_value = (/1, 2, 3/)
 
     ! Interpolate
@@ -442,8 +442,8 @@ contains
     end do
 
     ! -- Apply unequal weights
-    t1_weight = 0.25
-    t2_weight = 0.75
+    t1_weight = 0.25_r_def
+    t2_weight = 0.75_r_def
     expected_value = (/4, 5, 6/)
 
     ! Interpolate
@@ -493,12 +493,12 @@ contains
     variable_names_in = (/"rfield1", "rfield2", "rfield3"/)
     variable_function_spaces_in = (/W3 , Wtheta, W3/)
     variable_is_2d_in = (/.false., .false., .true./)
-    variable_initial_value_in = (/1.0, 2.0, 3.0/)
+    variable_initial_value_in = (/1.0_r_def, 2.0_r_def, 3.0_r_def/)
 
     variable_names_out = (/"rfield1", "rfield2", "rfield3", "rfield4"/)
     variable_function_spaces_out = (/W3, Wtheta, W3, Wtheta/)
     variable_is_2d_out = (/.false., .false., .true., .true./)
-    variable_initial_value_out = (/4.0, 5.0, 6.0, 7.0/)
+    variable_initial_value_out = (/4.0_r_def, 5.0_r_def, 6.0_r_def, 7.0_r_def/)
 
     ! Create collections
     call this%create_real_collection(                             &
@@ -511,7 +511,7 @@ contains
                   variable_initial_value_out, 'field_collection_out')
 
     ! -- Compare with the initial condition
-    expected_value = (/4.0, 5.0, 6.0, 7.0/)
+    expected_value = (/4.0_r_def, 5.0_r_def, 6.0_r_def, 7.0_r_def/)
     do i=1,nvars_out
       call field_collection_out%get_field(variable_names_out(i), field_ptr)
       field_proxy = field_ptr%get_proxy()
@@ -522,7 +522,7 @@ contains
     call copy_fields( field_collection_out, &
                       field_collection_in )
     ! Check the copied values
-    expected_value = (/1.0, 2.0, 3.0, 7.0/)
+    expected_value = (/1.0_r_def, 2.0_r_def, 3.0_r_def, 7.0_r_def/)
     do i=1,nvars_out
       call field_collection_out%get_field(variable_names_out(i), field_ptr)
       field_proxy = field_ptr%get_proxy()
@@ -629,7 +629,7 @@ contains
     variable_names = (/"rfield1", "rfield2", "rfield3"/)
     variable_function_spaces = (/W3 , Wtheta, W3/)
     variable_is_2d = (/.false., .false., .true./)
-    variable_initial_value = (/1.0, 2.0, 3.0/)
+    variable_initial_value = (/1.0_r_def, 2.0_r_def, 3.0_r_def/)
 
     ! Create input collection
     call this%create_real_collection(                          &

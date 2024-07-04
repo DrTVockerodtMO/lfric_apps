@@ -327,7 +327,7 @@ subroutine mphys_code( nlayers, seg_len,            &
 
     real(r_um), dimension(1,1,1) :: sea_salt_film, sea_salt_jet
 
-    real(r_um), parameter :: alt_1km = 1000.0 ! metres
+    real(r_um), parameter :: alt_1km = 1000.0_r_um ! metres
 
     logical, dimension(seg_len,1) :: land_sea_mask
 

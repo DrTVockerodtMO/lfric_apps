@@ -760,7 +760,7 @@ contains
       l_ukca = .true.
       l_ukca_plume_scav = .true.
       if (l_ukca_plume_scav) then
-        mode_aitsol_cvscav = 0.5    ! Plume scavenging fraction for soluble
+        mode_aitsol_cvscav = 0.5_r_um    ! Plume scavenging fraction for soluble
                                     ! Aitken mode aerosol
         call ukca_mode_scavcoeff()
       end if
@@ -863,9 +863,9 @@ contains
          ( glomap_mode == glomap_mode_dust_and_clim ) ) then
       i_dust = i_dust_flux
       dust_veg_emiss = 1
-      us_am = 1.45              ! Increases friction velocity
-      sm_corr = 0.5             ! Reduces soil moisture
-      horiz_d = 2.25
+      us_am = 1.45_r_um              ! Increases friction velocity
+      sm_corr = 0.5_r_um             ! Reduces soil moisture
+      horiz_d = 2.25_r_um
       l_fix_size_dist = .false.
       l_twobin_dust = .false.
     else
@@ -1146,9 +1146,9 @@ contains
         ! Parameters for fractional standard deviation (fsd) of condensate taken
         ! from part of equation 3 in Hill et al (2015) DOI: 10.1002/qj.2506,
         ! i.e. phi(x,c) = R21 (xc) ^ 1/3 { (0.016 xc)^2.76 + 1 } ^ -0.09
-        f_cons(1)      =  0.016
-        f_cons(2)      =  2.76
-        f_cons(3)      = -0.09
+        f_cons(1)      =  0.016_r_um
+        f_cons(2)      =  2.76_r_um
+        f_cons(3)      = -0.09_r_um
       end if
 
     end if

@@ -118,7 +118,7 @@ contains
     real(kind=r_def)       :: psi_loc, h_loc
     real(kind=r_def)       :: psi_analytical
     ! Use e-6 for tolerance as second answer is O(10^8)
-    real(r_def), parameter :: tol = 1.0e-6
+    real(r_def), parameter :: tol = 1.0e-6_r_def
 
     ! Test values both close and away from jet
 

@@ -155,9 +155,9 @@ contains
   integer(kind=i_def) :: lead_time
   real(kind=r_def) :: mu
   integer(kind=i_def) :: n, rp_count
-  real(kind=r_def), parameter :: shock_amp = 2.0
-  real(kind=r_def), parameter :: rand_max = 1.0
-  real(kind=r_def), parameter :: rand_min = -1.0
+  real(kind=r_def), parameter :: shock_amp = 2.0_r_def
+  real(kind=r_def), parameter :: rand_max = 1.0_r_def
+  real(kind=r_def), parameter :: rand_min = -1.0_r_def
 
   ! The random parameter is an array of length three
   ! The first value is the minimum, the second the parameter
@@ -425,7 +425,7 @@ contains
   real(kind=r_def), intent(in) :: param_0
   real(kind=r_def), intent(out) :: param_pert
 
-  if ( rand_no < 0.0 ) then
+  if ( rand_no < 0.0_r_def ) then
     param_pert = param_0 + (param_0 - param_min) * rand_no
   else
     param_pert = param_0 + (param_max - param_0) * rand_no

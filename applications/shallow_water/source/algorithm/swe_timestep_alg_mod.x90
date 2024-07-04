@@ -92,7 +92,7 @@ module swe_timestep_alg_mod
   class(abstract_iterative_solver_type), allocatable  :: swe_mixed_solver
 
   ! Absolute solver tolerance (mixed solver)
-  real(kind=r_def), parameter :: swe_mixed_solver_a_tol = 1.E-12
+  real(kind=r_def), parameter :: swe_mixed_solver_a_tol = 1.E-12_r_def
 
   ! Operator, preconditioner and iterative solver for
   ! Helmholtz (geopotential) problem
@@ -101,7 +101,7 @@ module swe_timestep_alg_mod
   class( abstract_iterative_solver_type ), allocatable  :: swe_geopot_solver
 
   ! Absolute solver tolerance (geopotential solver)
-  real(kind=r_def), parameter :: swe_geopot_solver_a_tol = 1.E-12
+  real(kind=r_def), parameter :: swe_geopot_solver_a_tol = 1.E-12_r_def
 
   public :: swe_timestep_alg_init
   public :: swe_timestep_alg_final

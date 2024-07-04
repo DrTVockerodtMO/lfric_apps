@@ -153,8 +153,8 @@ contains
     real(r_def), allocatable :: chi1(:), chi2(:), chi3(:), panel_id(:)
 
     real(kind=r_def) :: answer
-    real(kind=r_def) :: domain_max_x = 18000.00
-    real(kind=r_def) :: domain_max_y = 6000.00
+    real(kind=r_def) :: domain_max_x = 18000.00_r_def
+    real(kind=r_def) :: domain_max_y = 6000.00_r_def
 
     integer :: i, j, k, cell
 

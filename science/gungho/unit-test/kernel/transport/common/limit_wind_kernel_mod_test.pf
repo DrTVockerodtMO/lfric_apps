@@ -30,9 +30,9 @@ module limit_wind_kernel_mod_test
 
   real(r_def), parameter :: DT = 600.0_r_def
   real(r_def), parameter :: DX = 1000.0_r_def
-  real(r_def), parameter :: U0 = 1.0
-  real(r_def), parameter :: UFAST = 10.0
-  real(r_def), parameter :: MAX_CFL = 0.75
+  real(r_def), parameter :: U0 = 1.0_r_def
+  real(r_def), parameter :: UFAST = 10.0_r_def
+  real(r_def), parameter :: MAX_CFL = 0.75_r_def
 
 contains
 

@@ -425,7 +425,7 @@ module coupler_diagnostics_mod
       if (ldump_prep) then
 
         ! Calculate reciprocal of acc_step
-        r_acc_step = 1.0/acc_step
+        r_acc_step = 1.0_r_def/acc_step
         call invoke(inc_a_times_X( r_acc_step, fld ))
       endif
 

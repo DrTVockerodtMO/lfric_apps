@@ -244,7 +244,7 @@ contains
 
     itest = 5
     chi_surf = chi_3(itest)
-    chi_test = eta(itest-1)*height_domain_top + (1.0 - eta(itest-1))*this%mountain_height
+    chi_test = eta(itest-1)*height_domain_top + (1.0_r_def - eta(itest-1))*this%mountain_height
     @assertEqual( chi_surf, chi_test, tol )
 
     return

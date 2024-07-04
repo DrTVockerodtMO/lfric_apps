@@ -242,7 +242,7 @@ DO k = 1, num_levels
   ! Rho levels are midpoint between theta
   level_dep_constants(k, ldc_eta_rho) = &
       (level_dep_constants(k, ldc_eta_theta) +  &
-       level_dep_constants(k+1, ldc_eta_theta))  / 2.0
+       level_dep_constants(k+1, ldc_eta_theta))  / 2.0_real64
 END DO
 ! No soil level information yet - leave as rmdi
 ! No RHCrit information yet - leave as rmdi
@@ -258,7 +258,7 @@ DO k = 1, num_levels + 1
     (level_dep_constants(k, ldc_eta_theta)  / &
      level_dep_constants(level_num_of_first_constant_rho, ldc_eta_theta))) ** 2
   IF (k > level_num_of_first_constant_rho) THEN
-    level_dep_constants(k, ldc_C_theta) = 0.0
+    level_dep_constants(k, ldc_C_theta) = 0.0_real64
   END IF
 END DO
 DO k = 1, num_levels
@@ -268,7 +268,7 @@ DO k = 1, num_levels
     (level_dep_constants(k, ldc_eta_rho)  / &
      level_dep_constants(level_num_of_first_constant_rho, ldc_eta_rho))) ** 2
   IF (k >= level_num_of_first_constant_rho) THEN
-    level_dep_constants(k, ldc_C_rho) = 0.0
+    level_dep_constants(k, ldc_C_rho) = 0.0_real64
   END IF
 END DO
 

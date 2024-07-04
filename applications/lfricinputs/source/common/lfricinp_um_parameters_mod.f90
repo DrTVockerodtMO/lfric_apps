@@ -23,7 +23,7 @@ INTEGER, PUBLIC, PARAMETER :: um_real32  = SELECTED_REAL_KIND(6,37)
 INTEGER, PUBLIC, PARAMETER :: um_integer32 = SELECTED_INT_KIND(9)
 
 ! Missing data, real and integer
-REAL(KIND=um_real64), PARAMETER       :: um_rmdi     = -32768.0*32768.0
+REAL(KIND=um_real64), PARAMETER       :: um_rmdi     = -32768.0_um_real64*32768.0_um_real64
 INTEGER(KIND=um_integer64), PARAMETER :: um_imdi     = -32768
 INTEGER(KIND=um_integer32), PARAMETER :: um_imdi_32  = um_imdi
 

@@ -19,7 +19,8 @@ from stylist.fortran import (
     FortranCharacterset,
     MissingImplicit,
     IntrinsicModule,
-    ForbidUsage
+    ForbidUsage,
+    NakedLiteral
 )
 from stylist.rule import TrailingWhitespace
 from stylist.source import (
@@ -47,6 +48,7 @@ allowed_mpi = (
 infrastructure = Style(
     TrailingWhitespace(),
     FortranCharacterset(),
+    NakedLiteral(integers=False, reals=True)
 )
 
 # Define additional file type processing pipelines

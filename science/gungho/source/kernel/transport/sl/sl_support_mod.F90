@@ -378,7 +378,7 @@ module sl_support_mod
 
       ! Cubic-hermite weights
       if( sc(1,k) == sc(2,k) ) then
-        cc(1,k) = 0.0
+        cc(1,k) = 0.0_r_tran
         cc(2,k) = c1 - c3 - c4*inv_1p_beta
         cc(3,k) = c2 + c3
         cc(4,k) = c4*inv_1p_beta
@@ -386,7 +386,7 @@ module sl_support_mod
         cc(1,k) = -c3*inv_1p_alfa
         cc(2,k) = c1 - c4
         cc(3,k) = c2 + c4 + c3*inv_1p_alfa
-        cc(4,k) = 0.0
+        cc(4,k) = 0.0_r_tran
       else
         cc(1,k) = -c3*inv_1p_alfa
         cc(2,k) = c1 - c4*inv_1p_beta

@@ -75,7 +75,7 @@ DO i_stash = 1, lfric2um_config%num_fields
 
   ! Loop over number of levels in field
   DO level = 1, num_levels
-    global_field_array(:) = 0.0
+    global_field_array(:) = 0.0_real64
     ! Gather local lfric fields into global array on base rank
     CALL lfricinp_gather_lfric_field( lfric_field, global_field_array, comm, &
          num_levels, level, twod_mesh )

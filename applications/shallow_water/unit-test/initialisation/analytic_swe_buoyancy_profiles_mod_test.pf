@@ -119,7 +119,7 @@ contains
 
     real(kind=r_def) :: xyz(3)
     real(kind=r_def) :: buoyancy, answer
-    real(r_def), parameter :: tol = 1.0e-14
+    real(r_def), parameter :: tol = 1.0e-14_r_def
     real(r_def), parameter :: domain_x = 1.0_r_def
 
     ! check thermal vortex case at difference x values

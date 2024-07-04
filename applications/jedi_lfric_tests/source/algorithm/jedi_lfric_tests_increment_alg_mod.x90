@@ -26,7 +26,7 @@ contains
 
     implicit none
 
-    real(r_def) :: increment = 1.0
+    real(r_def) :: increment = 1.0_r_def
 
     ! Prognostic fields
     type( field_type ), intent( inout ) :: field

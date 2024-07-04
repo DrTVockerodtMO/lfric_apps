@@ -189,9 +189,9 @@ contains
     call start_datetime%init('2023-05-04T09:00:00Z')
 
     ! Define initial values for the fields
-    variable_initial_value(:,1) = (/0.0, -1.0, 2.0/)
-    variable_initial_value(:,2) = (/3.0, 10.0, 5.0/)
-    variable_initial_value(:,3) = (/0.5, -6.0, 9.0/)
+    variable_initial_value(:,1) = (/0.0_r_def, -1.0_r_def, 2.0_r_def/)
+    variable_initial_value(:,2) = (/3.0_r_def, 10.0_r_def, 5.0_r_def/)
+    variable_initial_value(:,3) = (/0.5_r_def, -6.0_r_def, 9.0_r_def/)
 
     ! Create a linear state object
     call linear_state_trajectory%initialise( forecast_length, time_step )
@@ -229,7 +229,7 @@ contains
 
     ! 1. Start datetime
     call test_datetime%init( '2023-05-04T09:00:00Z' )
-    expected_value = (/0.0, -1.0, 2.0/)
+    expected_value = (/0.0_r_def, -1.0_r_def, 2.0_r_def/)
     call linear_state_trajectory%get_linear_state( test_datetime, linear_state_collection )
     do ivar=1,nvars
       call linear_state_collection%get_field(ls_variable_names(ivar), field_ptr)
@@ -239,7 +239,7 @@ contains
 
     ! 2. Start plus 0.5 time step
     call test_datetime%init( '2023-05-04T09:15:00Z' )
-    expected_value = (/1.5, 4.5, 3.5/)
+    expected_value = (/1.5_r_def, 4.5_r_def, 3.5_r_def/)
     call linear_state_trajectory%get_linear_state( test_datetime, linear_state_collection )
     do ivar=1,nvars
       call linear_state_collection%get_field(ls_variable_names(ivar), field_ptr)
@@ -249,7 +249,7 @@ contains
 
     ! 3. Start plus 1 time step
     call test_datetime%init( '2023-05-04T09:30:00Z' )
-    expected_value = (/3.0, 10.0, 5.0/)
+    expected_value = (/3.0_r_def, 10.0_r_def, 5.0_r_def/)
     call linear_state_trajectory%get_linear_state( test_datetime, linear_state_collection )
     do ivar=1,nvars
       call linear_state_collection%get_field(ls_variable_names(ivar), field_ptr)
@@ -259,7 +259,7 @@ contains
 
     ! 4. Start plus 1.5 time step
     call test_datetime%init( '2023-05-04T09:45:00Z' )
-    expected_value = (/1.75, 2.0, 7.0/)
+    expected_value = (/1.75_r_def, 2.0_r_def, 7.0_r_def/)
 
     call linear_state_trajectory%get_linear_state( test_datetime, linear_state_collection )
     do ivar=1,nvars
@@ -270,7 +270,7 @@ contains
 
     ! 5. Last datetime
     call test_datetime%init( '2023-05-04T10:00:00Z' )
-    expected_value = (/0.5, -6.0, 9.0/)
+    expected_value = (/0.5_r_def, -6.0_r_def, 9.0_r_def/)
     call linear_state_trajectory%get_linear_state( test_datetime, linear_state_collection )
     do ivar=1,nvars
       call linear_state_collection%get_field(ls_variable_names(ivar), field_ptr)

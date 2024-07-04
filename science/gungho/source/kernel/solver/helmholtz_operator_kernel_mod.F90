@@ -361,7 +361,7 @@ subroutine helmholtz_operator_code(stencil_size,                       &
 
       ! Initialise to zero to allow for missing neighbours
       ! in order to fill in any missing horizontal neighbours.
-      a_op(df,:,:) = 0.0
+      a_op(df,:,:) = 0.0_r_solver
 
       ! First the centre value
       e=1

@@ -90,7 +90,7 @@ contains
     integer(kind=i_def), parameter :: cell = 1
 
     ! Volume factor is 2
-    this%detj_w3(:) = 2.0
+    this%detj_w3(:) = 2.0_r_tran
 
     this%mass_flux = (/ 2.0_r_tran, 8.0_r_tran /)
     ! The fluxes have the following vertical setup:    !

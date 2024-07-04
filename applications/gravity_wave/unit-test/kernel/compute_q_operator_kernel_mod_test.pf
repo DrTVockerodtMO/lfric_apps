@@ -95,7 +95,7 @@ contains
     real(r_def), allocatable :: wh(:), wv(:)
 
     real(r_def), allocatable :: q(:,:,:)
-    real(r_def) :: dz_test(3) = [2000.0, 2000.0, 2000.0]
+    real(r_def) :: dz_test(3) = [2000.0_r_def, 2000.0_r_def, 2000.0_r_def]
 
     ! Get canned data for a 3-layer mesh
     nlayers = 3

@@ -50,21 +50,21 @@ IMPLICIT NONE
 
 CLASS(datetime_type) :: self
 
-self % fctimes(:) = -1.0
+self % fctimes(:) = -1.0_real64
 self % validity_times(:) = 'XXXX-XX-XX XX:XX:XX'
 
 self % num_times = 1
-self % fctimes(1) = 0.0
+self % fctimes(1) = 0.0_real64
 
-self % first_fctime = 0.0
+self % first_fctime = 0.0_real64
 self % validity_times(1) = '2016-01-01 15:00:00'
 self % first_validity_time = '2016-01-01 15:00:00'
 self % calendar = 'Gregorian '
 
 self % first_step = 1
 self % last_step = 1
-self % spinup_period = 0.0
-self % seconds_per_step = 1.0
+self % spinup_period = 0.0_r_second
+self % seconds_per_step = 1.0_r_second
 
 END SUBROUTINE initialise
 

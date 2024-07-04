@@ -78,7 +78,7 @@ contains
         wind(1) =  3.0_r_def/4.0_r_def*exp(-(chi(2)**8.0_r_def)/2.0_r_def)*( &
                    32.0_r_def*sin(4.0_r_def*chi(1))*cos(8.0_r_def*chi(2)) &
                    - 19.2_r_def*cos(3.0_r_def*chi(1))*sin(6.0_r_def*chi(2)) &
-                   - 6.0_r_def*3.0*cos(5.0_r_def*chi(1))*sin(10.0_r_def*chi(2)) &
+                   - 6.0_r_def*3.0_r_def*cos(5.0_r_def*chi(1))*sin(10.0_r_def*chi(2)) &
                    + cos(2.0_r_def*chi(2))  )
         wind(2) = -3.0_r_def/4.0_r_def*exp(-(chi(2)**8.0_r_def)/2.0_r_def)*( &
                   16.0_r_def*sin(8.0_r_def*chi(2))*cos(4.0_r_def*chi(1)) &

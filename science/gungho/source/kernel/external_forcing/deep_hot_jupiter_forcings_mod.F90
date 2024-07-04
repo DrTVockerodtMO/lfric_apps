@@ -74,7 +74,7 @@ function deep_hot_jupiter_newton_frequency(exner) result(jupiter_like_frequency)
   real(kind=r_def), intent(in) :: exner
 
   ! Parameters
-  real(kind=r_def), parameter :: p_low = 1.0, p_high = 1.0e6
+  real(kind=r_def), parameter :: p_low = 1.0_r_def, p_high = 1.0e6_r_def
 
   ! Local variables
   real(kind=r_def) :: pressure, log_sigma
@@ -116,9 +116,9 @@ function day_side_temp(exner) result(t_day)
    real(kind=r_def), intent(in) :: exner
 
    ! Parameters
-   real(kind=r_def), parameter :: p_low = 100.0, p_high = 1.0e6
-   real(kind=r_def), parameter :: t_low = 1000.0, alpha = 0.015
-   real(kind=r_def), parameter :: beta = -120.0
+   real(kind=r_def), parameter :: p_low = 100.0_r_def, p_high = 1.0e6_r_def
+   real(kind=r_def), parameter :: t_low = 1000.0_r_def, alpha = 0.015_r_def
+   real(kind=r_def), parameter :: beta = -120.0_r_def
 
    ! Local variables
    real(kind=r_def) :: pressure
@@ -167,9 +167,9 @@ function night_side_temp(exner) result(t_night)
    real(kind=r_def), intent(in) :: exner
 
    ! Parameters
-   real(kind=r_def), parameter :: p_low = 100.0, p_high = 1.0e6
-   real(kind=r_def), parameter :: t_low = 250.0, alpha = 0.10
-   real(kind=r_def), parameter :: beta = 100.0
+   real(kind=r_def), parameter :: p_low = 100.0_r_def, p_high = 1.0e6_r_def
+   real(kind=r_def), parameter :: t_low = 250.0_r_def, alpha = 0.10_r_def
+   real(kind=r_def), parameter :: beta = 100.0_r_def
 
    ! Local variables
    real(kind=r_def) :: pressure

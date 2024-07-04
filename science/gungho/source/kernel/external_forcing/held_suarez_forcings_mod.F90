@@ -68,7 +68,7 @@ function held_suarez_newton_frequency(sigma, lat) result(held_suarez_frequency)
   real(kind=r_def)             :: held_suarez_frequency
   real(kind=r_def)             :: sigma_func
 
-  sigma_func = max((sigma - SIGMA_B)/(1.0 - SIGMA_B), 0.0_r_def)
+  sigma_func = max((sigma - SIGMA_B)/(1.0_r_def - SIGMA_B), 0.0_r_def)
   held_suarez_frequency = KA + (KS - KA)*sigma_func*(cos(lat)**4)
 
   ! If running on a scaled planet, then reduce the timescale...
@@ -86,7 +86,7 @@ function held_suarez_damping(sigma) result(held_suarez_damping_rate)
   real(kind=r_def)             :: held_suarez_damping_rate
   real(kind=r_def) :: sigma_func
 
-  sigma_func = max((sigma - SIGMA_B)/(1.0 - SIGMA_B), 0.0_r_def)
+  sigma_func = max((sigma - SIGMA_B)/(1.0_r_def - SIGMA_B), 0.0_r_def)
   held_suarez_damping_rate = -KF*sigma_func
 
   ! If running on a scaled planet, then reduce the timescale...

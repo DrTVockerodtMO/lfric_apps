@@ -218,8 +218,8 @@ CALL um_grid%set_grid_coords(                                                  &
      grid_spacing_y = delta_phi_targ,                                          &
      ! namelist provides p grid values and routine
      ! wants base grid origin, so apply offset
-     grid_origin_x = lambda_origin_targ - (0.5 * delta_lambda_targ),           &
-     grid_origin_y = phi_origin_targ - (0.5 * delta_phi_targ))
+     grid_origin_x = lambda_origin_targ - (0.5_real64 * delta_lambda_targ),           &
+     grid_origin_y = phi_origin_targ - (0.5_real64 * delta_phi_targ))
 
 CALL um_grid%print_grid_coords()
 

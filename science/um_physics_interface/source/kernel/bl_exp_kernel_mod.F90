@@ -786,7 +786,7 @@ contains
 
     ! Calculate vertical differences
     do i = 1, seg_len
-      dzl_charney(i,1,1) = 2.0 * (r_theta_levels(i,1,1) - r_theta_levels(i,1,0))
+      dzl_charney(i,1,1) = 2.0_r_bl * (r_theta_levels(i,1,1) - r_theta_levels(i,1,0))
       do k = 2, bl_levels
         dzl_charney(i,1,k) = dz_wth(map_wth(1,i) + k)
         rdz(i,1,k) = 1.0_r_bl/dz_wth(map_wth(1,i) + k-1)

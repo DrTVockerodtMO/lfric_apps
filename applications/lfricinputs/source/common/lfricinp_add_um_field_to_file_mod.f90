@@ -206,22 +206,22 @@ lookup_int(lbuser4) = stashcode
 lookup_int(lbuser7) = 1
 
 ! Datum value, always 1
-lookup_real_tmp(bdatum) = 0.0
+lookup_real_tmp(bdatum) = 0.0_real64
 
 ! Reserved for future use
-lookup_real_tmp(brsvd3) = 0.0
-lookup_real_tmp(brsvd4) = 0.0
+lookup_real_tmp(brsvd3) = 0.0_real64
+lookup_real_tmp(brsvd4) = 0.0_real64
 
 ! Check vertical coordinate type
 IF (lookup_int(lbvc) >= 126 .AND. lookup_int(lbvc) <= 139 &
      .OR. lookup_int(lbvc) == 5) THEN
   ! Special codes inc single level, set to 0.0
-  lookup_real_tmp(blev)=0.0
-  lookup_real_tmp(bhlev)=0.0
-  lookup_real_tmp(brlev)=0.0
-  lookup_real_tmp(bhrlev)=0.0
-  lookup_real_tmp(bulev)=0.0
-  lookup_real_tmp(bhulev)=0.0
+  lookup_real_tmp(blev)=0.0_real64
+  lookup_real_tmp(bhlev)=0.0_real64
+  lookup_real_tmp(brlev)=0.0_real64
+  lookup_real_tmp(bhrlev)=0.0_real64
+  lookup_real_tmp(bulev)=0.0_real64
+  lookup_real_tmp(bhulev)=0.0_real64
 ELSE IF (lookup_int(lbvc) == 65) THEN ! Standard hybrid height levels
   ! height of model level k above mean sea level is
   !       z(i,j,k) = Zsea(k) + C(k)*Zorog(i,j)
@@ -236,9 +236,9 @@ ELSE IF (lookup_int(lbvc) == 65) THEN ! Standard hybrid height levels
     ! numbers start at 0 but array start at 1
     IF (level_number == integer_constants(ih_model_levels)) THEN ! top level
       lookup_real_tmp(bulev) =  level_dep_c(level_number+1, ldc_zsea_theta)    &
-                                * 2.0 - level_dep_c(level_number, ldc_zsea_rho)
+                                * 2.0_real64 - level_dep_c(level_number, ldc_zsea_rho)
       lookup_real_tmp(bhulev)=   level_dep_c(level_number+1, ldc_c_theta)      &
-                                * 2.0 - level_dep_c(level_number,ldc_c_rho)
+                                * 2.0_real64 - level_dep_c(level_number,ldc_c_rho)
     ELSE
       lookup_real_tmp(bulev) = level_dep_c(level_number+1, ldc_zsea_rho)
       lookup_real_tmp(bhulev)= level_dep_c(level_number+1, ldc_c_rho)
@@ -248,8 +248,8 @@ ELSE IF (lookup_int(lbvc) == 65) THEN ! Standard hybrid height levels
     lookup_real_tmp(bhlev)= level_dep_c(level_number+1, ldc_c_theta)
 
     IF (level_number == 0) THEN        ! Zeroth level
-      lookup_real_tmp(brlev) = 0.0     ! zsea at/below surface
-      lookup_real_tmp(bhrlev)= 1.0     ! C    at/below surface
+      lookup_real_tmp(brlev) = 0.0_real64     ! zsea at/below surface
+      lookup_real_tmp(bhrlev)= 1.0_real64   ! C    at/below surface
     ELSE
       lookup_real_tmp(brlev) = level_dep_c(level_number, ldc_zsea_rho)
       lookup_real_tmp(bhrlev)=    level_dep_c(level_number, ldc_c_rho)
@@ -260,9 +260,9 @@ ELSE IF (lookup_int(lbvc) == 65) THEN ! Standard hybrid height levels
     ! if exner above top level
     IF (level_number >  integer_constants(ih_model_levels)) THEN
       lookup_real_tmp(bulev) = level_dep_c(level_number+1, ldc_zsea_theta)     &
-                               * 2.0 - level_dep_c(level_number-1, ldc_zsea_rho)
+                               * 2.0_real64 - level_dep_c(level_number-1, ldc_zsea_rho)
       lookup_real_tmp(bhulev)= level_dep_c(level_number+1, ldc_c_theta)        &
-                               * 2.0 - level_dep_c(level_number-1, ldc_c_rho)
+                               * 2.0_real64 - level_dep_c(level_number-1, ldc_c_rho)
       lookup_real_tmp(blev) = lookup_real_tmp(bulev)
       lookup_real_tmp(bhlev)= lookup_real_tmp(bhulev)
     ELSE

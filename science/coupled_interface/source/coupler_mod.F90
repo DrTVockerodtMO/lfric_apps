@@ -162,7 +162,7 @@ module coupler_mod
    type( field_collection_iterator_type)        :: iter
 
    ! Initilaise accumulation step counter
-   acc_step = 0.0
+   acc_step = 0.0_r_def
    ldump_prep = .false.
 
    call iter%initialise(dcpl_rcv)
@@ -715,7 +715,7 @@ module coupler_mod
     ldump_prep = .false.
 
     ! increment accumulation step
-    acc_step = acc_step + 1.0
+    acc_step = acc_step + 1.0_r_def
 
     call set_snow_mass_fields(depository)
 
@@ -778,7 +778,7 @@ module coupler_mod
    character(len=slength)          :: sname
 
    ldump_prep = .true.
-   acc_step = acc_step + 1.0
+   acc_step = acc_step + 1.0_r_def
 
    ! We need to loop over each output field and ensure it gets updated
    call iter%initialise(dcpl_snd)
@@ -800,7 +800,7 @@ module coupler_mod
         end select
    end do
 
-   acc_step = 0.0
+   acc_step = 0.0_r_def
 
    ice_frac_ptr   => null()
    nullify(field)

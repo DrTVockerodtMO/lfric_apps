@@ -311,7 +311,7 @@ program cma_test
   ! Helmholtz-operator are not well balanced and errors could go unnoticed
   nlayers = mesh%get_nlayers()
   domain_top = mesh%get_domain_top()
-  dx = sqrt(4.*pi/ncells_2d)*radius
+  dx = sqrt(4._r_def*pi/ncells_2d)*radius
   dz = domain_top / nlayers
 
   if ( ( dx < 0.1_r_def) .or. ( dx > 10.0_r_def) ) then

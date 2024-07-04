@@ -118,7 +118,7 @@ contains
 
     real(kind=r_def) :: xyz(3)
     real(kind=r_def) :: wind(3), answer(3)
-    real(r_def), parameter :: tol = 1.0e-14
+    real(r_def), parameter :: tol = 1.0e-14_r_def
     real(r_def), parameter :: domain_x=1.0_r_def
 
     ! Test with Mountain test case and different latitudes

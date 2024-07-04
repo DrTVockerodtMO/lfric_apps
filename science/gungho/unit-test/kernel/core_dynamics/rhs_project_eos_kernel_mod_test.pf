@@ -208,7 +208,7 @@ contains
     call get_w3_m3x3_dofmap(map_pid, 1_i_def)
 
     allocate( m3_inv(ndf_w3, ndf_w3, ncells_w3) )
-    m3_inv(:,:,:) = 0.1
+    m3_inv(:,:,:) = 0.1_r_def
 
     ! Get quadrature weights
     call get_gaussian_q3x3x3_quadrature_weights_xy(wh)

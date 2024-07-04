@@ -180,7 +180,7 @@ contains
           exner_at_dof = exner(map_w3(1) + k) * sqrt(exner(map_w3(1) + k) /    &
                                                      exner(map_w3(1) + k - 1))
         else
-          exner_at_dof = 0.5 * (exner(map_w3(1) + k) + exner(map_w3(1) + k + 1))
+          exner_at_dof = 0.5_r_def * (exner(map_w3(1) + k) + exner(map_w3(1) + k + 1))
         end if
 
         theta_at_dof = theta(map_wtheta(df) + k)
@@ -206,8 +206,8 @@ contains
       if ( (cloud == cloud_um) .and. &
            (test /= test_bryan_fritsch) .and. (test /= test_grabowski_clark) &
            .and. ( test /= test_isot_dry_atm ) ) then
-        mr_v(map_wtheta(1) + nlayers) = 1.0e-8
-        mr_v(map_wtheta(1) + nlayers-1) = 1.0e-8
+        mr_v(map_wtheta(1) + nlayers) = 1.0e-8_r_def
+        mr_v(map_wtheta(1) + nlayers-1) = 1.0e-8_r_def
       end if
 
     !--------------------------------------------------------------------------!
@@ -243,7 +243,7 @@ contains
 
         kp1 = min(k+1,nlayers-1)
         theta_at_dof = theta(map_wtheta(df) + k)
-        rho_at_dof = 0.5*(rho(map_w3(1) + k) + rho(map_w3(1) + kp1))
+        rho_at_dof = 0.5_r_def*(rho(map_w3(1) + k) + rho(map_w3(1) + kp1))
         pressure_at_dof = p_zero * &
            (rho_at_dof*Rd/p_zero*theta_at_dof)**(1.0_r_def/(1.0_r_def-kappa))
         exner_at_dof = (pressure_at_dof / p_zero) ** kappa

@@ -54,7 +54,7 @@ INTEGER(KIND=int64) :: stashcode, calendar_type
 CHARACTER(LEN=*), PARAMETER :: routinename='datetime%read_um_time_data'
 
 ! Variables needed for forecast time checking
-REAL(KIND=real64), PARAMETER :: tol_fct = 1.0e-6 ! fctime tolerance in Shumlib
+REAL(KIND=real64), PARAMETER :: tol_fct = 1.0e-6_real64 ! fctime tolerance in Shumlib
 REAL(KIND=real64) :: fctime, period, pdiff
 CHARACTER(LEN=16) :: timestring
 INTEGER :: i_field, level, time_idx, time_idx_insert, t_idx, time_idx_max
@@ -170,14 +170,14 @@ IF (datetime % num_times > 1) THEN
   CALL log_event(log_scratch_space, LOG_LEVEL_INFO)
 ELSE
   ! ... else set period to one hour by default
-  period = 1.0
+  period = 1.0_real64
   WRITE(log_scratch_space, *) 'Only single validity time detected. Setting '// &
                               'forecast period to one hour by default'
   CALL log_event(log_scratch_space, LOG_LEVEL_INFO)
 END IF
 
 ! Set time step information
-datetime % seconds_per_step = period * 3600.0
+datetime % seconds_per_step = period * 3600.0_real64
 datetime % first_step = 1
 datetime % last_step = INT(datetime % num_times, KIND=i_def)
 

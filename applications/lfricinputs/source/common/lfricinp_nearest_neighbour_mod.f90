@@ -61,7 +61,7 @@ circle_ang_rad   = circle_ang_rad_o
 ! Set initial value of minimum angular distance of a on mask point from the
 ! reference point. This variable will be used in a comparison test and updated
 ! appropriately during the search
-phi_min = 2.0 * PI
+phi_min = 2.0_real64 * PI
 
 ! Initial limits of the "previous" search circle UM grid bounding box
 ix_start_o = 0
@@ -144,11 +144,11 @@ DO
     ! best nearest NN candidate is closer, then the search radius is increased
     ! to only slightly above the current best NN distance, as there is no need
     ! to look at larger distances.
-    delta_ang_rad = MAX(0.20*circle_ang_rad, circle_ang_rad_o)
+    delta_ang_rad = MAX(0.20_real64*circle_ang_rad, circle_ang_rad_o)
     IF ( (phi_min-circle_ang_rad) > delta_ang_rad) THEN
       circle_ang_rad = circle_ang_rad + delta_ang_rad
     ELSE
-      circle_ang_rad = 1.05 * phi_min
+      circle_ang_rad = 1.05_real64 * phi_min
     END IF
     ! Store current UM grid bounding box boundaries for use in next iteration
     ix_start_o = ix_start
@@ -238,7 +238,7 @@ lon_deg = lon * radians_to_degrees
 lat_deg = lat * radians_to_degrees
 
 ! Readjust longitude range from [-180,180] to [0,360]
-IF (lon_deg < 0.0) lon_deg = lon_deg + 360.0
+IF (lon_deg < 0.0_real64) lon_deg = lon_deg + 360.0_real64
 
 ! Set the number points int he latitude and longitude direction on the grid and
 ! the lat lon origin values
@@ -287,7 +287,7 @@ phi_y = circle_ang_rad * radians_to_degrees
 ! looping over the indices. The calling routine will have to "wrap" the out of
 ! range indices back on to the proper UM grid index range, e.g. when they are
 ! used inside the body of said loop for instance
-IF ( ((lat_deg+phi_y) > 90.0) .OR. ((lat_deg-phi_y) < -90.0) ) THEN
+IF ( ((lat_deg+phi_y) > 90.0_real64) .OR. ((lat_deg-phi_y) < -90.0_real64) ) THEN
   ix_start = 1
   ix_end   = nx
 ELSE

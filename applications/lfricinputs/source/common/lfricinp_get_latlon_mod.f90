@@ -60,7 +60,7 @@ ELSE
 END IF
 
 ! Readjust longitude range from [0,360] to [-180,180]
-IF (lon > 180.0) lon = lon - 360.0
+IF (lon > 180.0_real64) lon = lon - 360.0_real64
 
 ! Convert longitude and latitude to radians
 lon = lon * degrees_to_radians
@@ -99,8 +99,8 @@ local_mesh => mesh%get_local_mesh()
 ! infrastucture does not provide a means of accessing the cell centre
 ! coordinates from the global mesh object.
 !
-lon = 0.0
-lat = 0.0
+lon = 0.0_real64
+lat = 0.0_real64
 nverts = local_mesh%get_nverts_per_cell()
 DO i = 1, nverts
     CALL local_mesh%get_vert_coords( local_mesh%get_vert_on_cell(i, cell_lid), &

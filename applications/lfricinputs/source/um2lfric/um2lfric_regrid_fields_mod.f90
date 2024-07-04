@@ -116,7 +116,7 @@ DO i_field = 1, um2lfric_config%num_fields
   stashcode = um2lfric_config%stash_list(i_field)
   call lfric_fields % get_field(get_field_name(stashcode), lfric_field)
   lfric_field_proxy = lfric_field % get_proxy()
-  lfric_field_proxy % data(:) = 0.0
+  lfric_field_proxy % data(:) = 0.0_real64
   lfric_field => NULL()
 END DO
 

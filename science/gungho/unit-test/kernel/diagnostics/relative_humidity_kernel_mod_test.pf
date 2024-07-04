@@ -56,9 +56,9 @@ contains
     class(relative_humidity_test_type), intent(inout) :: this
 
     real(kind=r_def), parameter :: tol = 1.0e-10_r_def
-    real(kind=r_def), parameter :: tk0c = 273.15 ! Temperature of freezing in Kelvin
-    real(kind=r_def), parameter :: qsa1 = 3.8    ! Constant in qsat equation
-    real(kind=r_def), parameter :: qsa4 = 6.109  ! Constant in qsat equation in mbar
+    real(kind=r_def), parameter :: tk0c = 273.15_r_def ! Temperature of freezing in Kelvin
+    real(kind=r_def), parameter :: qsa1 = 3.8_r_def   ! Constant in qsat equation
+    real(kind=r_def), parameter :: qsa4 = 6.109_r_def  ! Constant in qsat equation in mbar
     real(kind=r_def), parameter :: p_zero = 100000.0_r_def
     real(kind=r_def), parameter :: recip_epsilon = 0.60_r_def
     real(kind=r_def), parameter :: rd = 300.0_r_def

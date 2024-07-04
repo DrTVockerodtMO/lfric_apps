@@ -140,7 +140,7 @@ contains
 
     real(kind=r_def) :: llr(3), xyz(3)
     real(kind=r_def) :: b, buoyancy
-    real(r_def), parameter :: tol = 1.0e-14
+    real(r_def), parameter :: tol = 1.0e-14_r_def
 
     xyz = (/ scaled_radius, 0.0_r_def, 0.0_r_def /)
     b = analytic_buoyancy(xyz)

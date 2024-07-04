@@ -65,7 +65,7 @@ CLASS(lfricinp_regrid_weights_type) :: self
 
 INTEGER(KIND=int32) :: l, w
 
-dst(:) = 0.0
+dst(:) = 0.0_real64
 ! For now assume that any normalisation of weights has already been performed
 ! offline so there is no need to divide the destination by the fractional area
 DO w = 1, self%num_wgts
@@ -92,7 +92,7 @@ CLASS(lfricinp_regrid_weights_type) :: self
 
 INTEGER(KIND=int32) :: l, w
 
-dst(:,:) = 0.0
+dst(:,:) = 0.0_real64
 ! For now assume that any normalisation of weights has already been performed
 ! offline so there is no need to divide the destination by the fractional area
 DO w = 1, self%num_wgts

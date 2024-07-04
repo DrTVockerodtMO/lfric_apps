@@ -1301,7 +1301,7 @@ contains
     l_calc_dxek  = ( i_cld_vn == i_cld_pc2 )
     l_q_interact = l_calc_dxek
     l_congestus = .false. ! never used in GA9
-    entrain_coef = -99.0  ! unused default value
+    entrain_coef = -99.0_r_um  ! unused default value
 
     segments = 1          ! i.e. one column
     seg_num = map_wth(1)  ! Only used by debugging error message from UM
@@ -1380,7 +1380,7 @@ contains
           ! Reset to qmin in non-conservative way
           q_conv(1,1,k) = qmin_conv
         else
-          dq_add(1,1,k) = 0.0
+          dq_add(1,1,k) = 0.0_r_um
         end if
       end do ! k
     end if
@@ -1926,7 +1926,7 @@ contains
         ccw_3d(1,1,k) = ccw_3d(1,1,k) + one_over_conv_calls*it_ccw0(1,1,k)
         cca_3d(1,1,k) = cca_3d(1,1,k) + one_over_conv_calls*it_cca0(1,1,k)
         ! Assuming lccrad = .true.
-        cca_3d(1,1,k) = min(cca_3d(1,1,k), 1.0)
+        cca_3d(1,1,k) = min(cca_3d(1,1,k), 1.0_r_um)
       end do
 
       ! single level convection diagnostics
@@ -2178,13 +2178,13 @@ contains
                                 conv_prog_precip_min_threshold )
       do k = 1, n_conv_levels
         if (abs(dtheta_conv(1,1,k)) > theta_inc_threshold) then
-          conv_active = 1.0
+          conv_active = 1.0_r_um
         else
-          conv_active = 0.0
+          conv_active = 0.0_r_um
         end if
         conv_prog_precip(map_wth(1) + k)                          &
             = decay_amount * tot_conv_precip_2d(1,1) * conv_active &
-            + (1.0 - decay_amount) * conv_prog_precip(map_wth(1) + k)
+            + (1.0_r_def - decay_amount) * conv_prog_precip(map_wth(1) + k)
       end do
       conv_prog_precip(map_wth(1) + 0) = conv_prog_precip(map_wth(1) + 1)
     end if
@@ -2193,7 +2193,7 @@ contains
       decay_amount = timestep / tau_conv_prog_dtheta
       do k = 1, n_conv_levels
         dt_conv(map_wth(1) + k)  = (decay_amount * dtheta_conv(1,1,k) &
-                    + (1.0 - decay_amount) * conv_prog_dtheta(map_wth(1) + k))&
+                    + (1.0_r_def - decay_amount) * conv_prog_dtheta(map_wth(1) + k))&
                     * exner_in_wth(map_wth(1) + k)
       end do
 
@@ -2210,7 +2210,7 @@ contains
       decay_amount = timestep / tau_conv_prog_dq
       do k = 1, n_conv_levels
         dmv_conv(map_wth(1) + k) = decay_amount * dmv_conv(map_wth(1) + k)   &
-                     + (1.0 - decay_amount) * conv_prog_dmv(map_wth(1) + k)
+                     + (1.0_r_def - decay_amount) * conv_prog_dmv(map_wth(1) + k)
       end do
 
       if (outer == outer_iterations) then
@@ -2232,7 +2232,7 @@ contains
       if (cf_liquid_conv(1,1,k) > 0.0_r_um) then
         if ( (qcl_conv(1,1,k)/cf_liquid_conv(1,1,k) ) > 2.0e-3_r_um ) then
           orig_value = cf_liquid_conv(1,1,k)
-          cf_liquid_conv(1,1,k) = min(1.0,qcl_conv(1,1,k)/2.0e-3_r_um)
+          cf_liquid_conv(1,1,k) = min(1.0_r_um,qcl_conv(1,1,k)/2.0e-3_r_um)
           bulk_cf_conv(1,1,k) = bulk_cf_conv(1,1,k)                      &
                                 + cf_liquid_conv(1,1,k) - orig_value
         end if
@@ -2242,7 +2242,7 @@ contains
       if (cf_frozen_conv(1,1,k) > 0.0_r_um) then
         if ( (qcf_conv(1,1,k)/cf_frozen_conv(1,1,k)) > 2.0e-3_r_um ) then
           orig_value = cf_frozen_conv(1,1,k)
-          cf_frozen_conv(1,1,k) = min(1.0,qcf_conv(1,1,k)/2.0e-3_r_um)
+          cf_frozen_conv(1,1,k) = min(1.0_r_um,qcf_conv(1,1,k)/2.0e-3_r_um)
           bulk_cf_conv(1,1,k) = bulk_cf_conv(1,1,k)                     &
                                 + cf_frozen_conv(1,1,k) - orig_value
         end if
@@ -2279,7 +2279,7 @@ contains
 
     ! copy convective cloud fraction into prognostic array
     do k = 1, n_conv_levels
-      cca(map_wth(1) + k) =  min(cca_3d(1,1,k), 1.0)
+      cca(map_wth(1) + k) =  min(cca_3d(1,1,k), 1.0_r_um)
       ccw(map_wth(1) + k) =  ccw_3d(1,1,k)
     end do
 
@@ -2333,10 +2333,10 @@ contains
       ! component A of upward mass flux
       if (.not. associated(massflux_up_cmpta, empty_real_data) ) then
         do k = 1, n_conv_levels - 1
-          if ( (1.0 - max_mf_fall) * massflux_up_half(map_w3(1) + k-1) < &
+          if ( (1.0_r_def - max_mf_fall) * massflux_up_half(map_w3(1) + k-1) < &
                                      massflux_up_half(map_w3(1) + k) ) then
             massflux_up_cmpta(map_w3(1) + k-1) = massflux_up_half(map_w3(1) + k-1) &
-                                             * (1.0 - shallow_in_col(map_2d(1)))
+                                             * (1.0_r_def - shallow_in_col(map_2d(1)))
           else
             massflux_up_cmpta(map_w3(1) + k-1) = 0.0_r_def
           end if
@@ -2365,7 +2365,7 @@ contains
       do k = 1, bl_levels
         tke_bl(map_wth(1)+k) = MIN(max_tke,MAX(tke_bl(map_wth(1)+k),         &
                ( massflux_up(map_wth(1)+k) / ( g*rho_wet_tq(1,1,k)*          &
-                 MIN(0.5,MAX(0.05,cca_2d(map_2d(1)))) ) )**2))
+                 MIN(0.5_r_um,MAX(0.05_r_um,cca_2d(map_2d(1)))) ) )**2))
                  ! 0.5 and 0.05 are used here as plausible max and min
                  ! values of CCA to prevent numerical problems
       end do

@@ -354,12 +354,12 @@ module linear_data_algorithm_mod
     type(field_array_type), pointer      :: mr_array => null()
     type(field_array_type), pointer      :: moist_dyn_array => null()
 
-    gamma_theta = 1.e2
-    gamma_rho = 1.e-1
-    gamma_exner = 1.e-1
-    gamma_moist_dyn = 1.e-1
-    gamma_mr = 1.e-1
-    gamma_u = 1.e2
+    gamma_theta = 1.e2_r_def
+    gamma_rho = 1.e-1_r_def
+    gamma_exner = 1.e-1_r_def
+    gamma_moist_dyn = 1.e-1_r_def
+    gamma_mr = 1.e-1_r_def
+    gamma_u = 1.e2_r_def
 
     prognostic_fields => modeldb%fields%get_field_collection(&
                                           "prognostic_fields")

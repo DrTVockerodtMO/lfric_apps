@@ -291,7 +291,7 @@ subroutine casim_code( nlayers,                     &
 
 
     ! Local variables for the kernel
-    real(r_um), parameter :: alt_1km = 1000.0 ! metres
+    real(r_um), parameter :: alt_1km = 1000.0_r_um ! metres
 
     real(r_um) :: t_work ! Local working temperature
     real(r_um) :: rrain, rsnow

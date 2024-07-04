@@ -74,7 +74,7 @@ module planet_constants_mod
   real(r_um), parameter :: rv = real(gas_constant_h2o, r_um )
 
   ! Increment to Earth's hour angle per day number from epoch
-  real(r_um), parameter :: earth_dha = 2.0*pi
+  real(r_um), parameter :: earth_dha = 2.0_r_um*pi
 
   ! Von Karman's constant
   real(r_um), parameter :: vkman = 0.4_r_um

@@ -775,7 +775,7 @@ contains
     real(r_um), dimension(seg_len,1) :: charnock_w
 
     ! This is an idealised fixed value for ustar.
-    real(r_um), parameter :: ustar_fixed_value = 0.1
+    real(r_um), parameter :: ustar_fixed_value = 0.1_r_um
 
     real(r_um), dimension(seg_len,1,nice_use) :: radnet_sice
 
@@ -1556,7 +1556,7 @@ contains
           ch = rhokh(i,1) / ( vshr(i,1) * rhostar(i,1) )
 
           ! Now more complicated formula based on fluxes
-          fluxes%tstar_ij(i,1) = ( theta1 + wthvbar/(ch*max(0.1,vshr(i,1))) -  &
+          fluxes%tstar_ij(i,1) = ( theta1 + wthvbar/(ch*max(0.1_r_um,vshr(i,1))) -  &
                c_virtual * theta1 *                                            &
                (qs_star(i,1)-q(i,1,1)-dqsdt_star*fluxes%tstar_ij(i,1)) )       &
                / ( (p_zero/forcing%pstar_ij(i,1))**kappa +                     &

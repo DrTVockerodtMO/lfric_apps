@@ -28,7 +28,7 @@ module tidally_locked_earth_kernel_mod_test
 
   real(kind=r_def), parameter :: gravity      = 9.80665_r_def
   real(kind=r_def), parameter :: radius       = 6371229.0_r_def
-  real(kind=r_def), parameter :: omega        = 1.99784E-7
+  real(kind=r_def), parameter :: omega        = 1.99784E-7_r_def
   real(kind=r_def), parameter :: p_zero       = 100000.0_r_def
   real(kind=r_def), parameter :: rd           = 287.05_r_def
   real(kind=r_def), parameter :: cp           = 1005.0_r_def

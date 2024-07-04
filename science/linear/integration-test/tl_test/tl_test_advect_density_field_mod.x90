@@ -153,8 +153,8 @@ module tl_test_advect_density_field_mod
     call transport_field( ls_rho_np1, ls_rho, cast_dt, transport_metadata )
     call invoke( X_minus_Y( n1_advection_inc, ls_rho_np1, ls_rho ) )
 
-    gamma_u = 6.e7
-    gamma_rho = 1.e5
+    gamma_u = 6.e7_r_def
+    gamma_rho = 1.e5_r_def
     do n=1,2
       gamma_u = gamma_u / 2.0_r_def
       gamma_rho = gamma_rho / 2.0_r_def

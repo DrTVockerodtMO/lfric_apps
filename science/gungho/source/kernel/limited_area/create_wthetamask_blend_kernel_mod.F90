@@ -184,7 +184,7 @@ subroutine create_wthetamask_blend_code( nlayers,     &
     if ( geometry == geometry_spherical .and. &
          coord_system == coord_system_xyz ) then
       ! In alpha beta space - and only pick the face where x(2)>0
-      if ( x(2) > 0.0 ) then
+      if ( x(2) > 0.0_r_def ) then
         query_value_ns = atan2(x(3),x(2))
         query_value_ew = atan2(x(1),x(2))
       else

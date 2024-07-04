@@ -144,7 +144,7 @@ module jedi_lfric_mesh_interface_test
     integer :: i
 
     out = get_sigma_w3_levels(this%unit_test_mesh)
-    kgo = [ 0.1, 0.3, 0.5, 0.7, 0.9 ]
+    kgo = [ 0.1_r_def, 0.3_r_def, 0.5_r_def, 0.7_r_def, 0.9_r_def ]
 
     @assertEqual(kgo, out, tol)
 
@@ -161,7 +161,7 @@ module jedi_lfric_mesh_interface_test
     integer :: i
 
     out = get_sigma_wtheta_levels(this%unit_test_mesh)
-    kgo = [ 0.0, 0.2, 0.4, 0.6, 0.8, 1.0 ]
+    kgo = [ 0.0_r_def, 0.2_r_def, 0.4_r_def, 0.6_r_def, 0.8_r_def, 1.0_r_def ]
 
     @assertEqual(kgo, out, tol)
 

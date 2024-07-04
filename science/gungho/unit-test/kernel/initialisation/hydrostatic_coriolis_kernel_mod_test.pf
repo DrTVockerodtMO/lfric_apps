@@ -92,7 +92,7 @@ contains
 
     call get_wtheta_w3nodal_basis(this%basis_wt)
     allocate(this%basis_w3(1,1,1))
-    this%basis_w3(:,:,:) = 1.0
+    this%basis_w3(:,:,:) = 1.0_r_def
 
     call get_w3_m3x3_dofmap( this%map_w3, nlayers )
     call get_w3_m3x3_q3x3x3_size( this%ndf_w3, this%undf_w3, ncells, &
@@ -117,7 +117,7 @@ contains
     do j = 1,3
       do i = 1,3
         do k = 0,nlayers-1
-          this%height_w3_data(this%map_w3(1,icell)+k) = real(k+0.5)*dz
+          this%height_w3_data(this%map_w3(1,icell)+k) = real(k+0.5_r_def)*dz
         end do
         icell = icell + 1
       end do

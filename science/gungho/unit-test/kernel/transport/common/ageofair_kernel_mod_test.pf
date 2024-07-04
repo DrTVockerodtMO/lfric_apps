@@ -46,7 +46,9 @@ module ageofair_kernel_mod_test
                         undf_w3,                                &
                         map_w3 )
 
-    answer = (/0.0, 0.0, 0.0, 0.0, 0.0, 1234.0, 1234.0, 1234.0, 1234.0, 1234.0/)
+    answer = (/0.0_r_def, 0.0_r_def, 0.0_r_def, 0.0_r_def,          &
+               0.0_r_def, 1234.0_r_def, 1234.0_r_def, 1234.0_r_def, &
+               1234.0_r_def, 1234.0_r_def/)
     @assertEqual( answer, ageofair, tol )
 
   end subroutine test_all

@@ -988,11 +988,11 @@ contains
                real(tile_lw_grey_albedo(map_tile(1,ainfo%land_index(l))+n-1), r_um)
         end do
         ! recalculate the total resistance factor
-        resft(l,:) = fracaero_t(l,:) + (1.0 - fracaero_t(l,:)) * resfs(l,:)
-        resft(l,lake) = 1.0
+        resft(l,:) = fracaero_t(l,:) + (1.0_r_um - fracaero_t(l,:)) * resfs(l,:)
+        resft(l,lake) = 1.0_r_um
         ! recalculate the total lake fraction
-        flake(l,:) = 0.0
-        flake(l,lake) = 1.0
+        flake(l,:) = 0.0_r_um
+        flake(l,lake) = 1.0_r_um
       end do
 
       if (emis_method_soil /= emis_method_soil_fixed) fluxes%l_emis_surft_set(soil)=.true.
@@ -1338,7 +1338,7 @@ contains
           ! qsat needed since q1p5m always a specific humidity
           call qsat(work_2d_1,sf_diag%t1p5m,forcing%pstar_ij,pdims%i_end,pdims%j_end)
           do i = 1, seg_len
-            rh1p5m(map_2d(1,i)) = max(0.0, sf_diag%q1p5m(i,1)) * 100.0 / work_2d_1(i,1)
+            rh1p5m(map_2d(1,i)) = max(0.0_r_def, sf_diag%q1p5m(i,1)) * 100.0_r_def / work_2d_1(i,1)
           end do
         end if
 
@@ -1426,7 +1426,7 @@ contains
               surf_radnet(map_tile(1,i)+first_sea_tile-1) =                    &
                    real(sw_down_surf(map_2d(1,i)), r_um) -                     &
                    real(sw_up_tile(map_tile(1,i)+first_sea_tile-1), r_um) +    &
-                   emis_sea * (forcing%lw_down_ij(i,1) - sbcon * coast%tstar_sea_ij(i,1) ** 4.0)
+                   emis_sea * (forcing%lw_down_ij(i,1) - sbcon * coast%tstar_sea_ij(i,1) ** 4.0_r_def)
             end if
           end do
         end if
@@ -1452,8 +1452,8 @@ contains
           do i = 1, seg_len
             if (tile_fraction(map_tile(1,i)+first_sea_tile-1) > 0.0_r_def) then
               surf_lw_up(map_tile(1,i)+first_sea_tile-1) =                     &
-                   (1.0 - emis_sea) * forcing%lw_down_ij(i,1) +                &
-                   emis_sea * sbcon * coast%tstar_sea_ij(i,1) ** 4.0
+                   (1.0_r_def - emis_sea) * forcing%lw_down_ij(i,1) +                &
+                   emis_sea * sbcon * coast%tstar_sea_ij(i,1) ** 4.0_r_def
             end if
           end do
         end if

@@ -614,7 +614,7 @@ contains
     else
       varalpha = alpha
     end if
-    varbeta = 1.0 - varalpha
+    varbeta = 1.0_r_def - varalpha
 
     ! Perform some checking on the fields.
     call check_fields(self%state, cast_dt)

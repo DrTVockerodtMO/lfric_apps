@@ -136,7 +136,7 @@ function analytic_temperature(chi, choice) result(temperature)
   ! Test from Bryan and Fritsch (2002)
   case( test_bryan_fritsch )
 
-    l = sqrt(((chi(1)-XC)/2000.0_r_def)**2.0 + ((chi(3)-2000.0_r_def)/2000.0_r_def)**2.0)
+    l = sqrt(((chi(1)-XC)/2000.0_r_def)**2.0_r_def + ((chi(3)-2000.0_r_def)/2000.0_r_def)**2.0_r_def)
     if ( l <= 1.0_r_def ) then
       dt = 2.0_r_def * (cos(PI*l/2.0_r_def))**2.0_r_def
       temperature = 1.0_r_def + dt / 300.0_r_def

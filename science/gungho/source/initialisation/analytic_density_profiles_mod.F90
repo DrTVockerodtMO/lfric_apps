@@ -110,7 +110,7 @@ function vortex_field(lat,long,radius,time) result(density)
 
   ! check whether we are about to try and calculate atan2(0,0)
   if (abs(lat) < eps .and. abs(long) < eps) then
-    lon_dash = 0.0
+    lon_dash = 0.0_r_def
   else
     lon_dash = atan2(cos(lat)*sin(long-lon_pole),              &
                      cos(lat)*sin(lat_pole)*cos(long-lon_pole) &

@@ -47,7 +47,7 @@ contains
     end_date   = xios_date(gas_year(gas_index+1), 1, 1, 0, 0, 0)
     start_date_p1y = xios_date(gas_year(gas_index)+1, 1, 1, 0, 0, 0)
 
-    if ( gas_rate(gas_index) > 0.0 ) then
+    if ( gas_rate(gas_index) > 0.0_r_def ) then
 
       ! Use input rates to calculate current concentration
 
@@ -55,7 +55,7 @@ contains
       ! Find last concentration, denoted by last year with negative gas_rate
       ! Then apply gas_rates prior to current year
       do i=1, gas_index-1
-        if ( gas_rate(i) < 0.0 ) then
+        if ( gas_rate(i) < 0.0_r_def ) then
           gas_now = gas_conc(i+1)
         else
           gas_now = gas_now * gas_rate(i) ** ( gas_year(i+1) - gas_year(i) )

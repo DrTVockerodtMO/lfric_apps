@@ -206,7 +206,7 @@ contains
     do n=1, stph_n_max
       n_row = n_row + n
       do m=1, n
-        Pnm_star(map_sp(1)+ n_row + m) = Pnm_star(map_sp(1)+ n_row +m)*sqrt(2.0)
+        Pnm_star(map_sp(1)+ n_row + m) = Pnm_star(map_sp(1)+ n_row +m)*sqrt(2.0_r_def)
       end do
     end do
 

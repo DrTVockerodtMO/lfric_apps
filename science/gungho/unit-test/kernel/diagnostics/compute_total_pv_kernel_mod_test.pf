@@ -275,7 +275,7 @@ contains
       use_tol = tol32
     end if
     ! Answer should be (xi + omega_3)*dtheta/dz in cell 1
-    answer = (3.0e-5_r_def + 2.0*omega*(sin(lat_0+dlat/2.0_r_def)))*(dtheta/dz)/rho_ref
+    answer = (3.0e-5_r_def + 2.0_r_def*omega*(sin(lat_0+dlat/2.0_r_def)))*(dtheta/dz)/rho_ref
 
     ! This is only testing the vertical component of vorticity
     @assertEqual(answer, pv(map_w3(1, cell))/(dx*dy*dz) , use_tol)

@@ -448,7 +448,7 @@ contains
 
     dispersion_error = 2.0_r_def*(sqrt(var_actual*var_true) - cov)
     ! Take square root and take care of sign
-    if (dispersion_error < 0.0) then
+    if (dispersion_error < 0.0_r_def) then
       dispersion_error = -sqrt(-dispersion_error)
     else
       dispersion_error = sqrt(dispersion_error)

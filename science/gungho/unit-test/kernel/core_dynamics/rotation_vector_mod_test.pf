@@ -76,7 +76,7 @@ contains
 
     class(rotation_vector_test_type), intent(inout) :: this
 
-    real(r_def), parameter :: tol  = 1.0e-13, &    ! r_def 64bit
+    real(r_def), parameter :: tol  = 1.0e-13_r_def, &    ! r_def 64bit
                               zero = 0.0_r_def
 
     integer :: ngp = 1

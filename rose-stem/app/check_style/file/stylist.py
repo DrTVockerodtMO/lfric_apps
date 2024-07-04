@@ -18,6 +18,7 @@ from re import compile as re_compile
 from stylist.fortran import (
     FortranCharacterset,
     MissingImplicit,
+    NakedLiteral,
     IntrinsicModule,
     ForbidUsage
 )
@@ -48,6 +49,7 @@ infrastructure = Style(
     TrailingWhitespace(),
     FortranCharacterset(),
     MissingImplicit(),
+    NakedLiteral(integers=False, reals=True),
     IntrinsicModule(),
     ForbidUsage('mpi', exceptions=allowed_mpi)
 )

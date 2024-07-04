@@ -42,8 +42,8 @@ TYPE, PUBLIC :: lfricinp_grid_type
   REAL(KIND=real64)   :: v_origin_y = rmdi
   ! Hardwired parameters for now
   LOGICAL             :: rotated_pole = .FALSE.
-  REAL(KIND=real64)   :: pole_lat = 90.0
-  REAL(KIND=real64)   :: pole_long = 0.0
+  REAL(KIND=real64)   :: pole_lat = 90.0_real64
+  REAL(KIND=real64)   :: pole_long = 0.0_real64
   INTEGER(KIND=int64) :: horiz_grid_type = 0 ! Global
   CONTAINS
   PROCEDURE :: print_grid_coords
@@ -191,11 +191,11 @@ IF (grid_staggering == arakawa_C_endgame) THEN
   self%grid_origin_x = grid_origin_x
   self%grid_origin_y = grid_origin_y
   ! Set origin points for p, u and v points
-  self%p_origin_x = grid_origin_x + (0.5 * self%spacing_x)
-  self%p_origin_y = grid_origin_y + (0.5 * self%spacing_y)
+  self%p_origin_x = grid_origin_x + (0.5_real64 * self%spacing_x)
+  self%p_origin_y = grid_origin_y + (0.5_real64 * self%spacing_y)
   self%u_origin_x = grid_origin_x
-  self%u_origin_y = grid_origin_y + (0.5 * self%spacing_y)
-  self%v_origin_x = grid_origin_x + (0.5 * self%spacing_x)
+  self%u_origin_y = grid_origin_y + (0.5_real64 * self%spacing_y)
+  self%v_origin_x = grid_origin_x + (0.5_real64 * self%spacing_x)
   self%v_origin_y = grid_origin_y
 ELSE IF(grid_staggering == arakawa_C_nd) THEN
 ! If a standard Arakawa C grid is used then the x direction the number of P

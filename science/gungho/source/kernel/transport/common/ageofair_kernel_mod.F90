@@ -74,7 +74,7 @@ subroutine ageofair_code( nlayers,                                &
 
   do k = 0, reset_level-1
     do df=1,ndf_w3
-      ageofair( map_w3(df) + k ) =  0.0
+      ageofair( map_w3(df) + k ) =  0.0_r_def
     end do
   end do
 

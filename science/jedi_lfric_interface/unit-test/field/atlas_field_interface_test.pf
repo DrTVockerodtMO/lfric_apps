@@ -1539,7 +1539,7 @@ contains
     call atlas_field_interface%copy_to_lfric()
 
     ! Check LFRic data after copy
-    lfric_field_kgo = [-1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0]
+    lfric_field_kgo = [-1.0_real64, 0.0_real64, 1.0_real64, 2.0_real64, 3.0_real64, 4.0_real64, 5.0_real64, 6.0_real64, 7.0_real64]
     @assertEqual( lfric_field_kgo, lfric_field_proxy%data(1:ncells) )
 
     ! 1.2 Adjoint Copy Atlas field to the LFRic field
@@ -1551,7 +1551,7 @@ contains
     call atlas_field_interface%copy_to_lfric_ad()
 
     ! Check Atlas data after copy_to_lfric_ad
-    atlas_field_kgo = [7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0, 0.0, -1.0]
+    atlas_field_kgo = [7.0_real64, 6.0_real64, 5.0_real64, 4.0_real64, 3.0_real64, 2.0_real64, 1.0_real64, 0.0_real64, -1.0_real64]
     @assertEqual( atlas_field_kgo, atlas_field(1,:) )
 
     !-- 2. Test copy_from and its adjoint
@@ -1566,7 +1566,7 @@ contains
     call atlas_field_interface%copy_from_lfric()
 
     ! Check Atlas data after copy_from_lfric
-    atlas_field_kgo = [9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0]
+    atlas_field_kgo = [9.0_real64, 8.0_real64, 7.0_real64, 6.0_real64, 5.0_real64, 4.0_real64, 3.0_real64, 2.0_real64, 1.0_real64]
     @assertEqual( atlas_field_kgo, atlas_field(1,:) )
 
     ! Initialise the LFRic field before calling copy_from_lfric_ad
@@ -1576,7 +1576,7 @@ contains
     call atlas_field_interface%copy_from_lfric_ad()
 
     ! Check LFRic data after copy_from_lfric_ad
-    lfric_field_kgo = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0]
+    lfric_field_kgo = [1.0_real64, 2.0_real64, 3.0_real64, 4.0_real64, 5.0_real64, 6.0_real64, 7.0_real64, 8.0_real64, 9.0_real64]
     @assertEqual( lfric_field_kgo, lfric_field_proxy%data(1:ncells) )
 
     ! Check Atlas data after copy_from_lfric_ad

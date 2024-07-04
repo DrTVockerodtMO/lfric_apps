@@ -160,7 +160,7 @@ contains
     real(kind=r_def) :: xyz(3)
     real(kind=r_def) :: temperature, pressure, density
     real(kind=r_def) :: answer
-    real(kind=r_def), parameter :: tol = 1.0e-14
+    real(kind=r_def), parameter :: tol = 1.0e-14_r_def
 
     xyz = (/ 0.0_r_def, 0.0_r_def, 3000.0_r_def /)
     call reference_profile(pressure, density, temperature, xyz, test_cold_bubble_x)

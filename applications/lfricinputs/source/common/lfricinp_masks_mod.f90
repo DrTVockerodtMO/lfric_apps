@@ -93,7 +93,7 @@ ELSE
   DO i = 1, dim_1d
     lfric_land_mask(i) = .FALSE.
     IF (local_mesh%get_cell_owner(i) == local_rank ) THEN
-      IF (ancil_field_proxy%data(i) > 0.0) THEN
+      IF (ancil_field_proxy%data(i) > 0.0_real64) THEN
         lfric_land_mask(i) = .TRUE.
       END IF
     END IF
@@ -104,7 +104,7 @@ ELSE
   DO i = 1, dim_1d
     lfric_maritime_mask(i) = .FALSE.
     IF (local_mesh%get_cell_owner(i) == local_rank ) THEN
-      IF (ancil_field_proxy%data(i) < 1.0) THEN
+      IF (ancil_field_proxy%data(i) < 1.0_real64) THEN
         lfric_maritime_mask(i) = .TRUE.
       END IF
     END IF
@@ -119,11 +119,11 @@ ELSE
   !
   ! Set up UM logical land mask
   ALLOCATE(um_land_mask(dim_2dx,dim_2dy))
-  um_land_mask = (um_input_fields(1)%rdata > 0.0)
+  um_land_mask = (um_input_fields(1)%rdata > 0.0_real64)
   !
   ! Set up UM logical maritime mask
   ALLOCATE(um_maritime_mask(dim_2dx,dim_2dy))
-  um_maritime_mask = (um_input_fields(1)%rdata < 1.0)
+  um_maritime_mask = (um_input_fields(1)%rdata < 1.0_real64)
 
 END IF
 

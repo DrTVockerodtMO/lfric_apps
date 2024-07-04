@@ -80,7 +80,7 @@ contains
                                   ndata,                     &
                                   ndf_w3, undf_w3, map_w3(:,cell) )
 
-    answer = 26.85
+    answer = 26.85_r_def
     @assertEqual( answer, celsius_data(map_w3(1,cell)), tol )
 
     deallocate( kelvin_data )

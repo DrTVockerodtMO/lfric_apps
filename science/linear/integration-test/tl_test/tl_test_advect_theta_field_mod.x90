@@ -152,8 +152,8 @@ module tl_test_advect_theta_field_mod
     call transport_field( ls_theta_np1, ls_theta, cast_dt, transport_metadata )
     call invoke( X_minus_Y( n1_advection_inc, ls_theta_np1, ls_theta ) )
 
-    gamma_u = 1.e8
-    gamma_theta = 1.e2
+    gamma_u = 1.e8_r_def
+    gamma_theta = 1.e2_r_def
     do n=1,2
       gamma_u = gamma_u / 2.0_r_def
       gamma_theta = gamma_theta / 2.0_r_def

@@ -391,7 +391,7 @@ contains
     else
       varalpha = alpha
     end if
-    varbeta = 1.0 - varalpha
+    varbeta = 1.0_r_def - varalpha
 
     !--------------------------------------------------------------------
     ! Copy prognostic field data to state arrays

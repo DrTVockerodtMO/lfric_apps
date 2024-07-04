@@ -54,7 +54,7 @@ CASE (stashcode_v)
                                    "wind on W2H function space"
     CALL log_event(log_scratch_space, LOG_LEVEL_INFO)
     ! Switch sign of data, but leave RMDI values unchanged
-    field(:,:) = field(:,:) * MERGE(-1.0, 1.0, field /= um_rmdi)
+    field(:,:) = field(:,:) * MERGE(-1.0_real64, 1.0_real64, field /= um_rmdi)
   END IF
 END SELECT
 

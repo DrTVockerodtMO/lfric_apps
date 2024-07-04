@@ -410,10 +410,10 @@ ALLOCATE(grid_u_to_w2h_map % remap_matrix(num_wgts, num_links_u))
 ALLOCATE(grid_v_to_w2h_map % remap_matrix(num_wgts, num_links_v))
 DO wgt = 1, num_wgts
   DO lnk = 1, num_links_u
-    grid_u_to_w2h_map % remap_matrix(wgt, lnk) = 1.0
+    grid_u_to_w2h_map % remap_matrix(wgt, lnk) = 1.0_real64
   END DO
   DO lnk = 1, num_links_v
-    grid_v_to_w2h_map % remap_matrix(wgt, lnk) = 1.0
+    grid_v_to_w2h_map % remap_matrix(wgt, lnk) = 1.0_real64
   END DO
 END DO
 

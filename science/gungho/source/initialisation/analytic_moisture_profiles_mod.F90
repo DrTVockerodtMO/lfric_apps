@@ -83,7 +83,7 @@ function analytic_moisture(chi, temperature, pressure, choice) result(moisture)
     r2 = 200.0_r_def  ! inner radius of bubble
     h0 = 0.2_r_def    ! background relative humidity
 
-    r = sqrt((chi(1)-xc)**2.0 + (chi(3)-zc)**2.0)
+    r = sqrt((chi(1)-xc)**2.0_r_def + (chi(3)-zc)**2.0_r_def)
     if ( r <= r2 ) then
       rel_hum = 1.0_r_def
     else if ( r <= r1 ) then
