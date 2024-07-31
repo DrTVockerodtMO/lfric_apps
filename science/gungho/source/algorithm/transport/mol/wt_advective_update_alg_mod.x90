@@ -430,13 +430,17 @@ contains
   !> @brief Compute the horizontal advective update of a Wtheta field.
   !> @param[in,out] u_grad_f            Horizontal part of u.grad(f)
   !> @param[in]     wind                Advecting wind field
+  !> @param[in]     wind_dir            Wind field to determine direction in kernel,
+  !>                                    equal to wind when used in gungho
+  !>                                    but ls_wind when used in the linear model
   !> @param[in]     field               Wtheta field to advect
   !> @param[in]     transport_metadata  Contains transport configuration options
-  subroutine hori_wt_update_alg(u_grad_f, wind, field, transport_metadata)
+  subroutine hori_wt_update_alg(u_grad_f, wind, wind_dir, field, transport_metadata)
 
     implicit none
 
     type(r_tran_field_type),       intent(in)    :: wind
+    type(r_tran_field_type),       intent(in)    :: wind_dir
     type(r_tran_field_type),       intent(in)    :: field
     type(r_tran_field_type),       intent(inout) :: u_grad_f
     type(transport_metadata_type), intent(in)    :: transport_metadata
@@ -531,11 +535,12 @@ contains
     end if
 
 
-     call invoke( name="poly_update",                           &
-                  poly_adv_update_kernel_type(u_grad_f,         &
-                                              h_reconstruction, &
-                                              stencil_extent,   &
-                                              wind, stencil_extent))
+     call invoke( name="poly_update",                               &
+                  poly_adv_update_kernel_type(u_grad_f,             &
+                                              h_reconstruction,     &
+                                              stencil_extent,       &
+                                              wind, stencil_extent, &
+                                              wind_dir))
 
     nullify( adv_coeffs, multidata_fs,    &
              ndata_h,                     &
@@ -703,7 +708,7 @@ contains
         wind_v => transport_runtime%get_vertical_advecting_wind(mesh%get_id())
 
         ! Horizontal update
-        call hori_wt_update_alg(u_grad_f, wind_h, adv_field, transport_metadata)
+        call hori_wt_update_alg(u_grad_f, wind_h, wind_h, adv_field, transport_metadata)
 
         ! TODO #3325: Make consistent wind belong to transport_runtime thing
         if ( consistent_metric ) then
@@ -716,7 +721,7 @@ contains
           call consistent_wind%initialise( wind_v%get_function_space() )
           call invoke( setval_c(u_grad_z, 0.0_r_def), &
                        setval_X(consistent_wind, wind_v) )
-          call hori_wt_update_alg(u_grad_z, wind_h, height, transport_metadata)
+          call hori_wt_update_alg(u_grad_z, wind_h, wind_h, height, transport_metadata)
           call invoke( consistent_wind_kernel_type(consistent_wind, wind, &
                                                    u_grad_z, chi(3)) )
           ! Then vertical update uses consistent wind
@@ -731,7 +736,7 @@ contains
         end if
 
       case ( direction_h )
-        call hori_wt_update_alg(u_grad_f, wind, adv_field, transport_metadata)
+        call hori_wt_update_alg(u_grad_f, wind, wind, adv_field, transport_metadata)
 
       case ( direction_v )
         call vert_wt_update_alg(u_grad_f, wind, adv_field, &

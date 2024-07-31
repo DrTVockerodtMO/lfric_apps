@@ -104,16 +104,17 @@ subroutine horizontal_mass_flux_code( nlayers,        &
   ! Reconstruction is stored on a layer first multidata field
   ! with index for face f = (1,2,3,4) = (W,S,E,N): map_md(1) + (f-1)*nlayers + k
   ! each cell contains the values for when it is the upwind cell for each edge
-  ! so if u.n >= 0 then we set the flux to be the value on this edge from this cell
+  ! so if u.n > 0 then we set the flux to be the value on this edge from this cell
   ! and if u.n < 0 then the flux will be set by a
   ! neighbouring cell
   do df = 1,nfaces
     do k = 0, nlayers-1
       direction = wind(map_w2(df) + k)*v_dot_n(df)
-      if ( direction >= 0.0_r_tran ) then
+      if ( direction > 0.0_r_tran ) then
         ! Take value on edge from this column
         ijp = map_md(1) + (df-1)*nlayers
-        mass_flux( map_w2(df) + k) = reconstruction(ijp + k)*wind(map_w2(df)+k)
+        mass_flux( map_w2(df) + k) = mass_flux( map_w2(df) + k) + &
+                                     reconstruction(ijp + k)*wind(map_w2(df)+k)
       end if
     end do
   end do

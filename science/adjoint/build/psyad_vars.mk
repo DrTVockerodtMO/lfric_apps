@@ -4,7 +4,6 @@
 # under which the code may be used.
 ##############################################################################
 # Active variables
-all: export ACTIVE_tl_poly_advective_kernel_mod            := advective dtdx dtdy v u tracer wind
 all: export ACTIVE_tl_poly1d_vert_adv_kernel_mod           := advective wind dpdz tracer
 all: export ACTIVE_tl_vorticity_advection_kernel_mod       := r_u wind vorticity vorticity_at_quad \
                                                               u_at_quad j_vorticity vorticity_term \

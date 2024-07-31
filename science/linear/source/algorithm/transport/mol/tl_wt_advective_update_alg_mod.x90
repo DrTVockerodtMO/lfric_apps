@@ -36,7 +36,6 @@ module tl_wt_advective_update_alg_mod
                                                 consistent_metric
   use log_mod,                            only: log_event,         &
                                                 LOG_LEVEL_ERROR
-  use tl_poly_advective_kernel_mod,       only: tl_poly_advective_kernel_type
   use tl_poly1d_vert_adv_kernel_mod,      only: tl_poly1d_vert_adv_kernel_type
   use transport_enumerated_types_mod,     only: direction_v,                  &
                                                 direction_h,                  &
@@ -124,9 +123,8 @@ contains
         ls_wind_v => transport_runtime%get_vertical_advecting_wind(mesh%get_id())
 
         ! Horizontal update
-        ! TODO: we may need a special tl_hori_wt_update
-        call hori_wt_update_alg(u_grad_f, ls_wind_h, adv_field, transport_metadata)
-        call hori_wt_update_alg(u_grad_f, wind_h, ls_adv_field, transport_metadata)
+        call hori_wt_update_alg(u_grad_f, ls_wind_h, ls_wind_h, adv_field, transport_metadata)
+        call hori_wt_update_alg(u_grad_f, wind_h, ls_wind_h, ls_adv_field, transport_metadata)
 
         if ( consistent_metric ) then
           call log_event( "TL: consistent metric not implemented", LOG_LEVEL_ERROR )
@@ -139,20 +137,8 @@ contains
         nullify( wind_h, wind_v, ls_wind_h, ls_wind_v, transport_runtime )
 
       case ( direction_h )
-        ! TODO: we may need a special tl_hori_wt_update
-        call hori_wt_update_alg(u_grad_f, ls_wind, adv_field, transport_metadata)
-        call hori_wt_update_alg(u_grad_f, wind, ls_adv_field, transport_metadata)
-
-        ! TODO: Otherwise can remove the tl_poly_advective_kernel_type?
-        ! This is temporarily preserved in the comments
-        ! call horizontal_wt_reconstruct_alg(h_reconstruction, ls_wind, adv_field)
-        ! call horizontal_wt_reconstruct_alg(ls_h_reconstruction, ls_wind, ls_adv_field)
-        ! ! Combine to get horizontal part of ls_u.grad(f) + u.grad(ls_f)
-        ! call invoke( tl_poly_advective_kernel_type( u_grad_f,         &
-        !                                             wind,             &
-        !                                             h_reconstruction, &
-        !                                             ls_wind,          &
-        !                                             ls_h_reconstruction) )
+        call hori_wt_update_alg(u_grad_f, ls_wind, ls_wind, adv_field, transport_metadata)
+        call hori_wt_update_alg(u_grad_f, wind, ls_wind, ls_adv_field, transport_metadata)
 
       case ( direction_v )
         call tl_vert_wt_update_alg(u_grad_f, wind, adv_field, &

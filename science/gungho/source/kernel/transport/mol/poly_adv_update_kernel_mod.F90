@@ -34,10 +34,11 @@ private
 !> The type declaration for the kernel. Contains the metadata needed by the PSy layer
 type, public, extends(kernel_type) :: poly_adv_update_kernel_type
   private
-  type(arg_type) :: meta_args(3) = (/                                                          &
+  type(arg_type) :: meta_args(4) = (/                                                          &
        arg_type(GH_FIELD,  GH_REAL,    GH_WRITE, Wtheta),                                      &
        arg_type(GH_FIELD,  GH_REAL,    GH_READ,  ANY_DISCONTINUOUS_SPACE_1, STENCIL(CROSS2D)), &
-       arg_type(GH_FIELD,  GH_REAL,    GH_READ,  W2, STENCIL(CROSS2D))                         &
+       arg_type(GH_FIELD,  GH_REAL,    GH_READ,  W2, STENCIL(CROSS2D)),                        &
+       arg_type(GH_FIELD,  GH_REAL,    GH_READ,  W2)                                           &
        /)
   integer :: operates_on = CELL_COLUMN
 contains
@@ -66,6 +67,9 @@ contains
 !> @param[in]     smap_w2_size   Size of the w2stencil map in each direction
 !> @param[in]     smap_w2_max    Maximum size of the w2 stencil map
 !> @param[in]     smap_w2        Stencil map for the w2 fields
+!> @param[in]     wind_dir       Wind field used to determine direction,
+!>                               equal to wind when used in gungho
+!>                               but ls_wind when used in the linear model
 !> @param[in]     ndf_wt         Number of degrees of freedom per cell
 !> @param[in]     undf_wt        Number of unique degrees of freedom for the advective field
 !> @param[in]     map_wt         Dofmap for the cell at the base of the column
@@ -86,6 +90,7 @@ subroutine poly_adv_update_code( nlayers,                &
                                  smap_w2_size,           &
                                  smap_w2_max,            &
                                  smap_w2,                &
+                                 wind_dir,               &
                                  ndf_wt,                 &
                                  undf_wt,                &
                                  map_wt,                 &
@@ -120,6 +125,7 @@ subroutine poly_adv_update_code( nlayers,                &
   real(kind=r_tran), dimension(undf_wt), intent(inout) :: advective
   real(kind=r_tran), dimension(undf_md), intent(in)    :: reconstruction
   real(kind=r_tran), dimension(undf_w2), intent(in)    :: wind
+  real(kind=r_tran), dimension(undf_w2), intent(in)    :: wind_dir
 
   ! Internal variables
   integer(kind=i_def)                      :: k, df, ijp, df1, df2
@@ -129,6 +135,7 @@ subroutine poly_adv_update_code( nlayers,                &
   real(kind=r_tran), dimension(nfaces)      :: v_dot_n
   real(kind=r_tran), dimension(4,0:nlayers) :: tracer
   real(kind=r_tran), dimension(2,0:nlayers) :: uv
+  real(kind=r_tran), dimension(2,0:nlayers) :: uv_dir
   real(kind=r_tran)                         :: dtdx, dtdy
 
   integer(kind=i_def), dimension(nfaces) :: opposite
@@ -166,15 +173,23 @@ subroutine poly_adv_update_code( nlayers,                &
   k = 0
   uv(1,k) = 0.25_r_tran*( wind(map_w2(1)) + wind(map_w2(3)) )
   uv(2,k) = 0.25_r_tran*( wind(map_w2(2)) + wind(map_w2(4)) )
+  uv_dir(1,k) = 0.25_r_tran*( wind_dir(map_w2(1)) + wind_dir(map_w2(3)) )
+  uv_dir(2,k) = 0.25_r_tran*( wind_dir(map_w2(2)) + wind_dir(map_w2(4)) )
   do k = 1, nlayers-1
     uv(1,k) = 0.25_r_tran*( wind(map_w2(1) + k - 1 ) + wind(map_w2(1) + k ) &
                          + wind(map_w2(3) + k - 1 ) + wind(map_w2(3) + k ) )
     uv(2,k) = 0.25_r_tran*( wind(map_w2(2) + k - 1 ) + wind(map_w2(2) + k ) &
                          + wind(map_w2(4) + k - 1 ) + wind(map_w2(4) + k ) )
+    uv_dir(1,k) = 0.25_r_tran*( wind_dir(map_w2(1) + k - 1 ) + wind_dir(map_w2(1) + k ) &
+                         + wind_dir(map_w2(3) + k - 1 ) + wind_dir(map_w2(3) + k ) )
+    uv_dir(2,k) = 0.25_r_tran*( wind_dir(map_w2(2) + k - 1 ) + wind_dir(map_w2(2) + k ) &
+                         + wind_dir(map_w2(4) + k - 1 ) + wind_dir(map_w2(4) + k ) )
   end do
   k = nlayers
   uv(1,k) = 0.25_r_tran*( wind(map_w2(1) + k - 1) + wind(map_w2(3) + k - 1) )
   uv(2,k) = 0.25_r_tran*( wind(map_w2(2) + k - 1) + wind(map_w2(4) + k - 1) )
+  uv_dir(1,k) = 0.25_r_tran*( wind_dir(map_w2(1) + k - 1) + wind_dir(map_w2(3) + k - 1) )
+  uv_dir(2,k) = 0.25_r_tran*( wind_dir(map_w2(2) + k - 1) + wind_dir(map_w2(4) + k - 1) )
 
   ! Horizontal advective update
   ! Reconstruction is stored on a layer first multidata field
@@ -186,7 +201,7 @@ subroutine poly_adv_update_code( nlayers,                &
   direction_dofs = (/ 1, 2, 1, 2 /)
   do df = 1,nfaces
     do k = 0, nlayers
-      direction = uv(direction_dofs(df),k)*v_dot_n(df)
+      direction = uv_dir(direction_dofs(df),k)*v_dot_n(df)
       if ( direction > 0.0_r_tran .or. missing_neighbour(df) ) then
         ! Take value on edge from this column
         ijp = map_md(1) + (df-1)*(nlayers+1)

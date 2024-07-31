@@ -78,6 +78,7 @@ contains
     ! Internal variables
     type(field_type)             :: adv_inc_1, adv_inc_2
     type(field_type)             :: mass_flux_1, mass_flux_2
+    type(field_type)             :: reversed_ls_wind
     type(mesh_type),     pointer :: mesh => null()
     integer(kind=i_def)                :: ndata
     type(function_space_type), pointer :: recon_fs => null()
@@ -134,10 +135,22 @@ contains
           call mass_flux_1%initialise( wind%get_function_space() )
           call mass_flux_2%initialise( wind%get_function_space() )
           if ( do_horizontal ) then
-            call invoke( horizontal_mass_flux_kernel_type(mass_flux_1, ls_wind,          &
-                                                          reconstruction_field),         &
-                         tl_horizontal_mass_flux_kernel_type(mass_flux_2, ls_wind, wind, &
-                                                             ls_reconstruction_field) )
+            ! To properly initialise mass_flux_2, we need to call kernel twice -
+            ! once with the usual ls_wind to determine direction, another with the
+            ! reversed direction. We initialise mass_flux_2 with the average of the
+            ! upwind and downwind reconstructions, so that the result tends to this value 
+            ! as ls_wind tends to zero.
+            call reversed_ls_wind%initialise( ls_wind%get_function_space() )
+            call invoke( setval_c(mass_flux_1, 0.0_r_def),                                        &
+                         setval_c(mass_flux_2, 0.0_r_def),                                        &
+                         a_times_X(reversed_ls_wind, -1.0_r_def, ls_wind),                        &
+                         horizontal_mass_flux_kernel_type(mass_flux_1, ls_wind,                   &
+                                                          reconstruction_field),                  &
+                         tl_horizontal_mass_flux_kernel_type(mass_flux_2, ls_wind, wind,          &
+                                                             ls_reconstruction_field),            &
+                         tl_horizontal_mass_flux_kernel_type(mass_flux_2, reversed_ls_wind, wind, &
+                                                             ls_reconstruction_field),            &
+                         inc_a_times_X(0.5_r_def, mass_flux_2) )
           end if
           if ( do_vertical ) then
             call invoke( vertical_mass_flux_kernel_type(mass_flux_1, ls_wind,           &

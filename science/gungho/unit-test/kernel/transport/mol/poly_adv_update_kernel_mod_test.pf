@@ -57,6 +57,7 @@ contains
     real(r_def), dimension(undf_wt) :: advective
     real(r_def), dimension(undf_md) :: tracer
     real(r_def), dimension(undf_w2) :: wind
+    real(r_def), dimension(undf_w2) :: wind_dir
 
     integer(i_def) :: df, k
 
@@ -86,6 +87,7 @@ contains
     smap_w2(2,2,4) = map_w2(4)
 
     wind(:) = u0
+    wind_dir(:) = wind(:)
 
     do df = 1,undf_md
       tracer(df) = 300.0_r_def + real(df,r_def)
@@ -101,6 +103,7 @@ contains
                                smap_w2_size, &
                                smap_w2_max,  &
                                smap_w2,      &
+                               wind_dir,     &
                                ndf_wt,       &
                                undf_wt,      &
                                map_wt,       &
