@@ -21,18 +21,13 @@
 !       contact darth@metofice.gov.uk for advice.
 program jedi_tlm_forecast_tl
 
-  use constants_mod,           only : PRECISION_REAL, i_def
-  use log_mod,                 only : log_event, log_scratch_space, &
-                                      LOG_LEVEL_ALWAYS
-  use field_collection_mod,    only : field_collection_type
-
-  ! Data types and methods to get/store configurations
-  use jedi_state_config_mod,        only : jedi_state_config_type
-  use jedi_pseudo_model_config_mod, only : jedi_pseudo_model_config_type
-  use jedi_increment_config_mod,    only : jedi_increment_config_type
-  use jedi_linear_model_config_mod, only : jedi_linear_model_config_type
-  use jedi_geometry_config_mod,     only : jedi_geometry_config_type
   use cli_mod,                      only : get_initial_filename
+  use constants_mod,                only : PRECISION_REAL, i_def, str_def
+  use field_collection_mod,         only : field_collection_type
+  use log_mod,                      only : log_event, log_scratch_space, &
+                                           LOG_LEVEL_ALWAYS
+  use namelist_collection_mod,      only : namelist_collection_type
+  use namelist_mod,                 only : namelist_type
 
   ! Jedi emulator objects
   use jedi_checksum_mod,            only : output_checksum
@@ -56,20 +51,16 @@ program jedi_tlm_forecast_tl
   type( jedi_run_type )                 :: jedi_run
   type( jedi_post_processor_traj_type ) :: pp_traj
 
-  ! Emulator object configs
-  type( jedi_state_config_type )        :: jedi_state_config
-  type( jedi_increment_config_type )    :: jedi_increment_config
-  type( jedi_pseudo_model_config_type ) :: jedi_pseudo_model_config
-  type( jedi_linear_model_config_type ) :: jedi_linear_model_config
-  type( jedi_geometry_config_type )     :: jedi_geometry_config
-
-  type(jedi_duration_type)              :: forecast_length
-
   ! Local
-  character(:),              allocatable :: filename
-  integer( kind=i_def )                  :: model_communicator
-  character(*),                parameter :: program_name = "jedi_tlm_forecast_tl"
-  type( field_collection_type ), pointer :: depository => null()
+  type( namelist_collection_type ), pointer :: configuration
+  character(:),                 allocatable :: filename
+  integer( kind=i_def )                     :: model_communicator
+  type( field_collection_type ),    pointer :: depository => null()
+  type( jedi_duration_type )                :: forecast_length
+  type( namelist_type ),            pointer :: jedi_lfric_settings_config
+  character( str_def )                      :: forecast_length_str
+
+  character(*), parameter :: program_name = "jedi_tlm_forecast_tl"
 
   call log_event( 'Running ' // program_name // ' ...', LOG_LEVEL_ALWAYS )
   write(log_scratch_space,'(A)')                        &
@@ -88,43 +79,30 @@ program jedi_tlm_forecast_tl
 
   ! Initialize LFRic infrastructure
   call jedi_run%initialise_infrastructure( filename, model_communicator )
+  configuration => jedi_run%get_configuration()
 
-  ! Configuration for the jedi emulator objects
-  ! State configuration
-  call jedi_state_config%initialise( use_pseudo_model = .true. )
-
-  ! Increment configuration
-  call jedi_increment_config%initialise()
-
-  ! Linear Model configuration
-  call jedi_linear_model_config%initialise( filename )
-
-  ! Model configuration
-  call jedi_pseudo_model_config%initialise()
-
-  ! Geometry configuration
-  call jedi_geometry_config%initialise( filename )
-
-  ! Forecast configuration - Set the forecast length to be 6 hrs
-  call forecast_length%init( 'P0DT6H0M0S' )
+  ! Get the forecast length
+  jedi_lfric_settings_config => configuration%get_namelist('jedi_lfric_settings')
+  call jedi_lfric_settings_config%get_value( 'forecast_length', forecast_length_str )
+  call forecast_length%init(forecast_length_str)
 
   ! Create geometry
-  call jedi_geometry%initialise( model_communicator, jedi_geometry_config )
+  call jedi_geometry%initialise( model_communicator, configuration )
 
   ! Create state
-  call jedi_state%initialise( jedi_geometry, jedi_state_config )
+  call jedi_state%initialise( jedi_geometry, configuration )
 
   ! Create increment
-  call jedi_increment%initialise( jedi_geometry, jedi_increment_config )
+  call jedi_increment%initialise( jedi_geometry, configuration )
 
   ! Create linear model
-  call jedi_linear_model%initialise( jedi_geometry, jedi_linear_model_config )
+  call jedi_linear_model%initialise( jedi_geometry, filename )
 
   ! Initialise trajectory post processor with instance of jedi_linear_model
   call pp_traj%initialise( jedi_linear_model )
 
   ! Create non-linear model
-  call jedi_psuedo_model%initialise( jedi_pseudo_model_config )
+  call jedi_psuedo_model%initialise( configuration )
 
   ! Run non-linear model forecast to populate the trajectory object
   call jedi_psuedo_model%forecast( jedi_state, forecast_length, pp_traj )

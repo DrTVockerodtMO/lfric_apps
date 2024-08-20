@@ -45,12 +45,11 @@ contains
   !> @param [in]    mpi           The mpi communicator
   !> @param [in]    file_meta     The file meta data
   !> @param [in]    mesh_name     The name of the mesh
-  !> @param [in]    configuration The LFRic namelist object
   !> @param [in]    calendar      The model calendar
   !> @param [inout] io_context  The LFRic context object
   !> @param [inout] model_clock   The model clock
   subroutine initialise_io( context_name, mpi, file_meta, mesh_name, &
-                            configuration, calendar, io_context, model_clock )
+                            calendar, io_context, model_clock )
 
     implicit none
 
@@ -58,7 +57,6 @@ contains
     class(mpi_type),                        intent(in) :: mpi
     type(jedi_lfric_file_meta_type),        intent(in) :: file_meta(:)
     character(len=*),                       intent(in) :: mesh_name
-    type(namelist_collection_type),         intent(in) :: configuration
     class(calendar_type),                   intent(in) :: calendar
     class(io_context_type), allocatable, intent(inout) :: io_context
     type(model_clock_type),              intent(inout) :: model_clock
@@ -69,10 +67,8 @@ contains
     type(mesh_type), pointer     :: mesh
     type(field_type), pointer    :: chi(:)
     type(field_type), pointer    :: panel_id
-    type(namelist_type), pointer :: io_nml
-    logical                      :: use_xios_io
 
-    nullify(mesh, chi, panel_id, io_nml)
+    nullify(mesh, chi, panel_id)
 
     ! Create FEM specifics (function spaces and chi field)
     call init_fem( mesh_collection, chi_inventory, panel_id_inventory )
@@ -83,11 +79,8 @@ contains
     call panel_id_inventory%get_field( mesh, panel_id )
 
     ! Initialise I/O context and setup file to use
-    io_nml => configuration%get_namelist('io')
-    call io_nml%get_value( 'use_xios_io', use_xios_io )
-
-    call init_io( context_name, mpi%get_comm(), file_meta, use_xios_io, &
-                  calendar, io_context, chi, panel_id, model_clock )
+    call init_io( context_name, mpi%get_comm(), file_meta, calendar, &
+                  io_context, chi, panel_id, model_clock )
 
     ! Do initial step
     if ( model_clock%is_initialisation() ) then
@@ -110,7 +103,6 @@ contains
   !> @param[in] context_name  A string identifier for the context
   !> @param[in] communicator  The ID for the model MPI communicator
   !> @param[in] file_meta     The file meta data
-  !> @param[in] use_xios_io   Is true when using xios
   !> @param[in] calendar      The model calendar
   !> @param[in] io_context    The LFRic context object
   !> @param[in] chi           The model's coordinate fields
@@ -121,7 +113,6 @@ contains
   subroutine init_io( context_name,  &
                       communicator,  &
                       file_meta,     &
-                      use_xios_io,   &
                       calendar,      &
                       io_context,    &
                       chi,           &
@@ -134,7 +125,6 @@ contains
     character(*),                           intent(in) :: context_name
     integer(i_def),                         intent(in) :: communicator
     type(jedi_lfric_file_meta_type),        intent(in) :: file_meta(:)
-    logical,                                intent(in) :: use_xios_io
     class(calendar_type),                   intent(in) :: calendar
     class(io_context_type), allocatable, intent(inout) :: io_context
     type(field_type),                       intent(in) :: chi(:)
@@ -147,48 +137,34 @@ contains
     integer(i_def) :: rc
     type(linked_list_type), pointer :: file_list
 
-    ! Allocate XIOS IO context type based on model configuration
-    if ( use_xios_io ) then
-#ifdef USE_XIOS
-      if (present(before_close)) then
-        before_close_ptr => before_close
-      end if
-
-      allocate( lfric_xios_context_type::io_context, stat=rc )
-      if (rc /= 0) then
-        call log_event( "Unable to allocate LFRic-XIOS context object", &
-                        log_level_error )
-      end if
-
-      ! Select the lfric_xios_context_type
-      select type(io_context)
-      type is (lfric_xios_context_type)
-
-        ! Populate list of I/O files if procedure passed through
-        file_list => io_context%get_filelist()
-        call jedi_lfric_init_files(file_list, file_meta)
-
-        call io_context%set_timer_flag(subroutine_timers)
-
-        ! Setup the context
-        call io_context%initialise( context_name )
-        call io_context%initialise_xios_context( communicator,          &
-                                                 chi, panel_id,         &
-                                                 model_clock, calendar, &
-                                                 before_close_ptr )
-      end select
-
-#else
-      call log_event( "Cannot use XIOS I/O: application has not been built with " // &
-                      "enabled", log_level_error )
-#endif
-    else
-      allocate( empty_io_context_type::io_context, stat=rc )
-      if (rc /= 0) then
-        call log_event( "Unable to allocate empty context object", &
-                        log_level_error )
-      end if
+    ! Allocate XIOS IO context types
+    if (present(before_close)) then
+      before_close_ptr => before_close
     end if
+
+    allocate( lfric_xios_context_type::io_context, stat=rc )
+    if (rc /= 0) then
+      call log_event( "Unable to allocate LFRic-XIOS context object", &
+                      log_level_error )
+    end if
+
+    ! Select the lfric_xios_context_type
+    select type(io_context)
+    type is (lfric_xios_context_type)
+
+      ! Populate list of I/O files if procedure passed through
+      file_list => io_context%get_filelist()
+      call jedi_lfric_init_files(file_list, file_meta)
+
+      call io_context%set_timer_flag(subroutine_timers)
+
+      ! Setup the context
+      call io_context%initialise( context_name )
+      call io_context%initialise_xios_context( communicator,          &
+                                               chi, panel_id,         &
+                                               model_clock, calendar, &
+                                               before_close_ptr )
+    end select
 
   end subroutine init_io
 

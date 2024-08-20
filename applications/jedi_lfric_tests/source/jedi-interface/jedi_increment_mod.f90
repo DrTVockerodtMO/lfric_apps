@@ -13,22 +13,24 @@
 !>          JEDI fields (Atlas fields here).
 module jedi_increment_mod
 
-  use, intrinsic :: iso_fortran_env, only : real64
-  use atlas_field_emulator_mod,      only : atlas_field_emulator_type
-  use atlas_field_interface_mod,     only : atlas_field_interface_type
-  use io_context_mod,                only : io_context_type
-  use jedi_lfric_datetime_mod,       only : jedi_datetime_type
-  use jedi_lfric_duration_mod,       only : jedi_duration_type
-  use jedi_geometry_mod,             only : jedi_geometry_type
-  use jedi_increment_config_mod,     only : jedi_increment_config_type
-  use jedi_lfric_field_meta_mod,     only : jedi_lfric_field_meta_type
-  use field_collection_mod,          only : field_collection_type
-  use log_mod,                       only : log_event,          &
-                                            log_scratch_space,  &
-                                            LOG_LEVEL_INFO,     &
-                                            LOG_LEVEL_ERROR
-  use constants_mod,                 only : i_def, l_def, str_def
-  use model_clock_mod,               only : model_clock_type
+  use, intrinsic :: iso_fortran_env,  only : real64
+  use atlas_field_emulator_mod,       only : atlas_field_emulator_type
+  use atlas_field_interface_mod,      only : atlas_field_interface_type
+  use constants_mod,                  only : i_def, l_def, str_def
+  use field_collection_mod,           only : field_collection_type
+  use io_context_mod,                 only : io_context_type
+  use jedi_geometry_mod,              only : jedi_geometry_type
+  use jedi_lfric_datetime_mod,        only : jedi_datetime_type
+  use jedi_lfric_duration_mod,        only : jedi_duration_type
+  use jedi_lfric_field_meta_mod,      only : jedi_lfric_field_meta_type
+  use jedi_setup_field_meta_data_mod, only : setup_field_meta_data
+  use log_mod,                        only : log_event,          &
+                                             log_scratch_space,  &
+                                             LOG_LEVEL_INFO,     &
+                                             LOG_LEVEL_ERROR
+  use model_clock_mod,                only : model_clock_type
+  use namelist_collection_mod,        only : namelist_collection_type
+  use namelist_mod,                   only : namelist_type
 
   implicit none
 
@@ -114,17 +116,23 @@ contains
 !> @param [in] config   The configuration object including the required
 !>                      information to construct a increment and read a file to
 !>                      initialise the fields
-subroutine increment_initialiser_zero( self, geometry, config )
+subroutine increment_initialiser_zero( self, geometry, configuration )
 
   implicit none
 
   class( jedi_increment_type ),       intent(inout) :: self
-  type( jedi_geometry_type ), target,    intent(in) :: geometry
-  type( jedi_increment_config_type ), intent(inout) :: config
+  type( jedi_geometry_type ), target, intent(in)    :: geometry
+  type( namelist_collection_type ),   intent(in)    :: configuration
+
+  ! Local
+  type( namelist_type ), pointer :: jedi_increment_config
+
+  jedi_increment_config => configuration%get_namelist('jedi_increment')
 
   ! Create
-  call self%increment_initialiser( geometry, config )
-  ! init fields
+  call self%increment_initialiser( geometry, jedi_increment_config )
+
+  ! Initialise fields
   call self%zero()
 
 end subroutine increment_initialiser_zero
@@ -142,20 +150,26 @@ subroutine increment_initialiser( self, geometry, config )
 
   class( jedi_increment_type ),       intent(inout) :: self
   type( jedi_geometry_type ), target,    intent(in) :: geometry
-  type( jedi_increment_config_type ), intent(inout) :: config
+  type( namelist_type ), pointer,     intent(inout) :: config
 
   ! Local
-  integer(i_def) :: n_horizontal
-  integer(i_def) :: n_levels
-  integer(i_def) :: n_layers
-  integer(i_def) :: ivar
-  integer(i_def) :: n_variables
-  integer(i_def) :: fs_id
-  logical(l_def) :: twod_field
+  integer(i_def)                  :: n_horizontal
+  integer(i_def)                  :: n_levels
+  integer(i_def)                  :: n_layers
+  integer(i_def)                  :: ivar
+  integer(i_def)                  :: n_variables
+  integer(i_def)                  :: fs_id
+  logical(l_def)                  :: twod_field
+  character(str_def)              :: inc_time
+  character(str_def), allocatable :: variables(:)
 
   ! Setup
-  self%field_meta_data = config%field_meta_data
-  self%inc_time = config%inc_time
+  call config%get_value( 'inc_time', inc_time )
+  call self%inc_time%init( inc_time )
+
+  call config%get_value( 'variables', variables )
+  call setup_field_meta_data( self%field_meta_data, variables )
+
   self%geometry => geometry
   n_variables = self%field_meta_data%get_n_variables()
 
@@ -214,8 +228,7 @@ end function valid_time
 !> @brief    A method to update the internal Atlas field emulators
 !>
 !> @param [in] read_time   The data datetime to be read
-!> @param [in] file_prefix Character array that specifies the file to read from
-subroutine read_file( self, read_time, file_prefix )
+subroutine read_file( self, read_time )
 
   use jedi_lfric_io_update_mod,      only : update_io_field_collection
   use lfric_xios_read_mod,           only : read_state
@@ -224,9 +237,9 @@ subroutine read_file( self, read_time, file_prefix )
 
   class( jedi_increment_type ), intent(inout) :: self
   type( jedi_datetime_type ),      intent(in) :: read_time
-  character(len=*),                intent(in) :: file_prefix
 
   ! Local
+  character( len=* ),         parameter :: file_prefix="read_inc_"
   character( len=str_def ), allocatable :: variable_names(:)
   class( io_context_type ),     pointer :: context_ptr
 

@@ -11,7 +11,6 @@
         "jedi_lfric_tests_nwp_gal9-C12_gadi_intel_fast-debug-64bit",
         "jedi_lfric_tests_runge-kutta-C12_gadi_intel_fast-debug-64bit",
         "jedi_lfric_tests_forecast_default-C12_gadi_intel_fast-debug-64bit",
-        "jedi_lfric_tests_forecast_no_xios-C12_gadi_intel_fast-debug-64bit",
         "jedi_lfric_tests_forecast_pseudo_default-C12_gadi_intel_fast-debug-64bit",
         "jedi_lfric_tests_forecast_pseudo_pseudomodel-C12_gadi_intel_fast-debug-64bit",
         "jedi_lfric_tests_tlm_forecast_tl_default-C12_gadi_intel_fast-debug-64bit",

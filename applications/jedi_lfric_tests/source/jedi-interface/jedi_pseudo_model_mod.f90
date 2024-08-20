@@ -16,9 +16,11 @@ module jedi_pseudo_model_mod
   use jedi_lfric_datetime_mod,       only : jedi_datetime_type
   use jedi_lfric_duration_mod,       only : jedi_duration_type
   use jedi_state_mod,                only : jedi_state_type
-  use log_mod,                       only : log_event,          &
-                                            log_scratch_space,  &
+  use log_mod,                       only : log_event,         &
+                                            log_scratch_space, &
                                             LOG_LEVEL_ERROR
+  use namelist_collection_mod,       only : namelist_collection_type
+  use namelist_mod,                  only : namelist_type
 
   implicit none
 
@@ -33,8 +35,6 @@ type, public :: jedi_pseudo_model_type
   integer( kind=i_def )                    :: current_state
   !> The number of states
   integer( kind=i_def )                    :: n_states
-  !> The file prefix for reading
-  character( len=str_def )                 :: file_prefix
 
 contains
 
@@ -62,21 +62,43 @@ contains
 !> @brief    Initialiser for jedi_pseudo_model_type
 !>
 !> @param [in] config Configuration used to setup the model class
-subroutine initialise( self, config )
-
-  use jedi_pseudo_model_config_mod, only : jedi_pseudo_model_config_type
+subroutine initialise( self, configuration )
 
   implicit none
 
-  class( jedi_pseudo_model_type ),       intent(inout)  :: self
-  type( jedi_pseudo_model_config_type ), intent(in)     :: config
+  class( jedi_pseudo_model_type ),  intent(inout) :: self
+  type( namelist_collection_type ), intent(in)    :: configuration
+
+  ! Local
+  type( namelist_type ), pointer :: jedi_model_config
+  character( str_def )           :: initial_time
+  character( str_def )           :: time_step_str
+  integer( i_def )               :: number_of_steps
+  integer( i_def )               :: i
+  type( jedi_datetime_type )     :: next_datetime
+  type( jedi_duration_type )     :: time_step
 
   ! Setup the pseudo model
   self%current_state = 1_i_def
-  self%n_states = size( config%state_times, dim=1 )
+
+  ! Get config info and setup
+  jedi_model_config => configuration%get_namelist('jedi_pseudo_model')
+
+  call jedi_model_config%get_value( 'number_of_steps', number_of_steps )
+  self%n_states = number_of_steps
   allocate( self%state_times(self%n_states) )
-  self%state_times = config%state_times
-  self%file_prefix = config%read_file_prefix
+
+  call jedi_model_config%get_value( 'time_step', time_step_str )
+  call time_step%init( time_step_str )
+
+  call jedi_model_config%get_value( 'initial_time', initial_time )
+  ! Initialise datetime states 1 - number_of_steps time steps after
+  ! lfric calendar_start namelist variable time
+  call next_datetime%init( initial_time )
+  do i = 1, self%n_states
+    next_datetime = next_datetime + time_step
+    self%state_times(i) = next_datetime
+  end do
 
 end subroutine initialise
 
@@ -111,7 +133,7 @@ subroutine model_step( self, state )
   endif
 
   state_time = self%state_times( self%current_state )
-  call state%read_file( state_time, self%file_prefix )
+  call state%read_file( state_time )
 
   ! Iterate the current state
   self%current_state = self%current_state + 1_i_def

@@ -33,17 +33,6 @@
         "tsteps": 7,
     }) %}
 
-{% elif task_ns.conf_name == "forecast_no_xios-C12" %}
-
-    {% do task_dict.update({
-        "app_name": "jedi_forecast",
-        "opt_confs": ["no_xios"],
-        "resolution": "C12",
-        "DT": 3600,
-        "tsteps": 7,
-        "use_xios": false,
-    }) %}
-
 {% elif task_ns.conf_name == "forecast_pseudo_default-C12" %}
 
     {% do task_dict.update({

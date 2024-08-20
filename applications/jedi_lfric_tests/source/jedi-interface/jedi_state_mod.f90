@@ -14,25 +14,27 @@
 !>          used for IO and model time stepping.
 module jedi_state_mod
 
-  use, intrinsic :: iso_fortran_env, only : real64
-  use atlas_field_emulator_mod,      only : atlas_field_emulator_type
-  use atlas_field_interface_mod,     only : atlas_field_interface_type
-  use calendar_mod,                  only : calendar_type
-  use constants_mod,                 only : i_def, l_def, str_def
-  use driver_model_data_mod,         only : model_data_type
-  use driver_time_mod,               only : init_time, final_time
-  use field_collection_mod,          only : field_collection_type
-  use io_context_mod,                only : io_context_type
-  use jedi_lfric_datetime_mod,       only : jedi_datetime_type
-  use jedi_lfric_duration_mod,       only : jedi_duration_type
-  use jedi_geometry_mod,             only : jedi_geometry_type
-  use jedi_state_config_mod,         only : jedi_state_config_type
-  use jedi_lfric_field_meta_mod,     only : jedi_lfric_field_meta_type
-  use log_mod,                       only : log_event,          &
-                                            log_scratch_space,  &
-                                            LOG_LEVEL_INFO,     &
-                                            LOG_LEVEL_ERROR
-  use model_clock_mod,               only : model_clock_type
+  use, intrinsic :: iso_fortran_env,  only : real64
+  use atlas_field_emulator_mod,       only : atlas_field_emulator_type
+  use atlas_field_interface_mod,      only : atlas_field_interface_type
+  use calendar_mod,                   only : calendar_type
+  use constants_mod,                  only : i_def, l_def, str_def
+  use driver_model_data_mod,          only : model_data_type
+  use driver_time_mod,                only : init_time, final_time
+  use field_collection_mod,           only : field_collection_type
+  use io_context_mod,                 only : io_context_type
+  use jedi_geometry_mod,              only : jedi_geometry_type
+  use jedi_lfric_datetime_mod,        only : jedi_datetime_type
+  use jedi_lfric_duration_mod,        only : jedi_duration_type
+  use jedi_lfric_field_meta_mod,      only : jedi_lfric_field_meta_type
+  use jedi_setup_field_meta_data_mod, only : setup_field_meta_data
+  use log_mod,                        only : log_event,          &
+                                             log_scratch_space,  &
+                                             LOG_LEVEL_INFO,     &
+                                             LOG_LEVEL_ERROR
+  use model_clock_mod,                only : model_clock_type
+  use namelist_collection_mod,        only : namelist_collection_type
+  use namelist_mod,                   only : namelist_type
 
   implicit none
 
@@ -140,26 +142,33 @@ contains
 !> @param [in] config   The configuration object including the required
 !>                      information to construct a state and read a file to
 !>                      initialise the fields
-subroutine state_initialiser_read( self, geometry, config )
+subroutine state_initialiser_read( self, geometry, configuration )
 
   implicit none
 
   class( jedi_state_type ),           intent(inout) :: self
   type( jedi_geometry_type ), target, intent(in)    :: geometry
-  type( jedi_state_config_type ),     intent(inout) :: config
+  type( namelist_collection_type ),   intent(in)    :: configuration
 
-  call self%state_initialiser( geometry, config )
+  ! Local
+  type( namelist_type ), pointer :: jedi_state_config
+  logical( l_def )               :: use_pseudo_model
+
+  jedi_state_config => configuration%get_namelist('jedi_state')
+
+  call self%state_initialiser( geometry, jedi_state_config )
 
   ! Initialise the Atlas field emulators via the model_data or the
   ! io_collection
-  if ( .not. config%use_pseudo_model ) then
+  call jedi_state_config%get_value( 'use_pseudo_model', use_pseudo_model )
+  if ( .not. use_pseudo_model ) then
     ! This calls the models initialise method that populates model_data and
     ! does a copy from model_data to the fields
     call self%initialise_model_data()
   else
     ! We are not running the non-linear model so read the file directly and
     ! do a copy from io_collection to the fields
-    call self%read_file( config%state_time, config%read_file_prefix )
+    call self%read_file( self%state_time )
   end if
 
 end subroutine state_initialiser_read
@@ -177,20 +186,27 @@ subroutine state_initialiser( self, geometry, config )
 
   class( jedi_state_type ),        intent(inout) :: self
   type( jedi_geometry_type ), target, intent(in) :: geometry
-  type( jedi_state_config_type ),  intent(inout) :: config
+  type( namelist_type ),              intent(in) :: config
 
   ! Local
-  integer(i_def) :: n_horizontal
-  integer(i_def) :: n_levels
-  integer(i_def) :: n_layers
-  integer(i_def) :: ivar
-  integer(i_def) :: n_variables
-  integer(i_def) :: fs_id
-  logical(l_def) :: twod_field
+  integer(i_def)                  :: n_horizontal
+  integer(i_def)                  :: n_levels
+  integer(i_def)                  :: n_layers
+  integer(i_def)                  :: ivar
+  integer(i_def)                  :: n_variables
+  integer(i_def)                  :: fs_id
+  logical(l_def)                  :: twod_field
+  character(str_def)              :: state_time
+  character(str_def), allocatable :: variables(:)
+  logical(l_def)                  :: use_pseudo_model
 
   ! Setup
-  self%field_meta_data = config%field_meta_data
-  self%state_time = config%state_time
+  call config%get_value( 'state_time', state_time )
+  call self%state_time%init( state_time )
+
+  call config%get_value( 'variables', variables )
+  call setup_field_meta_data( self%field_meta_data, variables )
+
   self%geometry => geometry
   n_variables = self%field_meta_data%get_n_variables()
 
@@ -231,7 +247,8 @@ subroutine state_initialiser( self, geometry, config )
   call self%io_collection%initialise(name = 'io_collection', table_len=100)
 
   ! If running the model, create model data and link to fields .
-  if ( .not. config%use_pseudo_model ) then
+  call config%get_value( 'use_pseudo_model', use_pseudo_model )
+  if ( .not. use_pseudo_model ) then
     call init_time( self%model_clock, self%calendar )
     call self%create_model_data()
   end if
@@ -274,8 +291,7 @@ end function valid_time
 !> @brief    A method to update the internal Atlas field emulators
 !>
 !> @param [in] read_time   The datetime to be read from the file
-!> @param [in] file_prefix Character array that specifies the file to read from
-subroutine read_file( self, read_time, file_prefix )
+subroutine read_file( self, read_time )
 
   use jedi_lfric_io_update_mod, only: update_io_field_collection
   use lfric_xios_read_mod,      only: read_state
@@ -284,12 +300,12 @@ subroutine read_file( self, read_time, file_prefix )
 
   class( jedi_state_type ), intent(inout) :: self
   type( jedi_datetime_type ),  intent(in) :: read_time
-  character(len=*),            intent(in) :: file_prefix
 
   ! Local
   character( len=str_def ), allocatable :: variable_names(:)
   character( len=str_def )              :: current_datetime
   class( io_context_type ),     pointer :: context_ptr
+  character( len=* ),         parameter :: file_prefix="read_"
 
   ! Ensure the JEDI-IO context is set to current
   context_ptr => self%geometry%get_io_context()
@@ -322,8 +338,7 @@ end subroutine read_file
 !> Write model fields to file
 !>
 !> @param [in] write_time  The datetime to be write to the file
-!> @param [in] file_prefix Character array that specifies the file to write to
-subroutine write_file( self, write_time, file_prefix )
+subroutine write_file( self, write_time )
 
   use jedi_lfric_io_update_mod, only : update_io_field_collection
   use lfric_xios_write_mod,     only : write_state
@@ -332,12 +347,12 @@ subroutine write_file( self, write_time, file_prefix )
 
   class( jedi_state_type ),   intent(inout) :: self
   type( jedi_datetime_type ),    intent(in) :: write_time
-  character(len=*),              intent(in) :: file_prefix
 
   ! Local
   character( len=str_def ), allocatable :: variable_names(:)
   character( len=str_def )              :: current_datetime
   class( io_context_type ),     pointer :: context_ptr
+  character( len=* ), parameter         :: file_prefix="write_"
 
   ! Ensure the JEDI-IO context is set to current
   context_ptr => self%geometry%get_io_context()

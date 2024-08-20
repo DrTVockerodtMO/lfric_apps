@@ -30,6 +30,9 @@ contains
   !> LFRic initialiser.
   procedure, public :: initialise_infrastructure
 
+  !> Get a pointer to the stored configuration.
+  procedure, public ::  get_configuration
+
   !> Finalizer
   final             :: jedi_run_destructor
 
@@ -107,6 +110,18 @@ subroutine initialise_infrastructure( self, filename, model_communicator )
   call init_collections()
 
 end subroutine initialise_infrastructure
+
+!> @brief    Get pointer to the stored configuration
+!>
+!> @return  configuration A pointer to the configuration
+function get_configuration(self) result(configuration)
+
+  class( jedi_run_type ), target, intent(inout) :: self
+  type( namelist_collection_type ),     pointer :: configuration
+
+  configuration => self%configuration
+
+end function get_configuration
 
 !> @brief    Finalizer for jedi_run_type
 !>

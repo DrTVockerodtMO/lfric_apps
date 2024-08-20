@@ -39,6 +39,7 @@ module jedi_linear_model_mod
                                             log_scratch_space,  &
                                             LOG_LEVEL_ERROR
   use linear_state_trajectory_mod,   only : linear_state_trajectory_type
+  use namelist_mod,                  only : namelist_type
 
   implicit none
 
@@ -92,24 +93,28 @@ contains
 
 !> @brief    Initialiser for jedi_linear_model_type
 !>
-!> @param [in] jedi_geometry A JEDI geometry object
-!> @param [in] config        The linear model configuration
-subroutine initialise( self, jedi_geometry, config )
+!> @param [in] jedi_geometry   A JEDI geometry object
+!> @param [in] config_filename The name of the configuration file
+subroutine initialise( self, jedi_geometry, config_filename )
 
-  use jedi_linear_model_config_mod,         only : jedi_linear_model_config_type
   use jedi_lfric_linear_modeldb_driver_mod, only : initialise_modeldb
   use jedi_lfric_timestep_mod,              only : get_configuration_timestep
 
   implicit none
 
-  class( jedi_linear_model_type ),    intent(inout) :: self
-  type( jedi_geometry_type ),            intent(in) :: jedi_geometry
-  type( jedi_linear_model_config_type ), intent(in) :: config
+  class( jedi_linear_model_type ), target, intent(inout) :: self
+  type( jedi_geometry_type ),                 intent(in) :: jedi_geometry
+  character(len=*),                           intent(in) :: config_filename
+
+  ! Local
+  type( namelist_type ), pointer :: jedi_lfric_settings_config
+  character( str_def )           :: forecast_length_str
+  type( jedi_duration_type )     :: forecast_length
 
   ! 1. Setup modeldb
 
   ! 1.1 Initialise the modeldb
-  call initialise_modeldb( "linear modeldb", config%config_filename, &
+  call initialise_modeldb( "linear modeldb", config_filename, &
                             jedi_geometry%get_mpi_comm(), self%modeldb )
 
   ! 1.2 Add scalar winds that link the Atlas fields. These are used to
@@ -120,8 +125,12 @@ subroutine initialise( self, jedi_geometry, config )
   ! 2. Setup time
   self%time_step = get_configuration_timestep( self%modeldb%configuration )
 
+  jedi_lfric_settings_config => self%modeldb%configuration%get_namelist('jedi_lfric_settings')
+  call jedi_lfric_settings_config%get_value( 'forecast_length', forecast_length_str )
+  call forecast_length%init(forecast_length_str)
+
   ! 3. Setup trajactory
-  call self%linear_state_trajectory%initialise( config%forecast_length, &
+  call self%linear_state_trajectory%initialise( forecast_length, &
                                                 self%time_step )
 
 end subroutine initialise

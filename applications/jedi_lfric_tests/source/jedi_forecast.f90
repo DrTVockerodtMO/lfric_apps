@@ -19,15 +19,13 @@
 !       contact darth@metofice.gov.uk for advice.
 program jedi_forecast
 
-  use constants_mod,           only : PRECISION_REAL, i_def, i_timestep
-  use log_mod,                 only : log_event, log_scratch_space, &
-                                      LOG_LEVEL_ALWAYS
-  use field_collection_mod,    only : field_collection_type
-
-  ! Data types and methods to get/store configurations
-  use jedi_state_config_mod,    only : jedi_state_config_type
-  use jedi_geometry_config_mod, only : jedi_geometry_config_type
-  use cli_mod,                  only : get_initial_filename
+  use cli_mod,                      only : get_initial_filename
+  use constants_mod,                only : PRECISION_REAL, i_def, str_def
+  use field_collection_mod,         only : field_collection_type
+  use log_mod,                      only : log_event, log_scratch_space, &
+                                           LOG_LEVEL_ALWAYS
+  use namelist_collection_mod,      only : namelist_collection_type
+  use namelist_mod,                 only : namelist_type
 
   ! Jedi emulator objects
   use jedi_checksum_mod,             only : output_checksum
@@ -47,17 +45,15 @@ program jedi_forecast
   type( jedi_run_type )                  :: jedi_run
   type( jedi_post_processor_empty_type ) :: jedi_pp_empty
 
-  ! Emulator object configs
-  type( jedi_state_config_type )    :: jedi_state_config
-  type( jedi_geometry_config_type ) :: jedi_geometry_config
-  type( jedi_duration_type )        :: forecast_length
-  type( jedi_duration_type )        :: model_time_step
-
   ! Local
-  character(:), allocatable      :: filename
-  integer( i_def )               :: model_communicator
+  type( namelist_collection_type ), pointer :: configuration
+  character(:), allocatable                 :: filename
+  integer( i_def )                          :: model_communicator
+  type( jedi_duration_type )                :: forecast_length
+  type( namelist_type ),            pointer :: jedi_lfric_settings_config
+  character( str_def )                      :: forecast_length_str
 
-  character(*), parameter        :: program_name = "jedi_forecast"
+  character(*), parameter :: program_name = "jedi_forecast"
 
   type( field_collection_type ), pointer :: depository => null()
 
@@ -78,28 +74,21 @@ program jedi_forecast
 
   ! Initialize LFRic infrastructure
   call jedi_run%initialise_infrastructure( filename, model_communicator )
+  configuration => jedi_run%get_configuration()
 
-  ! Configs for for the jedi emulator objects
-  ! State config
-  call jedi_state_config%initialise( use_pseudo_model = .false. )
-
-  ! Geometry config
-  call jedi_geometry_config%initialise( filename )
-
-  ! Model config - model time step duration
-  call model_time_step%init( 'P0DT1H0M0S' )
-
-  ! Forecast config - forcast duration
-  call forecast_length%init( 'P0DT6H0M0S' )
+  ! Get the forecast length
+  jedi_lfric_settings_config => configuration%get_namelist('jedi_lfric_settings')
+  call jedi_lfric_settings_config%get_value( 'forecast_length', forecast_length_str )
+  call forecast_length%init(forecast_length_str)
 
   ! Create geometry
-  call jedi_geometry%initialise( model_communicator, jedi_geometry_config )
+  call jedi_geometry%initialise( model_communicator, configuration )
 
   ! Create state
-  call jedi_state%initialise( jedi_geometry, jedi_state_config )
+  call jedi_state%initialise( jedi_geometry, configuration )
 
   ! Create non-linear model
-  call jedi_model%initialise( model_time_step )
+  call jedi_model%initialise( configuration )
 
   ! Run non-linear model forecast
   call jedi_model%forecast( jedi_state, forecast_length, jedi_pp_empty )

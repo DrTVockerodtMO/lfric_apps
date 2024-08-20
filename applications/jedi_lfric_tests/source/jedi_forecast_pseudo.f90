@@ -19,15 +19,13 @@
 !       contact darth@metofice.gov.uk for advice.
 program jedi_forecast_pseudo
 
-  use constants_mod,           only : PRECISION_REAL, i_def
-  use log_mod,                 only : log_event, log_scratch_space, &
-                                      LOG_LEVEL_ALWAYS
-
-  ! Data types and methods to get/store configurations
-  use jedi_state_config_mod,        only : jedi_state_config_type
-  use jedi_pseudo_model_config_mod, only : jedi_pseudo_model_config_type
-  use jedi_geometry_config_mod,     only : jedi_geometry_config_type
   use cli_mod,                      only : get_initial_filename
+  use constants_mod,                only : PRECISION_REAL, i_def, str_def
+  use field_collection_mod,         only : field_collection_type
+  use log_mod,                      only : log_event, log_scratch_space, &
+                                           LOG_LEVEL_ALWAYS
+  use namelist_collection_mod,      only : namelist_collection_type
+  use namelist_mod,                 only : namelist_type
 
   ! Jedi emulator objects
   use jedi_checksum_mod,             only : output_checksum
@@ -47,16 +45,15 @@ program jedi_forecast_pseudo
   type( jedi_run_type )                  :: jedi_run
   type( jedi_post_processor_empty_type ) :: jedi_pp_empty
 
-  ! Emulator object configs
-  type(jedi_state_config_type)        :: jedi_state_config
-  type(jedi_pseudo_model_config_type) :: jedi_pseudo_model_config
-  type( jedi_geometry_config_type )   :: jedi_geometry_config
-  type(jedi_duration_type)            :: forecast_length
-
   ! Local
-  character(:), allocatable :: filename
-  integer(i_def)            :: model_communicator
-  character(*), parameter   :: program_name = "jedi_forecast_pseudo"
+  type( namelist_collection_type ), pointer :: configuration
+  character(:),                 allocatable :: filename
+  integer(i_def)                            :: model_communicator
+  type( jedi_duration_type )                :: forecast_length
+  type( namelist_type ),            pointer :: jedi_lfric_settings_config
+  character( str_def )                      :: forecast_length_str
+
+  character(*), parameter :: program_name = "jedi_forecast_pseudo"
 
   call log_event( 'Running ' // program_name // ' ...', LOG_LEVEL_ALWAYS )
   write(log_scratch_space,'(A)')                        &
@@ -75,28 +72,21 @@ program jedi_forecast_pseudo
 
   ! Initialize LFRic infrastructure
   call jedi_run%initialise_infrastructure( filename, model_communicator )
+  configuration => jedi_run%get_configuration()
 
-  ! Config for the jedi emulator objects
-  ! State config
-  call jedi_state_config%initialise( use_pseudo_model = .true. )
-
-  ! Model config
-  call jedi_pseudo_model_config%initialise()
-
-  ! Geometry config
-  call jedi_geometry_config%initialise( filename )
-
-  ! Forecast config - duration of forecast
-  call forecast_length%init('P0DT6H0M0S')
+  ! Get the forecast length
+  jedi_lfric_settings_config => configuration%get_namelist('jedi_lfric_settings')
+  call jedi_lfric_settings_config%get_value( 'forecast_length', forecast_length_str )
+  call forecast_length%init(forecast_length_str)
 
   ! Create geometry
-  call jedi_geometry%initialise( model_communicator, jedi_geometry_config )
+  call jedi_geometry%initialise( model_communicator, configuration )
 
   ! Create state
-  call jedi_state%initialise( jedi_geometry, jedi_state_config )
+  call jedi_state%initialise( jedi_geometry, configuration )
 
   ! Model
-  call jedi_psuedo_model%initialise( jedi_pseudo_model_config )
+  call jedi_psuedo_model%initialise( configuration )
 
   ! Run non-linear model forecast
   call jedi_psuedo_model%forecast( jedi_state, forecast_length, jedi_pp_empty )
@@ -104,8 +94,7 @@ program jedi_forecast_pseudo
   ! Write a netCDF via XIOS at the last time step.
   ! Passing state%datetime to state to be consistent with the implementation
   ! in JEDI.
-  call jedi_state%write_file( jedi_state%valid_time(), &
-                              jedi_state_config%write_file_prefix )
+  call jedi_state%write_file( jedi_state%valid_time() )
 
   call log_event( 'Finalising ' // program_name // ' ...', LOG_LEVEL_ALWAYS )
   ! To provide KGO

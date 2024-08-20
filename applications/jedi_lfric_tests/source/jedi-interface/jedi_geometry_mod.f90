@@ -18,7 +18,6 @@ module jedi_geometry_mod
                                             r_second, i_timestep
   use extrusion_mod,                 only : extrusion_type, TWOD
   use io_context_mod,                only : io_context_type
-  use jedi_geometry_config_mod,      only : jedi_geometry_config_type
   use jedi_lfric_driver_time_mod,    only : jedi_lfric_init_time, &
                                             jedi_lfric_final_time
   use jedi_lfric_mesh_interface_mod, only : is_mesh_cubesphere,        &
@@ -28,6 +27,9 @@ module jedi_geometry_mod
                                             get_sigma_w3_levels,       &
                                             get_sigma_wtheta_levels,   &
                                             get_stretching_height
+  use jedi_lfric_datetime_mod,       only : jedi_datetime_type
+  use jedi_lfric_duration_mod,       only : jedi_duration_type
+  use jedi_lfric_file_meta_mod,      only : jedi_lfric_file_meta_type
   use jedi_lfric_io_setup_mod,       only : initialise_io
   use log_mod,                       only : log_event, LOG_LEVEL_ERROR
   use mesh_mod,                      only : mesh_type
@@ -35,6 +37,7 @@ module jedi_geometry_mod
   use model_clock_mod,               only : model_clock_type
   use mpi_mod,                       only : mpi_type
   use namelist_collection_mod,       only : namelist_collection_type
+  use namelist_mod,                  only : namelist_type
 
   implicit none
 
@@ -86,7 +89,7 @@ contains
 
 !> @brief    Initialiser for jedi_geometry_type
 !>
-subroutine initialise( self, mpi_comm, jedi_geometry_config )
+subroutine initialise( self, mpi_comm, configuration )
   ! Access config directly until modeldb ready
   use driver_mesh_mod,           only: init_mesh
   use driver_config_mod,         only: init_config
@@ -96,33 +99,30 @@ subroutine initialise( self, mpi_comm, jedi_geometry_config )
   implicit none
 
   class( jedi_geometry_type ), intent(inout) :: self
-  integer( kind=i_def )                      :: mpi_comm
-  type( jedi_geometry_config_type )          :: jedi_geometry_config
+  integer( kind=i_def ),          intent(in) :: mpi_comm
+  type(namelist_collection_type), intent(in) :: configuration
 
   ! Local
-  type(mesh_type), pointer           :: mesh
-  type(mpi_type)                     :: mpi_obj
-  type(namelist_collection_type)     :: configuration
-  integer                            :: i_horizontal
-  real(real64)                       :: domain_top
-  real(real64)                       :: stretching_height
-  real(real64), allocatable          :: lonlat(:,:),          &
-                                        sigma_W3_levels(:),   &
-                                        sigma_Wtheta_levels(:)
+  type(mesh_type), pointer     :: mesh
+  type(mpi_type)               :: mpi_obj
+  type(namelist_type), pointer :: geometry_configuration
+  integer                      :: i_horizontal
+  real(real64)                 :: domain_top
+  real(real64)                 :: stretching_height
+  real(real64), allocatable    :: lonlat(:,:),          &
+                                  sigma_W3_levels(:),   &
+                                  sigma_Wtheta_levels(:)
 
   ! Save the mpi_comm
   self%mpi_comm = mpi_comm
 
   ! Setup mesh
-  call configuration%initialise( "geometry", table_len=10 )
-  call init_config( jedi_geometry_config%filename,       &
-                    jedi_lfric_tests_required_namelists, &
-                    configuration )
   mpi_obj = self%get_mpi_comm()
   call initialise_mesh( self%mesh_name, configuration, mpi_obj )
 
+  geometry_configuration => configuration%get_namelist('jedi_geometry')
   ! Setup the IO
-  call self%setup_io(jedi_geometry_config, configuration)
+  call self%setup_io( geometry_configuration )
 
   ! @todo: The geometry should read some fields: orog, height, ancils
 
@@ -289,35 +289,82 @@ end function get_io_context
 
 !> @brief    Private method to setup the IO for the application
 !>
-!> @param [in] config  A configuration object containing the IO options
-subroutine setup_io(self, config, configuration)
+!> @param [in] configuration A configuration object containing the IO options
+subroutine setup_io(self, configuration)
 
   implicit none
 
-  class( jedi_geometry_type ),       intent(inout) :: self
-  type( jedi_geometry_config_type ), intent(in)    :: config
-  type( namelist_collection_type ),  intent(in)    :: configuration
+  class( jedi_geometry_type ), intent(inout) :: self
+  type( namelist_type ),       intent(in)    :: configuration
 
   ! Local
   real( kind=r_second )      :: time_step
   integer( kind=i_timestep ) :: duration
   character( len= str_def )  :: calender_start
 
+  ! Local
+  character( len=str_def ) :: xios_id
+  character( len=str_def ) :: io_mode_str
+  character( len=str_def ) :: field_group_id
+  character( len=str_def ) :: file_name
+  character( len=str_def ) :: context_name
+  character( len=str_def ) :: io_write_path
+  character( len=str_def ) :: io_read_path
+  character( len=str_def ) :: io_time_step_str
+  character( len=str_def ) :: io_calender_start_str
+  integer( kind=i_def )    :: freq
+
+  type(jedi_lfric_file_meta_type) :: file_meta_data(2)
+  type( jedi_duration_type )      :: io_time_step
+  type( jedi_datetime_type )      :: io_calender_start
+
   ! Create IO clock and setup IO
-  call config%io_time_step%get_duration( duration )
+  call configuration%get_value( 'io_time_step', io_time_step_str )
+  call io_time_step%init( io_time_step_str )
+  call io_time_step%get_duration( duration )
   time_step = real( duration, r_second )
-  call config%io_calender_start%to_string(calender_start)
+
+  call configuration%get_value( 'io_calender_start', io_calender_start_str )
+  call io_calender_start%init( io_calender_start_str )
+  call io_calender_start%to_string(calender_start)
 
   call jedi_lfric_init_time( time_step, calender_start, &
                              self%io_clock, self%calendar )
 
-  call initialise_io( config%context_name,   &
-                      self%get_mpi_comm(),   &
-                      config%file_meta_data, &
-                      self%get_mesh_name(),  &
-                      configuration,         &
-                      self%calendar,         &
-                      self%io_context,       &
+  ! Setup two files - one read and one write
+  ! Note, xios_id is arbitrary but has to be unique within a context
+  ! Read
+  call configuration%get_value( 'io_read_path', io_read_path )
+  file_name = io_read_path
+  xios_id = "read_model_data"
+  io_mode_str = "read"
+  field_group_id = "read_fields"
+  freq=1_i_def
+  call file_meta_data(1)%initialise( file_name,   &
+                                     xios_id,     &
+                                     io_mode_str, &
+                                     freq,        &
+                                     field_group_id )
+  ! Write
+  call configuration%get_value( 'io_write_path', io_write_path )
+  file_name = io_write_path
+  xios_id = "write_model_data"
+  io_mode_str = "write"
+  field_group_id = "write_fields"
+  freq=1_i_def
+  call file_meta_data(2)%initialise( file_name,   &
+                                     xios_id,     &
+                                     io_mode_str, &
+                                     freq,        &
+                                     field_group_id )
+
+  context_name = "jedi_state"
+  call initialise_io( context_name,         &
+                      self%get_mpi_comm(),  &
+                      file_meta_data,       &
+                      self%get_mesh_name(), &
+                      self%calendar,        &
+                      self%io_context,      &
                       self%io_clock )
 
   ! Tick out of initialisation state
