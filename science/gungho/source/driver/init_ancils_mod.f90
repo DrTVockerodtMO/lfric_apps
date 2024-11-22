@@ -87,7 +87,7 @@ contains
   !> @details Organises fields to be read from ancils into ancil_fields
   !           collection then reads them.
   !> @param[in,out] depository The depository field collection
-  !> @param[out] ancil_fields Collection for ancillary fields
+  !> @param[in,out] ancil_fields Collection for ancillary fields
   !> @param[in] mesh      The current 3d mesh
   !> @param[in] twod_mesh The current 2d mesh
   subroutine create_fd_ancils( depository, ancil_fields, mesh, &
@@ -854,7 +854,7 @@ contains
   !> @details Organises fields to be read from ancils into ancil_fields
   !           collection then reads them in an idealised setup.
   !> @param[in,out] depository The depository field collection
-  !> @param[out] ancil_fields Collection for ancillary fields
+  !> @param[in,out] ancil_fields Collection for ancillary fields
   !> @param[in] mesh      The current 3d mesh
   !> @param[in] twod_mesh The current 2d mesh
   subroutine create_fd_ancils_idealised( depository, ancil_fields, &
@@ -863,7 +863,7 @@ contains
     implicit none
 
     type( field_collection_type ), intent( inout ) :: depository
-    type( field_collection_type ), intent( out )   :: ancil_fields
+    type( field_collection_type ), intent( inout ) :: ancil_fields
 
     type( mesh_type ), intent(in), pointer :: mesh
     type( mesh_type ), intent(in), pointer :: twod_mesh
