@@ -14,7 +14,7 @@ program ngarch
   use driver_comm_mod,             only : init_comm, final_comm
   use driver_config_mod,           only : init_config, final_config
   use driver_log_mod,              only : init_logger, final_logger
-  use gungho_modeldb_mod,          only : modeldb_type
+  use driver_modeldb_mod,          only : modeldb_type
   use driver_time_mod,             only : init_time, final_time
   use log_mod,                     only : log_event,       &
                                           log_level_trace, &

@@ -46,7 +46,7 @@ module jedi_lfric_linear_modeldb_driver_mod
   use gungho_init_fields_mod,       only : create_model_data, &
                                            finalise_model_data
   use gungho_mod,                   only : gungho_required_namelists
-  use gungho_modeldb_mod,           only : modeldb_type
+  use driver_modeldb_mod,           only : modeldb_type
   use gungho_model_mod,             only : initialise_infrastructure, &
                                            initialise_model, &
                                            finalise_infrastructure, &

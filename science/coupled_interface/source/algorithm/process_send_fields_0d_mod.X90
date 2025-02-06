@@ -14,7 +14,7 @@ module process_send_fields_0d_mod
   use field_mod,                     only: field_type
   use fs_continuity_mod,             only: W3
   use sci_geometric_constants_mod,   only: get_latitude
-  use gungho_modeldb_mod,            only: modeldb_type
+  use driver_modeldb_mod,            only: modeldb_type
   use log_mod,                       only: log_event,       &
                                            LOG_LEVEL_INFO,  &
                                            LOG_LEVEL_ERROR, &

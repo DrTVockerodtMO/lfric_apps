@@ -20,7 +20,7 @@ module tl_test_transport_control_mod
   use field_indices_mod,              only: igh_u, igh_t, igh_d, igh_p
   use function_space_collection_mod,  only: function_space_collection
   use derived_config_mod,             only: bundle_size
-  use gungho_modeldb_mod,             only: modeldb_type
+  use driver_modeldb_mod,             only: modeldb_type
   use moist_dyn_mod,                  only: num_moist_factors
   use mr_indices_mod,                 only: nummr
   use log_mod,                        only: log_event,         &

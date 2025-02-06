@@ -26,7 +26,7 @@ module tl_test_timesteps_alg_mod
   use gungho_step_mod,                only: gungho_step
   use gungho_model_mod,               only: initialise_model, &
                                             finalise_model
-  use gungho_modeldb_mod,             only: modeldb_type
+  use driver_modeldb_mod,             only: modeldb_type
   use log_mod,                        only: log_event,         &
                                             log_scratch_space, &
                                             LOG_LEVEL_INFO,    &

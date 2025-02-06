@@ -25,7 +25,7 @@ module jedi_linear_model_mod
   use driver_time_mod,               only : init_time, final_time
   use field_collection_mod,          only : field_collection_type
   use field_array_mod,               only : field_array_type
-  use gungho_modeldb_mod,            only : modeldb_type
+  use driver_modeldb_mod,            only : modeldb_type
   use jedi_base_linear_model_mod,    only : jedi_base_linear_model_type
   use jedi_geometry_mod,             only : jedi_geometry_type
   use jedi_lfric_moist_fields_mod,   only : update_ls_moist_fields, &

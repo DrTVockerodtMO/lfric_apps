@@ -6,11 +6,11 @@
 
 !>@brief A module to specify the surface latent and sensible heat fluxes
 module flux_calc_all_mod
-  use sci_time_interp_mod, only: time_interpolate_list, &
-                                 sinusoidal_function,   &
-                                 diurnal_function
-  use constants_mod,       only: i_def, r_def, rmdi
-  use gungho_modeldb_mod,  only: modeldb_type
+  use sci_time_interp_mod,          only: time_interpolate_list, &
+                                          sinusoidal_function,   &
+                                          diurnal_function
+  use constants_mod,                only: i_def, r_def, rmdi
+  use driver_modeldb_mod,           only: modeldb_type
   use specified_surface_config_mod, only: &
                                  time_data, profile_size,                &
                                  function_name_fluxes,                   &

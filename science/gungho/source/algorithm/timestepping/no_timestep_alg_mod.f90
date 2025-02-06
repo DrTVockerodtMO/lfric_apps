@@ -9,11 +9,11 @@
 
 module no_timestep_alg_mod
 
-  use log_mod,                            only: log_event,         &
-                                                log_scratch_space, &
-                                                LOG_LEVEL_WARNING
-  use timestep_method_mod,       only: timestep_method_type
-  use gungho_modeldb_mod,        only: modeldb_type
+  use log_mod,                          only: log_event,          &
+                                              log_scratch_space,  &
+                                              LOG_LEVEL_WARNING
+  use timestep_method_mod,              only: timestep_method_type
+  use driver_modeldb_mod,               only: modeldb_type
 
   implicit none
 

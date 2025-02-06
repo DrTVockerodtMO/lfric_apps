@@ -27,7 +27,7 @@ module jedi_lfric_nl_modeldb_driver_mod
   use driver_time_mod,              only : init_time, final_time
   use gungho_init_fields_mod,       only : finalise_model_data
   use gungho_mod,                   only : gungho_required_namelists
-  use gungho_modeldb_mod,           only : modeldb_type
+  use driver_modeldb_mod,           only : modeldb_type
   use gungho_model_mod,             only : finalise_infrastructure, &
                                            finalise_model
   use log_mod,                      only : log_event,         &

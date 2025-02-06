@@ -46,7 +46,7 @@ module gungho_model_mod
   use sci_geometric_constants_mod,       &
                                   only : get_chi_inventory, get_panel_id_inventory
   use gungho_extrusion_mod,       only : create_extrusion
-  use gungho_modeldb_mod,         only : modeldb_type
+  use driver_modeldb_mod,         only : modeldb_type
   use gungho_setup_io_mod,        only : init_gungho_files
   use init_altitude_mod,          only : init_altitude
   use inventory_by_mesh_mod,      only : inventory_by_mesh_type

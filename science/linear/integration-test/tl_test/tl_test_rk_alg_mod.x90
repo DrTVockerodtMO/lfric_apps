@@ -19,7 +19,7 @@ module tl_test_rk_alg_mod
   use function_space_collection_mod,  only: function_space_collection
   use finite_element_config_mod,      only: element_order_h, element_order_v
   use fs_continuity_mod,              only: W2, W3, Wtheta
-  use gungho_modeldb_mod,             only: modeldb_type
+  use driver_modeldb_mod,             only: modeldb_type
   use moist_dyn_mod,                  only: num_moist_factors
   use mr_indices_mod,                 only: nummr
   use timestepping_config_mod,        only: dt

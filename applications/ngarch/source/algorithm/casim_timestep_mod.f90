@@ -18,7 +18,7 @@ module casim_timestep_mod
   use sci_field_bundle_builtins_mod, only: clone_bundle, &
                                            set_bundle_scalar
   use field_collection_mod,          only: field_collection_type
-  use gungho_modeldb_mod,            only: modeldb_type
+  use driver_modeldb_mod,            only: modeldb_type
   use log_mod,                       only: log_event,         &
                                            log_scratch_space, &
                                            LOG_LEVEL_INFO,    &

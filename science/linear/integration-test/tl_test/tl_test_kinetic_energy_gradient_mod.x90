@@ -17,7 +17,7 @@ module tl_test_kinetic_energy_gradient_mod
   use fs_continuity_mod,              only: W2
   use quadrature_xyoz_mod,            only: quadrature_xyoz_type
   use field_mod,                      only: field_type
-  use gungho_modeldb_mod,             only: modeldb_type
+  use driver_modeldb_mod,             only: modeldb_type
   use field_collection_mod,           only: field_collection_type
   use function_space_collection_mod,  only: function_space_collection
   use finite_element_config_mod,      only: element_order_h, element_order_v

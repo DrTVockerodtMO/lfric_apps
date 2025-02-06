@@ -65,7 +65,7 @@ module rk_alg_timestep_mod
   use field_mod,                          only: field_type
   use field_collection_mod,               only: field_collection_type
   use function_space_collection_mod,      only: function_space_collection
-  use gungho_modeldb_mod,                 only: modeldb_type
+  use driver_modeldb_mod,                 only: modeldb_type
   use model_clock_mod,                    only: model_clock_type
   use quadrature_xyoz_mod,                only: quadrature_xyoz_type
   use quadrature_face_mod,                only: quadrature_face_type

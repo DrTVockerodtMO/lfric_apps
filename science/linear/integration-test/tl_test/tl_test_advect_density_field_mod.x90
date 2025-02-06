@@ -20,7 +20,7 @@ module tl_test_advect_density_field_mod
   use function_space_collection_mod,  only: function_space_collection
   use finite_element_config_mod,      only: element_order_h, element_order_v
   use fs_continuity_mod,              only: W2, W3
-  use gungho_modeldb_mod,             only: modeldb_type
+  use driver_modeldb_mod,             only: modeldb_type
   use log_mod,                        only: log_event,         &
                                             log_scratch_space, &
                                             LOG_LEVEL_INFO

@@ -16,7 +16,7 @@ module create_iau_mod
   use field_collection_mod,       only : field_collection_type
   use fs_continuity_mod,          only : W3, Wtheta
   use mesh_mod,                   only : mesh_type
-  use gungho_modeldb_mod,         only : modeldb_type
+  use driver_modeldb_mod,         only : modeldb_type
   use lfric_xios_read_mod,        only : read_field_generic
   use init_time_axis_mod,         only : setup_field
 #ifdef UM_PHYSICS

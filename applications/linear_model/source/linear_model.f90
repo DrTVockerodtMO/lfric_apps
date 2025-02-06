@@ -21,7 +21,7 @@ program linear_model
   use driver_log_mod,         only : init_logger, final_logger
   use driver_time_mod,        only : init_time, final_time
   use gungho_mod,             only : gungho_required_namelists
-  use gungho_modeldb_mod,     only : modeldb_type
+  use driver_modeldb_mod,     only : modeldb_type
   use linear_driver_mod,      only : initialise, step, finalise
   use log_mod,                only : log_event,       &
                                      log_level_trace, &

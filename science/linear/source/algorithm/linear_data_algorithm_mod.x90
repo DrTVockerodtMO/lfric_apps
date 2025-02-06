@@ -16,7 +16,7 @@ module linear_data_algorithm_mod
                                             get_panel_id,         &
                                             get_face_selector_ew, &
                                             get_face_selector_ns
-  use gungho_modeldb_mod,             only: modeldb_type
+  use driver_modeldb_mod,             only: modeldb_type
   use linear_config_mod,              only: ls_read_w2h
   use linked_list_mod,                only: linked_list_type
   use lfric_xios_read_mod,            only: read_state

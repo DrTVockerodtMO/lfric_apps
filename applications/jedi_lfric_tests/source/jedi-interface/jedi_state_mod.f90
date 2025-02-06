@@ -19,7 +19,7 @@ module jedi_state_mod
   use atlas_field_interface_mod,      only : atlas_field_interface_type
   use constants_mod,                  only : i_def, l_def, str_def
   use field_collection_mod,           only : field_collection_type
-  use gungho_modeldb_mod,             only : modeldb_type
+  use driver_modeldb_mod,             only : modeldb_type
   use io_context_mod,                 only : io_context_type
   use jedi_geometry_mod,              only : jedi_geometry_type
   use jedi_lfric_datetime_mod,        only : jedi_datetime_type

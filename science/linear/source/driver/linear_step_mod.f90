@@ -19,7 +19,7 @@ module linear_step_mod
                                              moisture_formulation_dry, &
                                              use_physics
   use sci_geometric_constants_mod,    only : get_da_at_w2
-  use gungho_modeldb_mod,             only : modeldb_type
+  use driver_modeldb_mod,             only : modeldb_type
   use io_config_mod,                  only : write_conservation_diag, &
                                              write_minmax_tseries
   use log_mod,                        only : log_event, &

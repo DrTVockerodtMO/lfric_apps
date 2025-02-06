@@ -12,7 +12,7 @@ module linear_diagnostics_driver_mod
   use diagnostics_io_mod,        only : write_scalar_diagnostic, &
                                         write_vector_diagnostic
   use field_collection_mod,      only : field_collection_type
-  use gungho_modeldb_mod,        only : modeldb_type
+  use driver_modeldb_mod,        only : modeldb_type
   use field_array_mod,           only : field_array_type
   use field_mod,                 only : field_type
   use formulation_config_mod,    only : moisture_formulation,    &

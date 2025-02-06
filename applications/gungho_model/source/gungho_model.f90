@@ -26,7 +26,7 @@ program gungho_model
   use driver_timer_mod,       only: init_timers, final_timers
   use gungho_mod,             only: gungho_required_namelists
   use gungho_driver_mod,      only: initialise, step, finalise
-  use gungho_modeldb_mod,     only: modeldb_type
+  use driver_modeldb_mod,     only: modeldb_type
   use log_mod,                only: log_event,       &
                                     log_level_info,  &
                                     log_level_trace, &

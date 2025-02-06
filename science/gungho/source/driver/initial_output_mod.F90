@@ -12,7 +12,7 @@ module initial_output_mod
   use io_context_mod,             only : io_context_type
   use gungho_diagnostics_driver_mod, &
                                   only : gungho_diagnostics_driver
-  use gungho_modeldb_mod,         only : modeldb_type
+  use driver_modeldb_mod,         only : modeldb_type
   use log_mod,                    only : log_event, log_level_error
   use mesh_mod,                   only : mesh_type
   use io_context_mod,             only : io_context_type

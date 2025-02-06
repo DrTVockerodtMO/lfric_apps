@@ -20,7 +20,7 @@ module tl_test_driver_mod
   use gungho_init_fields_mod,     only : create_model_data,     &
                                          initialise_model_data, &
                                          finalise_model_data
-  use gungho_modeldb_mod,         only : modeldb_type
+  use driver_modeldb_mod,         only : modeldb_type
   use gungho_time_axes_mod,       only : gungho_time_axes_type
   use io_value_mod,               only : io_value_type
   use io_context_mod,             only : io_context_type

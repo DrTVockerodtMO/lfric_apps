@@ -25,7 +25,7 @@ module tl_test_project_eos_pressure_mod
   use finite_element_config_mod,      only: element_order_h, element_order_v
   use fs_continuity_mod,              only: W3, Wtheta
   use function_space_collection_mod,  only: function_space_collection
-  use gungho_modeldb_mod,             only: modeldb_type
+  use driver_modeldb_mod,             only: modeldb_type
   use moist_dyn_mod,                  only: num_moist_factors, gas_law
   use operator_mod,                   only: operator_type
   use planet_config_mod,              only: cp

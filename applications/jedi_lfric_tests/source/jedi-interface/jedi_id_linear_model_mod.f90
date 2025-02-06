@@ -24,7 +24,7 @@ module jedi_id_linear_model_mod
   use constants_mod,                 only : str_def
   use driver_time_mod,               only : init_time, final_time
   use field_collection_mod,          only : field_collection_type
-  use gungho_modeldb_mod,            only : modeldb_type
+  use driver_modeldb_mod,            only : modeldb_type
   use jedi_geometry_mod,             only : jedi_geometry_type
   use jedi_increment_mod,            only : jedi_increment_type
   use jedi_base_linear_model_mod,    only : jedi_base_linear_model_type

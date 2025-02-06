@@ -25,7 +25,7 @@ module tl_test_rhs_project_eos_mod
   use moist_dyn_mod,                  only: num_moist_factors, gas_law
   use sci_geometric_constants_mod,    only: get_coordinates, &
                                             get_panel_id
-  use gungho_modeldb_mod,             only: modeldb_type
+  use driver_modeldb_mod,             only: modeldb_type
   use operator_mod,                   only: operator_type
   use planet_config_mod,              only: cp, kappa, rd, p_zero
   use quadrature_xyoz_mod,            only: quadrature_xyoz_type

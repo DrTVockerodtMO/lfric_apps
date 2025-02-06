@@ -17,7 +17,7 @@ module bl_exp_alg_mod
   use function_space_collection_mod, only: function_space_collection
   use sci_fem_constants_mod,         only: get_rmultiplicity
   use fs_continuity_mod,             only: W2, W3, Wtheta
-  use gungho_modeldb_mod,            only: modeldb_type
+  use driver_modeldb_mod,            only: modeldb_type
   use sci_geometric_constants_mod,   only: get_height, get_da_at_w2,           &
                                            get_delta_at_wtheta, get_dz_at_wtheta
   use physics_constants_mod,         only: get_max_diff, get_rdz_fd1,          &

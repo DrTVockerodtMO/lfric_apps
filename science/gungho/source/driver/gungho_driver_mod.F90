@@ -22,7 +22,7 @@ module gungho_driver_mod
                                          initialise_model_data, &
                                          output_model_data, &
                                          finalise_model_data
-  use gungho_modeldb_mod,         only : modeldb_type
+  use driver_modeldb_mod,         only : modeldb_type
   use gungho_model_mod,           only : initialise_infrastructure, &
                                          initialise_model, &
                                          finalise_infrastructure, &

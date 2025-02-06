@@ -78,8 +78,7 @@ module semi_implicit_timestep_alg_mod
   use field_collection_mod,       only: field_collection_type
   use io_value_mod,               only: io_value_type, &
                                         get_io_value
-  use gungho_modeldb_mod,         only: modeldb_type
-  use gungho_model_data_mod,      only: model_data_type
+  use driver_modeldb_mod,         only: modeldb_type
   use mesh_mod,                   only: mesh_type
   use mesh_collection_mod,        only: mesh_collection
   use model_clock_mod,            only: model_clock_type
@@ -251,7 +250,6 @@ contains
     type(mesh_type),                 pointer :: mesh
     type(mesh_type),                 pointer :: twod_mesh
 
-    type(model_data_type), pointer  :: model_data
     class(model_clock_type), pointer :: model_clock
 
     type( field_collection_type ), pointer :: prognostic_fields
@@ -292,7 +290,6 @@ contains
 
     ! Get pointers to field collections for use downstream
     prognostic_fields => modeldb%fields%get_field_collection("prognostic_fields")
-    model_data => modeldb%model_data
     model_clock => modeldb%clock
 
     ! Get pointers to fields for use downstream
@@ -354,7 +351,7 @@ contains
                   model_clock, dtemp_encorr,                  &
                   mesh, twod_mesh)
 
-    nullify(      model_data, model_clock, mesh,              &
+    nullify(      model_clock, mesh,                          &
                   prognostic_fields, moisture_fields,         &
                   u, rho, theta, exner, mr, moist_dyn,        &
                   adv_tracer_all_outer,adv_tracer_last_outer, &

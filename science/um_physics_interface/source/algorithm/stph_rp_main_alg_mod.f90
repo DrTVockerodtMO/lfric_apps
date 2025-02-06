@@ -9,7 +9,7 @@
 module stph_rp_main_alg_mod
 
   use constants_mod,        only: r_def, i_def, l_def
-  use gungho_modeldb_mod,   only: modeldb_type
+  use driver_modeldb_mod,   only: modeldb_type
 
   implicit none
 

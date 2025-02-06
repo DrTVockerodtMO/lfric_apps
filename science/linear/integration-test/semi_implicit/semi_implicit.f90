@@ -13,7 +13,7 @@ program semi_implicit
   use configuration_mod,       only: read_configuration, final_configuration
   use driver_collections_mod,  only: init_collections, final_collections
   use driver_time_mod,         only: init_time, final_time
-  use gungho_modeldb_mod,      only: modeldb_type
+  use driver_modeldb_mod,      only: modeldb_type
   use halo_comms_mod,          only: initialise_halo_comms, finalise_halo_comms
   use log_mod,                 only: log_event,       &
                                      LOG_LEVEL_ERROR, &

@@ -15,7 +15,7 @@ module linear_model_data_mod
   use function_space_mod,             only : function_space_type
   use function_space_collection_mod,  only : function_space_collection
   use fs_continuity_mod,              only : W2, W3, WTheta, W2h
-  use gungho_modeldb_mod,             only : modeldb_type
+  use driver_modeldb_mod,             only : modeldb_type
   use gungho_time_axes_mod,           only : gungho_time_axes_type, &
                                              get_time_axes_from_collection
   use init_time_axis_mod,             only : setup_field

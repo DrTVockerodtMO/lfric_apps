@@ -23,7 +23,7 @@ module linear_driver_mod
                                          initialise_model_data, &
                                          output_model_data, &
                                          finalise_model_data
-  use gungho_modeldb_mod,         only : modeldb_type
+  use driver_modeldb_mod,         only : modeldb_type
   use gungho_step_mod,            only : gungho_step
   use gungho_time_axes_mod,       only : gungho_time_axes_type, &
                                          get_time_axes_from_collection

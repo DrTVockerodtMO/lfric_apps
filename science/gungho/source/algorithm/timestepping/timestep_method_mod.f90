@@ -15,7 +15,7 @@ module timestep_method_mod
   use field_mod,                    only: field_type
   use key_value_collection_mod,     only: key_value_collection_type
   use key_value_mod,                only: abstract_value_type
-  use gungho_modeldb_mod,           only: modeldb_type
+  use driver_modeldb_mod,           only: modeldb_type
 
   implicit none
 

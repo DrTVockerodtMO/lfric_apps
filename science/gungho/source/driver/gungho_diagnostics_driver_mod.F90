@@ -50,7 +50,7 @@ module gungho_diagnostics_driver_mod
   use io_config_mod,             only : subroutine_timers, use_xios_io, write_fluxes
   use timer_mod,                 only : timer
   use transport_config_mod,      only : transport_ageofair
-  use gungho_modeldb_mod,        only : modeldb_type
+  use driver_modeldb_mod,        only : modeldb_type
 
 #ifdef UM_PHYSICS
   use pres_lev_diags_alg_mod,    only : pres_lev_diags_alg

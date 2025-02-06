@@ -25,7 +25,7 @@ program lfric_coupled
   use driver_time_mod,        only : init_time, final_time
   use gungho_mod,             only : gungho_required_namelists
   use gungho_driver_mod,      only : initialise, step, finalise
-  use gungho_modeldb_mod,     only : modeldb_type
+  use driver_modeldb_mod,     only : modeldb_type
   use mpi_mod,                only : global_mpi
 
   implicit none

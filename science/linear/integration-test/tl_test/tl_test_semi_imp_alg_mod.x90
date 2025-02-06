@@ -22,7 +22,7 @@ module tl_test_semi_imp_alg_mod
   use formulation_config_mod,         only: moisture_formulation,    &
                                             moisture_formulation_dry
   use fs_continuity_mod,              only: W2, W3, Wtheta
-  use gungho_modeldb_mod,             only: modeldb_type
+  use driver_modeldb_mod,             only: modeldb_type
   use moist_dyn_mod,                  only: num_moist_factors
   use mr_indices_mod,                 only: nummr
   use timestepping_config_mod,        only: dt

@@ -111,7 +111,7 @@ contains
   !> @param[in] modeldb  The model database object to check
   subroutine check_configuration(modeldb)
 
-    use gungho_modeldb_mod,          only: modeldb_type
+    use driver_modeldb_mod,          only: modeldb_type
     use log_mod,                     only: log_event,                          &
                                            log_scratch_space,                  &
                                            LOG_LEVEL_ERROR,                    &

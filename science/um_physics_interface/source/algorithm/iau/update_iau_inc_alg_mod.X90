@@ -13,7 +13,7 @@ module update_iau_inc_alg_mod
   use field_array_mod,                  only : field_array_type
   use field_mod,                        only : field_type
   use field_collection_mod,             only : field_collection_type
-  use gungho_modeldb_mod,               only : modeldb_type
+  use driver_modeldb_mod,               only : modeldb_type
   use fs_continuity_mod,                only : W2, W3, Wtheta
   use iau_config_mod,                   only : iau_pc2,               &
                                                iau_wet_density,       &

@@ -23,7 +23,7 @@ module coupler_mod
   use function_space_collection_mod,  only: function_space_collection
   use field_collection_iterator_mod,  only: field_collection_iterator_type
   use field_collection_mod,           only: field_collection_type
-  use gungho_modeldb_mod,             only: modeldb_type
+  use driver_modeldb_mod,             only: modeldb_type
   use constants_mod,                  only: i_def, r_def, str_def, l_def, &
                                             i_halo_index, imdi, rmdi
   use timestepping_config_mod,        only: dt

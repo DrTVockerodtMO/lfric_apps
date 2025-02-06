@@ -12,7 +12,7 @@ module jedi_checksum_mod
   use sci_checksum_alg_mod,        only: checksum_alg
   use field_array_mod,             only: field_array_type
   use field_mod,                   only: field_type
-  use gungho_modeldb_mod,          only: modeldb_type
+  use driver_modeldb_mod,          only: modeldb_type
   use jedi_lfric_tests_config_mod, only: test_field
   use field_collection_mod,        only: field_collection_type
 

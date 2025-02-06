@@ -48,7 +48,7 @@ contains
   !> @param[in]    mesh       The current 3d mesh
   subroutine create_scalar_winds( modeldb, mesh )
 
-    use gungho_modeldb_mod, only : modeldb_type
+    use driver_modeldb_mod, only : modeldb_type
 
     implicit none
 

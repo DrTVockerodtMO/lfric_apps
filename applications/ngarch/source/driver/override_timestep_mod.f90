@@ -16,7 +16,7 @@ module override_timestep_mod
 
   use timestep_method_mod, only: timestep_method_type
   use no_timestep_alg_mod, only: no_timestep_type
-  use gungho_modeldb_mod,  only: modeldb_type
+  use driver_modeldb_mod,  only: modeldb_type
   use ngarch_config_mod,   only: method, method_casim, method_lfricatm
   use log_mod,             only: log_event, LOG_LEVEL_ERROR
 
