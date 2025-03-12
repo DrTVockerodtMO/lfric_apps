@@ -6,18 +6,6 @@
 -    use adj_extract_w_kernel_mod, only : adj_extract_w_kernel_type
 +    use sci_extract_w_kernel_mod, only : extract_w_kernel_type
 +    use adj_sci_extract_w_kernel_mod, only : adj_extract_w_kernel_type
--    use finite_element_config_mod, only : element_order
-+    use finite_element_config_mod, only : element_order_h,element_order_v
+     use finite_element_config_mod, only : element_order_h, element_order_v
      use fs_continuity_mod, only : w2, wtheta
      use constants_mod, only : i_def, r_def
-@@ -34,8 +34,8 @@
-     real(kind=r_def) :: MachineTol
-     real(kind=r_def) :: relative_diff
- 
--    vector_space_w2_ptr => function_space_collection%get_fs(mesh,element_order,w2)
--    vector_space_wtheta_ptr => function_space_collection%get_fs(mesh,element_order,wtheta)
-+    vector_space_w2_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,w2)
-+    vector_space_wtheta_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,wtheta)
-     call velocity_w2v%initialise(vector_space=vector_space_wtheta_ptr, name='velocity_w2v')
-     call u_physics%initialise(vector_space=vector_space_w2_ptr, name='u_physics')
-     call velocity_w2v_input%initialise(vector_space=vector_space_wtheta_ptr, name='velocity_w2v_input')

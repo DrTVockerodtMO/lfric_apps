@@ -1,9 +1,5 @@
-@@ -10,53 +10,51 @@
-     use function_space_collection_mod, only : function_space_collection
-     use opt_apply_variable_hx_kernel_mod, only : opt_apply_variable_hx_kernel_type
-     use adj_opt_apply_variable_hx_kernel_mod, only : adj_opt_apply_variable_hx_kernel_type
--    use finite_element_config_mod, only : element_order
-+    use finite_element_config_mod, only : element_order_h,element_order_v
+@@ -13,10 +13,12 @@
+     use finite_element_config_mod, only : element_order_h, element_order_v
      use fs_continuity_mod, only : w2, w3, wtheta
      use operator_mod, only : operator_type
 -    use constants_mod, only : i_def, r_def
@@ -17,9 +13,7 @@
      type(mesh_type), pointer, intent(in) :: mesh
      type(field_type), dimension(3), intent(in), optional :: chi
      type(field_type), intent(in), optional :: panel_id
-     TYPE(function_space_type), POINTER :: vector_space_w2_ptr
-     TYPE(function_space_type), POINTER :: vector_space_w3_ptr
-     TYPE(function_space_type), POINTER :: vector_space_wtheta_ptr
+@@ -26,30 +28,26 @@
 -    type(field_type) :: lhs
 -    type(field_type) :: x
 -    type(field_type) :: mt_inv
@@ -68,16 +62,6 @@
 +    real(kind=r_solver) :: inner2
 +    real(kind=r_solver) :: MachineTol
 +    real(kind=r_solver) :: relative_diff
- 
--    vector_space_w2_ptr => function_space_collection%get_fs(mesh,element_order,w2)
--    vector_space_w3_ptr => function_space_collection%get_fs(mesh,element_order,w3)
--    vector_space_wtheta_ptr => function_space_collection%get_fs(mesh,element_order,wtheta)
-+    vector_space_w2_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,w2)
-+    vector_space_w3_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,w3)
-+    vector_space_wtheta_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,wtheta)
-     call lhs%initialise(vector_space=vector_space_w3_ptr, name='lhs')
-     call x%initialise(vector_space=vector_space_w2_ptr, name='x')
-     call mt_inv%initialise(vector_space=vector_space_wtheta_ptr, name='mt_inv')
 @@ -68,46 +66,38 @@
      call m3%initialise(vector_space_w3_ptr, vector_space_w3_ptr)
      call lhs_input%initialise(vector_space=vector_space_w3_ptr, name='lhs_input')

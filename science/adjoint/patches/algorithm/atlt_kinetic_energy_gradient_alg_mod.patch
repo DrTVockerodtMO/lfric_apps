@@ -4,11 +4,10 @@
      use tl_kinetic_energy_gradient_kernel_mod, only : tl_kinetic_energy_gradient_kernel_type
 -    use adj_kinetic_energy_gradient_kernel_mod, only : adj_kinetic_energy_gradient_kernel_type
 +    use atl_kinetic_energy_gradient_kernel_mod, only : atl_kinetic_energy_gradient_kernel_type
--    use finite_element_config_mod, only : element_order
-+    use finite_element_config_mod, only : element_order_h,element_order_v
+     use finite_element_config_mod, only : element_order_h, element_order_v
      use fs_continuity_mod, only : w0, w2, w3
      use quadrature_xyoz_mod, only : quadrature_xyoz_type
-@@ -27,33 +27,22 @@
+@@ -27,26 +27,15 @@
      type(field_type) :: r_u
      type(field_type) :: u
      type(field_type) :: ls_u
@@ -35,16 +34,6 @@
      real(kind=r_def) :: inner2
      real(kind=r_def) :: MachineTol
      real(kind=r_def) :: relative_diff
- 
--    vector_space_w0_ptr => function_space_collection%get_fs(mesh,element_order,w0)
--    vector_space_w2_ptr => function_space_collection%get_fs(mesh,element_order,w2)
--    vector_space_w3_ptr => function_space_collection%get_fs(mesh,element_order,w3)
-+    vector_space_w0_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,w0)
-+    vector_space_w2_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,w2)
-+    vector_space_w3_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,w3)
-     call r_u%initialise(vector_space=vector_space_w2_ptr, name='r_u')
-     call u%initialise(vector_space=vector_space_w2_ptr, name='u')
-     call ls_u%initialise(vector_space=vector_space_w2_ptr, name='ls_u')
 @@ -57,63 +46,25 @@
      call r_u%initialise(vector_space=vector_space_w2_ptr, name='r_u')
      call u%initialise(vector_space=vector_space_w2_ptr, name='u')
@@ -53,8 +42,7 @@
 -    call chi_3(2_i_def)%initialise(vector_space=vector_space_w0_ptr, name='chi_3')
 -    call chi_3(3_i_def)%initialise(vector_space=vector_space_w0_ptr, name='chi_3')
 -    call panel_id_1%initialise(vector_space=vector_space_w3_ptr, name='panel_id_1')
--    qr_xyoz = quadrature_xyoz_type(element_order + 3,quadrature_rule)
-+    qr_xyoz = quadrature_xyoz_type(element_order_h+3, element_order_h+3, element_order_v+3, quadrature_rule)
+     qr_xyoz = quadrature_xyoz_type(element_order_h + 3,element_order_h + 3,element_order_v + 3,quadrature_rule)
      call r_u_input%initialise(vector_space=vector_space_w2_ptr, name='r_u_input')
      call u_input%initialise(vector_space=vector_space_w2_ptr, name='u_input')
 -    call ls_u_input%initialise(vector_space=vector_space_w2_ptr, name='ls_u_input')

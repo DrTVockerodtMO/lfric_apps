@@ -9,9 +9,6 @@
 # 2) PSyAD: generates adjoint kernels and adjoint test algorithms from the pre-patch stage tangent linear kernels.
 # 3) Post-patch: copies (and patches) adjoint kernels and adjoint test algorithms from PSYAD_WDIR to WORKING_DIR.
 
-# TODO: Setup the psyad command to use '--config=/path/to/psyclone.cfg'.
-# This requires the PSyclone issue https://github.com/stfc/PSyclone/issues/2826 to be fixed.
-
 # List of targets needed by this script.
 include $(ADJOINT_BUILD)/psyad_targets.mk
 

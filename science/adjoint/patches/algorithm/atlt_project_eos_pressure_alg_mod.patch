@@ -1,4 +1,4 @@
-@@ -4,13 +4,14 @@
+@@ -4,12 +4,13 @@
  
    contains
    subroutine atlt_project_eos_pressure_alg(mesh, chi, panel_id)
@@ -10,11 +10,9 @@
      use tl_project_eos_pressure_kernel_mod, only : tl_project_eos_pressure_kernel_type
 -    use adj_project_eos_pressure_kernel_mod, only : adj_project_eos_pressure_kernel_type
 +    use atl_project_eos_pressure_kernel_mod, only : atl_project_eos_pressure_kernel_type
--    use finite_element_config_mod, only : element_order
-+    use finite_element_config_mod, only : element_order_h,element_order_v
+     use finite_element_config_mod, only : element_order_h, element_order_v
      use fs_continuity_mod, only : w0, w3, wtheta
      use operator_mod, only : operator_type
-     use quadrature_xyoz_mod, only : quadrature_xyoz_type
 @@ -18,6 +19,7 @@
      use quadrature_rule_gaussian_mod, only : quadrature_rule_gaussian_type
      use setop_random_kernel_mod, only : setop_random_kernel_type
@@ -32,7 +30,7 @@
      type(operator_type) :: m3_inv
      type(quadrature_xyoz_type) :: qr_xyoz
      type(quadrature_rule_gaussian_type) :: quadrature_rule
-@@ -41,37 +41,23 @@
+@@ -41,30 +41,16 @@
      type(field_type) :: rho_input
      type(field_type) :: theta_input
      type(field_type) :: moist_dyn_gas_input
@@ -64,16 +62,6 @@
      real(kind=r_def) :: inner2
      real(kind=r_def) :: MachineTol
      real(kind=r_def) :: relative_diff
- 
--    vector_space_w0_ptr => function_space_collection%get_fs(mesh,element_order,w0)
--    vector_space_w3_ptr => function_space_collection%get_fs(mesh,element_order,w3)
--    vector_space_wtheta_ptr => function_space_collection%get_fs(mesh,element_order,wtheta)
-+    vector_space_w0_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,w0)
-+    vector_space_w3_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,w3)
-+    vector_space_wtheta_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,wtheta)
-     call exner%initialise(vector_space=vector_space_w3_ptr, name='exner')
-     call rho%initialise(vector_space=vector_space_w3_ptr, name='rho')
-     call theta%initialise(vector_space=vector_space_wtheta_ptr, name='theta')
 @@ -79,93 +65,48 @@
      call ls_rho%initialise(vector_space=vector_space_w3_ptr, name='ls_rho')
      call ls_theta%initialise(vector_space=vector_space_wtheta_ptr, name='ls_theta')
@@ -83,8 +71,7 @@
 -    call chi3(3_i_def)%initialise(vector_space=vector_space_w0_ptr, name='chi3')
 -    call panel_id_1%initialise(vector_space=vector_space_w3_ptr, name='panel_id_1')
      call m3_inv%initialise(vector_space_w3_ptr, vector_space_w3_ptr)
--    qr_xyoz = quadrature_xyoz_type(element_order + 3,quadrature_rule)
-+    qr_xyoz = quadrature_xyoz_type(element_order_h+3, element_order_h+3, element_order_v+3, quadrature_rule)
+     qr_xyoz = quadrature_xyoz_type(element_order_h + 3,element_order_h + 3,element_order_v + 3,quadrature_rule)
      call exner_input%initialise(vector_space=vector_space_w3_ptr, name='exner_input')
      call rho_input%initialise(vector_space=vector_space_w3_ptr, name='rho_input')
      call theta_input%initialise(vector_space=vector_space_wtheta_ptr, name='theta_input')

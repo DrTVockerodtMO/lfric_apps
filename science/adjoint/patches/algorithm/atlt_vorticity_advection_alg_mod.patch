@@ -1,15 +1,13 @@
-@@ -9,8 +9,8 @@
+@@ -9,7 +9,7 @@
      use mesh_mod, only : mesh_type
      use function_space_collection_mod, only : function_space_collection
      use tl_vorticity_advection_kernel_mod, only : tl_vorticity_advection_kernel_type
 -    use adj_vorticity_advection_kernel_mod, only : adj_vorticity_advection_kernel_type
 +    use atl_vorticity_advection_kernel_mod, only : atl_vorticity_advection_kernel_type
--    use finite_element_config_mod, only : element_order
-+    use finite_element_config_mod, only : element_order_h,element_order_v
+     use finite_element_config_mod, only : element_order_h, element_order_v
      use fs_continuity_mod, only : w1, w2, w3, wchi
      use quadrature_xyoz_mod, only : quadrature_xyoz_type
-     use constants_mod, only : i_def, r_def
-@@ -30,40 +30,26 @@
+@@ -30,32 +30,18 @@
      type(field_type) :: vorticity
      type(field_type) :: ls_wind
      type(field_type) :: ls_vorticity
@@ -42,18 +40,6 @@
      real(kind=r_def) :: inner2
      real(kind=r_def) :: MachineTol
      real(kind=r_def) :: relative_diff
- 
--    vector_space_w1_ptr => function_space_collection%get_fs(mesh,element_order,w1)
--    vector_space_w2_ptr => function_space_collection%get_fs(mesh,element_order,w2)
--    vector_space_w3_ptr => function_space_collection%get_fs(mesh,element_order,w3)
--    vector_space_wchi_ptr => function_space_collection%get_fs(mesh,element_order,wchi)
-+    vector_space_w1_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,w1)
-+    vector_space_w2_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,w2)
-+    vector_space_w3_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,w3)
-+    vector_space_wchi_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,wchi)
-     call r_u%initialise(vector_space=vector_space_w2_ptr, name='r_u')
-     call wind%initialise(vector_space=vector_space_w2_ptr, name='wind')
-     call vorticity%initialise(vector_space=vector_space_w1_ptr, name='vorticity')
 @@ -69,79 +55,33 @@
      call vorticity%initialise(vector_space=vector_space_w1_ptr, name='vorticity')
      call ls_wind%initialise(vector_space=vector_space_w2_ptr, name='ls_wind')
@@ -62,8 +48,7 @@
 -    call chi_3(2_i_def)%initialise(vector_space=vector_space_wchi_ptr, name='chi_3')
 -    call chi_3(3_i_def)%initialise(vector_space=vector_space_wchi_ptr, name='chi_3')
 -    call panel_id_1%initialise(vector_space=vector_space_w3_ptr, name='panel_id_1')
--    qr_xyoz = quadrature_xyoz_type(element_order + 3,quadrature_rule)
-+    qr_xyoz = quadrature_xyoz_type(element_order_h+3, element_order_h+3, element_order_v+3, quadrature_rule)
+     qr_xyoz = quadrature_xyoz_type(element_order_h + 3,element_order_h + 3,element_order_v + 3,quadrature_rule)
      call r_u_input%initialise(vector_space=vector_space_w2_ptr, name='r_u_input')
      call wind_input%initialise(vector_space=vector_space_w2_ptr, name='wind_input')
      call vorticity_input%initialise(vector_space=vector_space_w1_ptr, name='vorticity_input')

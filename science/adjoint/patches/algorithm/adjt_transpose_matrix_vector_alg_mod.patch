@@ -1,13 +1,4 @@
-@@ -10,7 +10,7 @@
-     use function_space_collection_mod, only : function_space_collection
-     use transpose_matrix_vector_kernel_mod, only : transpose_matrix_vector_kernel_type
-     use adj_transpose_matrix_vector_kernel_mod, only : adj_transpose_matrix_vector_kernel_type
--    use finite_element_config_mod, only : element_order
-+    use finite_element_config_mod, only : element_order_h,element_order_v
-     use fs_continuity_mod, only : w0
-     use operator_mod, only : operator_type
-     use constants_mod, only : i_def, r_def
-@@ -31,11 +31,12 @@
+@@ -31,6 +31,7 @@
      real(kind=r_def) :: inner1
      real(kind=r_def) :: lhs_lhs_input_inner_prod
      real(kind=r_def) :: x_x_input_inner_prod
@@ -15,12 +6,6 @@
      real(kind=r_def) :: inner2
      real(kind=r_def) :: MachineTol
      real(kind=r_def) :: relative_diff
- 
--    vector_space_w0_ptr => function_space_collection%get_fs(mesh,element_order,w0)
-+    vector_space_w0_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,w0)
-     call lhs%initialise(vector_space=vector_space_w0_ptr, name='lhs')
-     call x%initialise(vector_space=vector_space_w0_ptr, name='x')
-     call matrix%initialise(vector_space_w0_ptr, vector_space_w0_ptr)
 @@ -48,8 +49,9 @@
  &setop_random_kernel_type(matrix), transpose_matrix_vector_kernel_type(lhs, x, matrix), x_innerproduct_x(lhs_inner_prod, lhs), &
  &x_innerproduct_x(x_inner_prod, x))

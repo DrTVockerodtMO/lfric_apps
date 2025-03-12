@@ -10,8 +10,7 @@
      use tl_rhs_project_eos_kernel_mod, only : tl_rhs_project_eos_kernel_type
 -    use adj_rhs_project_eos_kernel_mod, only : adj_rhs_project_eos_kernel_type
 +    use atl_rhs_project_eos_kernel_mod, only : atl_rhs_project_eos_kernel_type
--    use finite_element_config_mod, only : element_order
-+    use finite_element_config_mod, only : element_order_h,element_order_v
+     use finite_element_config_mod, only : element_order_h, element_order_v
      use fs_continuity_mod, only : w0, w3, wtheta
      use constants_mod, only : i_def, r_def
 +    use planet_config_mod, only : kappa, rd, p_zero
@@ -23,7 +22,7 @@
      real(kind=r_def), parameter :: overall_tolerance = 1500.0_r_def
      type(mesh_type), pointer, intent(in) :: mesh
      type(field_type), dimension(3), intent(in), optional :: chi
-@@ -33,57 +36,32 @@
+@@ -33,50 +36,25 @@
      type(field_type) :: ls_rho
      type(field_type) :: ls_theta
      type(field_type) :: ls_moist_dyn_gas
@@ -75,16 +74,6 @@
      real(kind=r_def) :: inner2
      real(kind=r_def) :: MachineTol
      real(kind=r_def) :: relative_diff
- 
--    vector_space_w0_ptr => function_space_collection%get_fs(mesh,element_order,w0)
--    vector_space_w3_ptr => function_space_collection%get_fs(mesh,element_order,w3)
--    vector_space_wtheta_ptr => function_space_collection%get_fs(mesh,element_order,wtheta)
-+    vector_space_w0_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,w0)
-+    vector_space_w3_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,w3)
-+    vector_space_wtheta_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,wtheta)
-     call rhs_eos%initialise(vector_space=vector_space_w3_ptr, name='rhs_eos')
-     call exner%initialise(vector_space=vector_space_w3_ptr, name='exner')
-     call rho%initialise(vector_space=vector_space_w3_ptr, name='rho')
 @@ -93,118 +71,54 @@
      call ls_rho%initialise(vector_space=vector_space_w3_ptr, name='ls_rho')
      call ls_theta%initialise(vector_space=vector_space_wtheta_ptr, name='ls_theta')
@@ -93,8 +82,7 @@
 -    call chi3(2_i_def)%initialise(vector_space=vector_space_w0_ptr, name='chi3')
 -    call chi3(3_i_def)%initialise(vector_space=vector_space_w0_ptr, name='chi3')
 -    call panel_id_1%initialise(vector_space=vector_space_w3_ptr, name='panel_id_1')
--    qr_xyoz = quadrature_xyoz_type(element_order + 3,quadrature_rule)
-+    qr_xyoz = quadrature_xyoz_type(element_order_h+3, element_order_h+3, element_order_v+3, quadrature_rule)
+     qr_xyoz = quadrature_xyoz_type(element_order_h + 3,element_order_h + 3,element_order_v + 3,quadrature_rule)
      call rhs_eos_input%initialise(vector_space=vector_space_w3_ptr, name='rhs_eos_input')
      call exner_input%initialise(vector_space=vector_space_w3_ptr, name='exner_input')
      call rho_input%initialise(vector_space=vector_space_w3_ptr, name='rho_input')

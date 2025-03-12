@@ -4,19 +4,9 @@
      use tl_moist_dyn_mass_kernel_mod, only : tl_moist_dyn_mass_kernel_type
 -    use adj_moist_dyn_mass_kernel_mod, only : adj_moist_dyn_mass_kernel_type
 +    use atl_moist_dyn_mass_kernel_mod, only : atl_moist_dyn_mass_kernel_type
--    use finite_element_config_mod, only : element_order
-+    use finite_element_config_mod, only : element_order_h,element_order_v
+     use finite_element_config_mod, only : element_order_h, element_order_v
      use fs_continuity_mod, only : wtheta
      use constants_mod, only : i_def, r_def
-@@ -33,7 +33,7 @@
-     real(kind=r_def) :: MachineTol
-     real(kind=r_def) :: relative_diff
- 
--    vector_space_wtheta_ptr => function_space_collection%get_fs(mesh,element_order,wtheta)
-+    vector_space_wtheta_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,wtheta)
-     call moist_dyn_tot%initialise(vector_space=vector_space_wtheta_ptr, name='moist_dyn_tot')
-     call mr_g(1_i_def)%initialise(vector_space=vector_space_wtheta_ptr, name='mr_g')
-     call mr_g(2_i_def)%initialise(vector_space=vector_space_wtheta_ptr, name='mr_g')
 @@ -80,7 +80,7 @@
      mr_ci_mr_ci_input_inner_prod(4_i_def) = 0.0_r_def
      mr_ci_mr_ci_input_inner_prod(5_i_def) = 0.0_r_def
@@ -25,4 +15,4 @@
 +    call invoke(atl_moist_dyn_mass_kernel_type(moist_dyn_tot, mr_ci), &
  &x_innerproduct_y(moist_dyn_tot_moist_dyn_tot_input_inner_prod, moist_dyn_tot, moist_dyn_tot_input), &
  &x_innerproduct_y(mr_ci_mr_ci_input_inner_prod(1_i_def), mr_ci(1_i_def), mr_ci_input(1_i_def)), &
- &x_innerproduct_y(mr_ci_mr_ci_input_inner_prod(2_i_def), mr_ci(2_i_def), mr_ci_input(2_i_def)), &
+ &x_innerproduct_y(ci_mr_ci_input_inner_prod(2_i_def), mr_ci(2_i_def), mr_ci_input(2_i_def)), &

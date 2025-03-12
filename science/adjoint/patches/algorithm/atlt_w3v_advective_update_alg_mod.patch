@@ -3,9 +3,8 @@
      use function_space_collection_mod, only : function_space_collection
      use tl_w3v_advective_update_kernel_mod, only : tl_w3v_advective_update_kernel_type
 -    use adj_w3v_advective_update_kernel_mod, only : adj_w3v_advective_update_kernel_type
--    use finite_element_config_mod, only : element_order
 +    use atl_w3v_advective_update_kernel_mod, only : atl_w3v_advective_update_kernel_type
-+    use finite_element_config_mod, only : element_order_h, element_order_v
+     use finite_element_config_mod, only : element_order_h, element_order_v
      use fs_continuity_mod, only : w2, w3
      use operator_mod, only : operator_type
      use constants_mod, only : i_def, r_def
@@ -29,8 +28,8 @@
      real(kind=r_def) :: MachineTol
      real(kind=r_def) :: relative_diff
  
--    vector_space_w2_ptr => function_space_collection%get_fs(mesh,element_order,w2)
--    vector_space_w3_ptr => function_space_collection%get_fs(mesh,element_order,w3)
+-    vector_space_w2_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,w2)
+-    vector_space_w3_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,w3)
 +    vector_space_w2_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,w2)
 +    vector_space_w3_ptr => function_space_collection % get_fs(mesh, element_order_h, element_order_v, w3, 6, ndata_first = .false.)
      call advective_increment%initialise(vector_space=vector_space_w3_ptr, name='advective_increment')

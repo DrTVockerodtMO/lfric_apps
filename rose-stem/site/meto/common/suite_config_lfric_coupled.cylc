@@ -17,9 +17,9 @@
                                'module load meto-gmake/4.3' %}
 {% endif %}
 
-{% set xc40_coupled_intel = 'module load GC5-PrgEnv/intel/17.0.0.098/2024-12-ifort/5427' %}
+{% set xc40_coupled_intel = 'module load GC5-PrgEnv/intel/17.0.0.098/2024-12-ifort/5551' %}
 {% if site_vars["meto_xc40"] == "xcs" %}
-    {% set xc40_coupled_intel = 'module load GC5-PrgEnv/intel/17.0.0.098/2024-12-ifort/5425' %}
+    {% set xc40_coupled_intel = 'module load GC5-PrgEnv/intel/17.0.0.098/2024-12-ifort/5552' %}
 {% endif %}
 
 {% set xc40_coupled_setup = 'module load cray-snplauncher/${CRAY_MPICH2_VER}' %}

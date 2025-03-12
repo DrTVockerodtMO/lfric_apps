@@ -1,9 +1,6 @@
-@@ -10,50 +10,51 @@
-     use function_space_collection_mod, only : function_space_collection
-     use apply_mixed_lu_operator_kernel_mod, only : apply_mixed_lu_operator_kernel_type
+@@ -12,44 +12,45 @@
      use adj_apply_mixed_lu_operator_kernel_mod, only : adj_apply_mixed_lu_operator_kernel_type
--    use finite_element_config_mod, only : element_order
-+    use finite_element_config_mod, only : element_order_h, element_order_v
+     use finite_element_config_mod, only : element_order_h, element_order_v
      use fs_continuity_mod, only : w2, w3, wtheta
 -    use operator_mod, only : operator_type
 -    use constants_mod, only : i_def, r_def
@@ -65,15 +62,8 @@
 +    real(kind=r_solver) :: MachineTol
 +    real(kind=r_solver) :: relative_diff
  
--    vector_space_w2_ptr => function_space_collection%get_fs(mesh,element_order,w2)
--    vector_space_w3_ptr => function_space_collection%get_fs(mesh,element_order,w3)
--    vector_space_wtheta_ptr => function_space_collection%get_fs(mesh,element_order,wtheta)
-+    vector_space_w2_ptr => function_space_collection%get_fs(mesh,element_order_h, element_order_v,w2)
-+    vector_space_w3_ptr => function_space_collection%get_fs(mesh,element_order_h, element_order_v,w3)
-+    vector_space_wtheta_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,wtheta)
-     call lhs_u%initialise(vector_space=vector_space_w2_ptr, name='lhs_u')
-     call wind%initialise(vector_space=vector_space_w2_ptr, name='wind')
-     call theta%initialise(vector_space=vector_space_wtheta_ptr, name='theta')
+     vector_space_w2_ptr => function_space_collection%get_fs(mesh,element_order_h, element_order_v,w2)
+     vector_space_w3_ptr => function_space_collection%get_fs(mesh,element_order_h, element_order_v,w3)
 @@ -79,12 +80,12 @@
  &setop_random_kernel_type(grad), apply_mixed_lu_operator_kernel_type(lhs_u, wind, theta, exner, mu_cd, p2theta, grad, norm_u), &
  &x_innerproduct_x(lhs_u_inner_prod, lhs_u), x_innerproduct_x(wind_inner_prod, wind), x_innerproduct_x(theta_inner_prod, theta), &

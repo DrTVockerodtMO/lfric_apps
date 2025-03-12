@@ -4,11 +4,10 @@
      use function_space_collection_mod, only : function_space_collection
 -    use combine_multidata_field_kernel_mod, only : combine_multidata_field_kernel_type
 -    use adj_combine_multidata_field_kernel_mod, only : adj_combine_multidata_field_kernel_type
--    use finite_element_config_mod, only : element_order
--    use fs_continuity_mod, only : w0
 +    use sci_combine_multidata_field_kernel_mod, only : combine_multidata_field_kernel_type
 +    use adj_sci_combine_multidata_field_kernel_mod, only : adj_combine_multidata_field_kernel_type
-+    use finite_element_config_mod, only : element_order_h, element_order_v
+     use finite_element_config_mod, only : element_order_h, element_order_v
+-    use fs_continuity_mod, only : w0
 +    use fs_continuity_mod, only : w3
      use constants_mod, only : i_def, l_def, r_def
      use setop_random_kernel_mod, only : setop_random_kernel_type
@@ -39,7 +38,7 @@
      real(kind=r_def) :: MachineTol
      real(kind=r_def) :: relative_diff
  
--    vector_space_w0_ptr => function_space_collection%get_fs(mesh,element_order,w0)
+-    vector_space_w0_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,w0)
 -    call field_out%initialise(vector_space=vector_space_w0_ptr, name='field_out')
 -    call field1_in%initialise(vector_space=vector_space_w0_ptr, name='field1_in')
 -    call field2_in%initialise(vector_space=vector_space_w0_ptr, name='field2_in')

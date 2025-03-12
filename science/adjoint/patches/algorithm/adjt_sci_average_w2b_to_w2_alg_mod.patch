@@ -6,11 +6,10 @@
 -    use adj_average_w2b_to_w2_kernel_mod, only : adj_average_w2b_to_w2_kernel_type
 +    use sci_average_w2b_to_w2_kernel_mod, only : average_w2b_to_w2_kernel_type
 +    use adj_sci_average_w2b_to_w2_kernel_mod, only : adj_average_w2b_to_w2_kernel_type
--    use finite_element_config_mod, only : element_order
-+    use finite_element_config_mod, only : element_order_h,element_order_v
+     use finite_element_config_mod, only : element_order_h, element_order_v
      use fs_continuity_mod, only : w2, w2broken
      use constants_mod, only : i_def, r_def
-@@ -26,18 +26,15 @@
+@@ -26,14 +26,11 @@
      type(field_type) :: rmultiplicity_w2
      type(field_type) :: field_w2_input
      type(field_type) :: field_w2_broken_input
@@ -25,12 +24,6 @@
      real(kind=r_def) :: inner2
      real(kind=r_def) :: MachineTol
      real(kind=r_def) :: relative_diff
- 
--    vector_space_w2_ptr => function_space_collection%get_fs(mesh,element_order,w2)
--    vector_space_w2broken_ptr => function_space_collection%get_fs(mesh,element_order,w2broken)
-+    vector_space_w2_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,w2)
-+    vector_space_w2broken_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,w2broken)
-     call field_w2%initialise(vector_space=vector_space_w2_ptr, name='field_w2')
 @@ -45,31 +42,24 @@
      call rmultiplicity_w2%initialise(vector_space=vector_space_w2_ptr, name='rmultiplicity_w2')
      call field_w2_input%initialise(vector_space=vector_space_w2_ptr, name='field_w2_input')

@@ -4,19 +4,9 @@
      use tl_moist_dyn_gas_kernel_mod, only : tl_moist_dyn_gas_kernel_type
 -    use adj_moist_dyn_gas_kernel_mod, only : adj_moist_dyn_gas_kernel_type
 +    use atl_moist_dyn_gas_kernel_mod, only : atl_moist_dyn_gas_kernel_type
--    use finite_element_config_mod, only : element_order
-+    use finite_element_config_mod, only : element_order_h,element_order_v
+     use finite_element_config_mod, only : element_order_h, element_order_v
      use fs_continuity_mod, only : wtheta
      use constants_mod, only : i_def, r_def
-@@ -33,7 +33,7 @@
-     real(kind=r_def) :: MachineTol
-     real(kind=r_def) :: relative_diff
- 
--    vector_space_wtheta_ptr => function_space_collection%get_fs(mesh,element_order,wtheta)
-+    vector_space_wtheta_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,wtheta)
-     call moist_dyn_gas%initialise(vector_space=vector_space_wtheta_ptr, name='moist_dyn_gas')
-     call mr_v%initialise(vector_space=vector_space_wtheta_ptr, name='mr_v')
-     call moist_dyn_gas_input%initialise(vector_space=vector_space_wtheta_ptr, name='moist_dyn_gas_input')
 @@ -49,7 +49,7 @@
      inner1 = inner1 + mr_v_inner_prod
      moist_dyn_gas_moist_dyn_gas_input_inner_prod = 0.0_r_def

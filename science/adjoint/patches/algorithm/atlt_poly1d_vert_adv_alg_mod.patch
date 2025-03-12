@@ -1,15 +1,13 @@
-@@ -9,8 +9,8 @@
+@@ -9,7 +9,7 @@
      use mesh_mod, only : mesh_type
      use function_space_collection_mod, only : function_space_collection
      use tl_poly1d_vert_adv_kernel_mod, only : tl_poly1d_vert_adv_kernel_type
 -    use adj_poly1d_vert_adv_kernel_mod, only : adj_poly1d_vert_adv_kernel_type
 +    use atl_poly1d_vert_adv_kernel_mod, only : atl_poly1d_vert_adv_kernel_type
--    use finite_element_config_mod, only : element_order
-+    use finite_element_config_mod, only : element_order_h,element_order_v
+     use finite_element_config_mod, only : element_order_h, element_order_v
      use fs_continuity_mod, only : w2v, w3, wtheta
      use constants_mod, only : i_def, l_def, r_def
-     use setop_random_kernel_mod, only : setop_random_kernel_type
-@@ -31,35 +31,23 @@
+@@ -31,28 +31,16 @@
      integer(kind=i_def) :: ndata
      integer(kind=i_def) :: global_order
      logical(kind=l_def) :: logspace
@@ -38,16 +36,6 @@
      real(kind=r_def) :: inner2
      real(kind=r_def) :: MachineTol
      real(kind=r_def) :: relative_diff
- 
--    vector_space_w2v_ptr => function_space_collection%get_fs(mesh,element_order,w2v)
--    vector_space_w3_ptr => function_space_collection%get_fs(mesh,element_order,w3)
--    vector_space_wtheta_ptr => function_space_collection%get_fs(mesh,element_order,wtheta)
-+    vector_space_w2v_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,w2v)
-+    vector_space_w3_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,w3)
-+    vector_space_wtheta_ptr => function_space_collection%get_fs(mesh,element_order_h,element_order_v,wtheta)
-     call advective%initialise(vector_space=vector_space_wtheta_ptr, name='advective')
-     call wind%initialise(vector_space=vector_space_w2v_ptr, name='wind')
-     call tracer%initialise(vector_space=vector_space_wtheta_ptr, name='tracer')
 @@ -69,59 +57,33 @@
      call advective_input%initialise(vector_space=vector_space_wtheta_ptr, name='advective_input')
      call wind_input%initialise(vector_space=vector_space_w2v_ptr, name='wind_input')
