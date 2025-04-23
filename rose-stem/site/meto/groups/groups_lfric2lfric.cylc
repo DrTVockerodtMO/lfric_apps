@@ -77,6 +77,37 @@
     ],
     }) %}
 
+{# EX1A Groups #}
+{% do site_groups.update({
+    "lfric2lfric_ex1a_developer": [
+        "lfric2lfric_ral_seuk-C32_lam_MG_ex1a_gnu_fast-debug-64bit",
+        "lfric2lfric_ral3-seuk_ex1a_gnu_fast-debug-64bit",
+        "lfric2lfric_clim_gal9-C24_C12_ex1a_gnu_fast-debug-64bit",
+        "lfric2lfric_ral_seuk-C32_lam_MG_ex1a_cce_fast-debug-64bit",
+        "lfric2lfric_ral3-seuk_ex1a_cce_fast-debug-64bit",
+        "lfric2lfric_clim_gal9-C24_C12_ex1a_cce_fast-debug-64bit",
+        "lfric2lfric_ex1a_canned",
+    ],
+    "lfric2lfric_ex1a_extra": [
+        "lfric2lfric_ral3-uk_ex1a_gnu_fast-debug-64bit",
+        "lfric2lfric_ral3-ukv_ex1a_gnu_fast-debug-64bit",
+        "lfric2lfric_ral3-uk_ex1a_cce_fast-debug-64bit",
+        "lfric2lfric_ral3-ukv_ex1a_cce_fast-debug-64bit",
+    ],
+    "lfric2lfric_ex1a": [
+        "lfric2lfric_ex1a_developer",
+        "lfric2lfric_ex1a_extra",
+    ],
+    "lfric2lfric_ex1a_build": [
+        "build_lfric2lfric_ex1a_gnu_fast-debug-64bit",
+        "build_lfric2lfric_ex1a_cce_fast-debug-64bit",
+    ],
+    "lfric2lfric_ex1a_canned": [
+        "lfric2lfric_canned_ex1a_gnu_fast-debug-64bit",
+        "lfric2lfric_canned_ex1a_cce_fast-debug-64bit",
+    ],
+    }) %}
+
 {# Platform Generic Groups #}
 {% if site_vars.launch_platform == "spice" %}
     {% do site_groups.update({
@@ -105,9 +136,11 @@
     {% do site_groups.update({
         "lfric2lfric_developer": [
             "lfric2lfric_azspice_developer",
+            "lfric2lfric_ex1a_developer",
         ],
         "lfric2lfric_extra": [
             "lfric2lfric_azspice_extra",
+            "lfric2lfric_ex1a_extra",
         ],
         "lfric2lfric": [
             "lfric2lfric_developer",
@@ -115,9 +148,11 @@
         ],
         "lfric2lfric_build": [
             "lfric2lfric_azspice_build",
+            "lfric2lfric_ex1a_build",
         ],
         "lfric2lfric_canned": [
             "lfric2lfric_azspice_canned",
+            "lfric2lfric_ex1a_canned",
         ],
         }) %}
 {% endif %}
@@ -141,5 +176,10 @@
 {% do site_groups.xc40_developer.extend(site_groups.lfric2lfric_xc40_developer) %}
 {% do site_groups.xc40.extend(site_groups.lfric2lfric_xc40) %}
 {% do site_groups.xc40_build.extend(site_groups.lfric2lfric_xc40_build) %}
+
+{# EX1A Extends #}
+{% do site_groups.ex1a_developer.extend(site_groups.lfric2lfric_ex1a_developer) %}
+{% do site_groups.ex1a.extend(site_groups.lfric2lfric_ex1a) %}
+{% do site_groups.ex1a_build.extend(site_groups.lfric2lfric_ex1a_build) %}
 
 {% do LOG.debug("Finished in site/meto/groups/groups_lfric2lfric.cylc") %}
