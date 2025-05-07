@@ -115,6 +115,7 @@ module slow_physics_alg_mod
   use bl_imp_alg_mod,            only: bl_imp_alg
   use conv_ll_alg_mod,           only: conv_ll_alg
   use conv_gr_alg_mod,           only: conv_gr_alg
+  use jules_exp_alg_mod,         only: jules_exp_alg
   use jules_extra_alg_mod,       only: jules_extra_alg
   use leonard_term_alg_mod,      only: leonard_term_alg
   use pc2_conv_coupling_alg_mod, only: pc2_conv_coupling_alg
@@ -266,6 +267,9 @@ contains
     type( field_type ) :: radiative_cloud_fraction, radiative_conv_fraction
     type( field_type ) :: conv_liquid_fraction, conv_frozen_fraction
     type( field_type ) :: conv_liquid_mmr, conv_frozen_mmr
+    ! ...for JULES & Boundary Layer
+    type( field_type ) :: recip_l_mo_sea, rhostar, h_blend_orog
+    type( field_type ) :: t1_sd_2d, q1_sd_2d
 #endif
     ! ...for spectral GWD
     type( field_type ) :: du_tot_spectral_gwd, dtheta_spectral_gwd
@@ -806,12 +810,20 @@ contains
     ! UM explicit boundary layer and Jules surface schemes
     !--------------------------------------------------------------------
     if (boundary_layer == boundary_layer_um ) then
-      call bl_exp_alg(modeldb, theta, rho, exner, mr_n,                  &
-                      derived_fields, radiation_fields,                  &
-                      microphysics_fields, dmr_mphys, orography_fields,  &
-                      turbulence_fields, convection_fields, cloud_fields,&
-                      surface_fields, soil_fields, snow_fields,          &
-                      aerosol_fields, clock)
+      call jules_exp_alg(modeldb, theta, mr_n,                               &
+                         derived_fields, radiation_fields,                   &
+                         orography_fields,                                   &
+                         turbulence_fields, convection_fields, cloud_fields, &
+                         surface_fields, soil_fields, snow_fields,           &
+                         aerosol_fields, recip_l_mo_sea, rhostar,            &
+                         h_blend_orog, t1_sd_2d, q1_sd_2d)
+      call bl_exp_alg(theta, rho, exner, mr_n,                            &
+                      derived_fields, radiation_fields,                   &
+                      microphysics_fields, dmr_mphys, orography_fields,   &
+                      turbulence_fields, convection_fields, cloud_fields, &
+                      surface_fields,                                     &
+                      recip_l_mo_sea, rhostar,                            &
+                      h_blend_orog, t1_sd_2d, q1_sd_2d, clock)
 
     !--------------------------------------------------------------------
     ! Calculate Leonard term fluxes and increments
