@@ -6,6 +6,9 @@
 {% do LOG.debug("Entered site/azngarch/variables.cylc") %}
 
 {% do site_vars.update({"known_applications": ["lfric_atm",
+                                               "gungho",
+                                               "gungho_model",
+                                               "ngarch",
                                                "mesh"]}) %}
 
 {% do site_vars.update({"site_platforms": ["sandbox"]}) %}
@@ -14,6 +17,8 @@
 
 {% do site_vars.update({"mesh_build": {"sandbox": "gnu_fast-debug-64bit"} }) %}
 
+{% do site_vars.update({"lfricinputs_kgo_base": "$UMDIR/standard_jobs/lfricinputs/kgo"}) %}
+
 {% if HPC_QUEUE is defined %}
     {% do site_vars.update({"hpc_queue": HPC_QUEUE}) %}
 {% else %}
@@ -21,5 +26,8 @@
 {% endif %}
 
 {% include "site/azngarch/common/default_directives.cylc" %}
+
+{# Set fixed release version the KGO corresponds to #}
+{% set BASE = "vn1.0" %}
 
 {% do LOG.debug("Finished in site/azngarch/variables.cylc") %}

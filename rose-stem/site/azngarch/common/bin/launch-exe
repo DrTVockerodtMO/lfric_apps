@@ -47,7 +47,7 @@ elif [ "${RUN_METHOD}" = "srun" ] ; then
       NODES="$(( (TOTAL_RANKS*OMP_NUM_THREADS+CORES_PER_NODE*HYPERTHREADS-1) / CORES_PER_NODE*HYPERTHREADS ))"
     fi
     CPUS_PER_TASK="$(( NODES*CORES_PER_NODE*HYPERTHREADS / TOTAL_RANKS ))"
-    if [[ ! -z "${XIOS_SERVER_MODE}" && "${XIOS_SERVER_MODE}" = "True" ]] ; then
+    if [ ! -z "${XIOS_SERVER_MODE}" ] && [ "${XIOS_SERVER_MODE}" = "True" ] ; then
       LAUNCHER_OPTS="--het-group=0 --distribution=block:block --hint=nomultithread --nodes=${NODES} --ntasks=${TOTAL_RANKS} --cpus-per-task=${CPUS_PER_TASK}"
     else
       LAUNCHER_OPTS="--distribution=block:block --hint=nomultithread --nodes=${NODES} --ntasks=${TOTAL_RANKS} --cpus-per-task=${CPUS_PER_TASK}"
@@ -61,7 +61,7 @@ fi
 
 # Construct XIOS server options
 #===========================================
-if [[ ! -z "${XIOS_SERVER_MODE}" && "${XIOS_SERVER_MODE}" = "True" ]] ; then
+if [ ! -z "${XIOS_SERVER_MODE}" ] && [ "${XIOS_SERVER_MODE}" = "True" ] ; then
   if [ "${RUN_METHOD}" = "srun" ] ; then
     if [ "${TARGET_PLATFORM}" = "ncas-ex" ] ; then
       XIOS_CPUS_PER_TASK="$(( xios_nodes*CORES_PER_NODE / XIOS_SERVER_RANKS ))"

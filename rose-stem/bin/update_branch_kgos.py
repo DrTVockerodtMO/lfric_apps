@@ -17,7 +17,10 @@ PLATFORMS = {
     "meto": {
         "azspice": {"copy_command": "cp "},
         "ex1a": {},
-    }
+        },
+    "azngarch": {
+        "sandbox": {"copy_command": "cp "},
+        },
 }
 
 EX1A_PLATFORMS = {

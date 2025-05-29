@@ -24,7 +24,6 @@
             HYPERTHREADS    = 1
             CORES_PER_NODE  = 120
             NUMA_REGIONS_PER_NODE = 8
-            LUSTRE_FILESYSTEM = true
 
     [[SANDBOX_SLURM]]
         inherit = SANDBOX_BASE
@@ -114,4 +113,4 @@
 
     [[SANDBOX_HOUSEKEEPING]]
 
-{% do LOG.debug("Finished in site/mcas/common/suite_config_sandbox.cylc") %}
+{% do LOG.debug("Finished in site/azngarch/common/suite_config_sandbox.cylc") %}
