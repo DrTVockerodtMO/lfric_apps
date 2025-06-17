@@ -9,7 +9,12 @@
 module end_of_transport_step_alg_mod
 
   use base_mesh_config_mod,           only: topology, topology_non_periodic
-  use boundaries_config_mod,          only: limited_area, transport_boundary_depth
+  use boundaries_config_mod,          only: limited_area,                      &
+                                            transport_boundary_depth,          &
+                                            transport_overwrite_freq,          &
+                                            transport_overwrite_freq_all,      &
+                                            transport_overwrite_freq_final,    &
+                                            transport_overwrite_freq_split_step
   use check_configuration_mod,        only: check_any_eqn_consistent,          &
                                             check_any_wt_eqn_conservative
   use conservative_neg_fix_kernel_mod, &
@@ -49,27 +54,29 @@ module end_of_transport_step_alg_mod
   use operator_mod,                   only: operator_type
   use r_tran_field_mod,               only: r_tran_field_type
   use r_tran_operator_mod,            only: r_tran_operator_type
-  use split_transport_utils_mod,      only: get_num_split_steps
+  use split_transport_utils_mod,      only: get_num_split_steps,               &
+                                            get_dry_config
   use timer_mod,                      only: timer
-  use transport_config_mod,           only: dry_field_name,              &
-                                            min_val_abs_tol,             &
-                                            min_val_max_iterations,      &
-                                            min_val_method,              &
-                                            min_val_method_iterative,    &
-                                            min_val_method_clipping,     &
-                                            theta_dispersion_correction, &
-                                            operators,                   &
-                                            operators_fem,               &
-                                            cheap_update
+  use transport_config_mod,           only: dry_field_name,                    &
+                                            min_val_abs_tol,                   &
+                                            min_val_max_iterations,            &
+                                            min_val_method,                    &
+                                            min_val_method_iterative,          &
+                                            min_val_method_clipping,           &
+                                            theta_dispersion_correction,       &
+                                            operators,                         &
+                                            operators_fem,                     &
+                                            cheap_update,                      &
+                                            horizontal_method
   use transport_constants_mod,        only: get_directional_im3_div_r_tran, &
                                             get_detj_at_w3_r_tran,          &
                                             get_element_order_h_transport,  &
                                             get_element_order_v_transport
   use transport_counter_mod,          only: transport_counter_type
-  use transport_enumerated_types_mod, only: direction_3d,   &
-                                            direction_h,    &
-                                            direction_v,    &
-                                            splitting_none, &
+  use transport_enumerated_types_mod, only: direction_3d,                      &
+                                            direction_h,                       &
+                                            direction_v,                       &
+                                            splitting_none,                    &
                                             splitting_strang_vhv
   use transport_metadata_mod,         only: transport_metadata_type
   use sci_field_minmax_alg_mod,       only: get_field_minmax
@@ -115,6 +122,8 @@ contains
     logical(kind=l_def)                   :: final_split_step
     type(mesh_type),              pointer :: mesh
     integer(kind=i_def)                   :: step
+    logical(kind=l_def)                   :: do_overwrite
+    type(r_tran_field_type),      pointer :: field_start
 
     if ( subroutine_timers ) call timer('transport.end_of_transport')
 
@@ -130,18 +139,34 @@ contains
        call invoke( inc_max_aX(min_value, field_np1) )
     end if
 
-    ! At the end do the overwrite step for the blending zone
-    if ( limited_area .and. topology == topology_non_periodic ) then
+    do_overwrite = (                                                           &
+      ! Only overwrite when we have a LAM, and one of the following...
+      limited_area .and. topology == topology_non_periodic .and. (             &
+        transport_overwrite_freq == transport_overwrite_freq_split_step .or.   &
+        transport_overwrite_freq == transport_overwrite_freq_all .or. (        &
+          final_split_step                                                     &
+          .and. transport_overwrite_freq == transport_overwrite_freq_final     &
+        )                                                                      &
+      )                                                                        &
+    )
+
+    if ( do_overwrite ) then
       ! This code is required while LAMs loop over cells right up to
       ! the edge of a limited area domain.  It can be removed if
       ! we only loop over columns in the interior domain.
+      ! Only need to do this for Method-of-Lines scheme, as FFSL/SL schemes
+      ! should give sensible answers near the domain boundary.
 
       ! Don't update the field near the edge of the domain. A configurable depth of using
       ! the transport_boundary_depth is chosen here.  This will depend
       ! on the number of RK stages and spatial reconstruction order.
       ! Ticket #3112 will investigate further options.
-      call overwrite_blending_zone_rtran(field_np1, field_in, &
-                                         depth=transport_boundary_depth)
+      if (transport_overwrite_freq == transport_overwrite_freq_final) then
+        field_start => transport_counter%get_field_n()
+        call overwrite_blending_zone_rtran(field_np1, field_start, depth=transport_boundary_depth)
+      else
+        call overwrite_blending_zone_rtran(field_np1, field_in, depth=transport_boundary_depth)
+      end if
     end if
 
     call log_field_minmax( LOG_LEVEL_DEBUG, 'field_np1: end_of_advective_step', field_np1)
@@ -201,6 +226,7 @@ contains
     logical(kind=l_def)                   :: enforce_min_value
     logical(kind=l_def)                   :: final_split_step
     logical(kind=l_def)                   :: is_dry_field
+    logical(kind=l_def)                   :: do_overwrite
     real(kind=r_tran)                     :: min_value
     real(kind=r_tran)                     :: adv_dt
     real(kind=r_tran)                     :: acceptable_min
@@ -312,16 +338,33 @@ contains
     ! ------------------------------------------------------------------------ !
     ! Blending zone update
     ! ------------------------------------------------------------------------ !
-    if ( limited_area .and. topology == topology_non_periodic ) then
+    do_overwrite = (                                                           &
+      ! Only overwrite when we have a LAM, and one of the following...
+      limited_area .and. topology == topology_non_periodic .and. (             &
+        transport_overwrite_freq == transport_overwrite_freq_split_step .or.   &
+        transport_overwrite_freq == transport_overwrite_freq_all .or. (        &
+          final_split_step                                                     &
+          .and. transport_overwrite_freq == transport_overwrite_freq_final     &
+        )                                                                      &
+      )                                                                        &
+    )
+
+    if ( do_overwrite ) then
       ! This code is required while LAMs loop over cells right up to
       ! the edge of a limited area domain.  It can be removed if
       ! we only loop over columns in the interior domain.
+      ! Only need to do this for Method-of-Lines scheme, as FFSL/SL schemes
+      ! should give sensible answers near the domain boundary.
 
       ! Don't update the field near the edge of the domain. A configurable depth of using
       ! the transport_boundary_depth is chosen here.  This will depend
       ! on the number of RK stages and spatial reconstruction order.
       ! Ticket #3112 will investigate further options.
-      call overwrite_blending_zone_rtran(field_np1, field_in, depth=transport_boundary_depth)
+      if (transport_overwrite_freq == transport_overwrite_freq_final) then
+        call overwrite_blending_zone_rtran(field_np1, field_start, depth=transport_boundary_depth)
+      else
+        call overwrite_blending_zone_rtran(field_np1, field_in, depth=transport_boundary_depth)
+      end if
     end if
 
     ! ------------------------------------------------------------------------ !
@@ -361,6 +404,8 @@ contains
   !!          - overwrite field data in the blending zone, if necessary
   !> @param[in,out] field_np1            Field at the end of the transport step
   !!                                     to be computed.
+  !> @param[in]     field_in             Field at the beginning of this
+  !!                                     transport step
   !> @param[in]     flux                 The mass flux for this transport step.
   !> @param[in]     flux_precomputations Object storing the reference densities
   !!                                     and fluxes (used for computing the
@@ -373,7 +418,8 @@ contains
   !!                                     divergence of fluxes. If this argument
   !!                                     is not provided, field_np1 will be
   !!                                     computed but only on the final step
-  subroutine end_of_consistent_step_alg(field_np1, flux, flux_precomputations, &
+  subroutine end_of_consistent_step_alg(field_np1, field_in, flux,             &
+                                        flux_precomputations,                  &
                                         transport_counter, transport_metadata, &
                                         compute_field_np1)
 
@@ -392,6 +438,7 @@ contains
 
     ! Arguments
     type(r_tran_field_type),         intent(inout) :: field_np1
+    type(r_tran_field_type),         intent(in)    :: field_in
     type(r_tran_field_type),         intent(in)    :: flux
     type(flux_precomputations_type), intent(inout) :: flux_precomputations
     type(transport_counter_type),    intent(inout) :: transport_counter
@@ -434,6 +481,7 @@ contains
     logical(kind=l_def)                   :: enforce_min_value
     logical(kind=l_def)                   :: final_split_step
     logical(kind=l_def)                   :: logspace
+    logical(kind=l_def)                   :: do_overwrite
     real(kind=r_tran)                     :: min_value
     real(kind=r_tran)                     :: adv_dt
     real(kind=r_tran)                     :: acceptable_min
@@ -683,16 +731,34 @@ contains
     ! ------------------------------------------------------------------------ !
     ! Blending zone update
     ! ------------------------------------------------------------------------ !
-    if ( limited_area .and. topology == topology_non_periodic ) then
+    do_overwrite = (                                                           &
+      ! Only overwrite when we have a LAM, and one of the following...
+      limited_area .and. topology == topology_non_periodic .and. (             &
+        transport_overwrite_freq == transport_overwrite_freq_split_step .or.   &
+        transport_overwrite_freq == transport_overwrite_freq_all .or. (        &
+          final_split_step                                                     &
+          .and. transport_overwrite_freq == transport_overwrite_freq_final     &
+        )                                                                      &
+      )                                                                        &
+    )
+
+    if ( do_overwrite  ) then
       ! This code is required while LAMs loop over cells right up to
       ! the edge of a limited area domain.  It can be removed if
       ! we only loop over columns in the interior domain.
+      ! Only need to do this for Method-of-Lines scheme, as FFSL/SL schemes
+      ! should give sensible answers near the domain boundary.
 
       ! Don't update the field near the edge of the domain. A configurable depth of using
       ! the transport_boundary_depth is chosen here.  This will depend
       ! on the number of RK stages and spatial reconstruction order.
       ! Ticket #3112 will investigate further options.
-      call overwrite_blending_zone_rtran(field_np1, mr_start, depth=transport_boundary_depth)
+      if (transport_overwrite_freq == transport_overwrite_freq_final) then
+        mr_start => transport_counter%get_field_n()
+        call overwrite_blending_zone_rtran(field_np1, mr_start, depth=transport_boundary_depth)
+      else
+        call overwrite_blending_zone_rtran(field_np1, field_in, depth=transport_boundary_depth)
+      end if
     end if
 
     call log_field_minmax( LOG_LEVEL_DEBUG, 'field_np1: end_of_consistent_step', field_np1)

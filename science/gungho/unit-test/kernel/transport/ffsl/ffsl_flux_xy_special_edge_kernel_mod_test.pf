@@ -35,21 +35,21 @@ contains
     integer(kind=i_def), parameter :: nlayers = 1
     integer(kind=i_def), parameter :: ndf_w3 = 1
     integer(kind=i_def), parameter :: ndf_w2 = 4
-    integer(kind=i_def), parameter :: stencil_size = 11
-    integer(kind=i_def), parameter :: stencil_extent = ( stencil_size - 1_i_def ) / 2_i_def
+    integer(kind=i_def), parameter :: stencil_max = 6
     integer(kind=i_def), parameter :: undf_w2 = ndf_w2*nlayers
-    integer(kind=i_def), parameter :: undf_w3 = ndf_w3*nlayers*stencil_size
+    integer(kind=i_def), parameter :: undf_w3 = ndf_w3*nlayers*(2*stencil_max-1)
     integer(kind=i_def), parameter :: order = 1
-    integer(kind=i_def), parameter :: ndep = stencil_size
+    integer(kind=i_def), parameter :: ndep = 2*stencil_max-1
     integer(kind=i_def), parameter :: ndf_depk = 4
     integer(kind=i_def), parameter :: ndep_half = (ndep - 1) / 2
     integer(kind=i_def), parameter :: undf_depk = ndf_depk*ndep
     real(kind=r_tran),   parameter :: min_val = 0.0_r_tran
 
-    integer(kind=i_def), dimension(ndf_w3)              :: map_w3
-    integer(kind=i_def), dimension(ndf_w2)              :: map_w2
-    integer(kind=i_def), dimension(ndf_depk)            :: map_depk
-    integer(kind=i_def), dimension(ndf_w3,stencil_size) :: stencil_map
+    integer(kind=i_def), dimension(ndf_w3)               :: map_w3
+    integer(kind=i_def), dimension(ndf_w2)               :: map_w2
+    integer(kind=i_def), dimension(ndf_depk)             :: map_depk
+    integer(kind=i_def), dimension(4)                    :: stencil_sizes
+    integer(kind=i_def), dimension(ndf_w3,stencil_max,4) :: stencil_map
 
     real(kind=r_tran),   dimension(undf_w3)   :: field_for_x
     real(kind=r_tran),   dimension(undf_w3)   :: field_for_y
@@ -73,7 +73,10 @@ contains
     logical(kind=l_def) :: high_order_edges
 
     ! Set up maps
-    stencil_map(1,:) = (/ 6, 5, 4, 3, 2, 1, 7, 8, 9, 10, 11 /)
+    stencil_sizes(:) = stencil_max
+    stencil_map(:,:,:) = reshape(                                              &
+        (/ 6, 5, 4, 3, 2, 1,    6, 5, 4, 3, 2, 1,                              &
+           6, 7, 8, 9, 10, 11,  6, 7, 8, 9, 10, 11 /), [1, stencil_max, 4] )
     map_w2(:) = (/ 1, 2, 3, 4 /)
     map_w3(1) = 6
     map_depk(:) = (/ 1, 12, 23, 34 /)
@@ -137,16 +140,20 @@ contains
     call ffsl_flux_xy_special_edge_code( nlayers,           &
                                          flux,              &
                                          field_for_x,       &
-                                         stencil_size,      &
+                                         stencil_sizes,     &
+                                         stencil_max,       &
                                          stencil_map,       &
                                          dry_mass_for_x,    &
-                                         stencil_size,      &
+                                         stencil_sizes,     &
+                                         stencil_max,       &
                                          stencil_map,       &
                                          field_for_y,       &
-                                         stencil_size,      &
+                                         stencil_sizes,     &
+                                         stencil_max,       &
                                          stencil_map,       &
                                          dry_mass_for_y,    &
-                                         stencil_size,      &
+                                         stencil_sizes,     &
+                                         stencil_max,       &
                                          stencil_map,       &
                                          dep_pts,           &
                                          frac_dry_flux,     &
@@ -155,11 +162,13 @@ contains
                                          panel_id,          &
                                          panel_edge_dist_W, &
                                          panel_edge_dist_E, &
-                                         stencil_size,      &
+                                         stencil_sizes,     &
+                                         stencil_max,       &
                                          stencil_map,       &
                                          panel_edge_dist_S, &
                                          panel_edge_dist_N, &
-                                         stencil_size,      &
+                                         stencil_sizes,     &
+                                         stencil_max,       &
                                          stencil_map,       &
                                          face_selector_ew,  &
                                          face_selector_ns,  &
@@ -168,7 +177,6 @@ contains
                                          monotone,          &
                                          edge_monotone,     &
                                          min_val,           &
-                                         stencil_extent,    &
                                          ndep,              &
                                          dt,                &
                                          ndf_w2,            &
@@ -202,16 +210,20 @@ contains
     call ffsl_flux_xy_special_edge_code( nlayers,           &
                                          flux,              &
                                          field_for_x,       &
-                                         stencil_size,      &
+                                         stencil_sizes,     &
+                                         stencil_max,       &
                                          stencil_map,       &
                                          dry_mass_for_x,    &
-                                         stencil_size,      &
+                                         stencil_sizes,     &
+                                         stencil_max,       &
                                          stencil_map,       &
                                          field_for_y,       &
-                                         stencil_size,      &
+                                         stencil_sizes,     &
+                                         stencil_max,       &
                                          stencil_map,       &
                                          dry_mass_for_y,    &
-                                         stencil_size,      &
+                                         stencil_sizes,     &
+                                         stencil_max,       &
                                          stencil_map,       &
                                          dep_pts,           &
                                          frac_dry_flux,     &
@@ -220,11 +232,13 @@ contains
                                          panel_id,          &
                                          panel_edge_dist_W, &
                                          panel_edge_dist_E, &
-                                         stencil_size,      &
+                                         stencil_sizes,     &
+                                         stencil_max,       &
                                          stencil_map,       &
                                          panel_edge_dist_S, &
                                          panel_edge_dist_N, &
-                                         stencil_size,      &
+                                         stencil_sizes,     &
+                                         stencil_max,       &
                                          stencil_map,       &
                                          face_selector_ew,  &
                                          face_selector_ns,  &
@@ -233,7 +247,6 @@ contains
                                          monotone,          &
                                          edge_monotone,     &
                                          min_val,           &
-                                         stencil_extent,    &
                                          ndep,              &
                                          dt,                &
                                          ndf_w2,            &
@@ -307,16 +320,20 @@ contains
     call ffsl_flux_xy_special_edge_code( nlayers,           &
                                          flux,              &
                                          field_for_x,       &
-                                         stencil_size,      &
+                                         stencil_sizes,     &
+                                         stencil_max,       &
                                          stencil_map,       &
                                          dry_mass_for_x,    &
-                                         stencil_size,      &
+                                         stencil_sizes,     &
+                                         stencil_max,       &
                                          stencil_map,       &
                                          field_for_y,       &
-                                         stencil_size,      &
+                                         stencil_sizes,     &
+                                         stencil_max,       &
                                          stencil_map,       &
                                          dry_mass_for_y,    &
-                                         stencil_size,      &
+                                         stencil_sizes,     &
+                                         stencil_max,       &
                                          stencil_map,       &
                                          dep_pts,           &
                                          frac_dry_flux,     &
@@ -325,11 +342,13 @@ contains
                                          panel_id,          &
                                          panel_edge_dist_W, &
                                          panel_edge_dist_E, &
-                                         stencil_size,      &
+                                         stencil_sizes,     &
+                                         stencil_max,       &
                                          stencil_map,       &
                                          panel_edge_dist_S, &
                                          panel_edge_dist_N, &
-                                         stencil_size,      &
+                                         stencil_sizes,     &
+                                         stencil_max,       &
                                          stencil_map,       &
                                          face_selector_ew,  &
                                          face_selector_ns,  &
@@ -338,7 +357,6 @@ contains
                                          monotone,          &
                                          edge_monotone,     &
                                          min_val,           &
-                                         stencil_extent,    &
                                          ndep,              &
                                          dt,                &
                                          ndf_w2,            &
@@ -376,16 +394,20 @@ contains
     call ffsl_flux_xy_special_edge_code( nlayers,           &
                                          flux,              &
                                          field_for_x,       &
-                                         stencil_size,      &
+                                         stencil_sizes,     &
+                                         stencil_max,       &
                                          stencil_map,       &
                                          dry_mass_for_x,    &
-                                         stencil_size,      &
+                                         stencil_sizes,     &
+                                         stencil_max,       &
                                          stencil_map,       &
                                          field_for_y,       &
-                                         stencil_size,      &
+                                         stencil_sizes,     &
+                                         stencil_max,       &
                                          stencil_map,       &
                                          dry_mass_for_y,    &
-                                         stencil_size,      &
+                                         stencil_sizes,     &
+                                         stencil_max,       &
                                          stencil_map,       &
                                          dep_pts,           &
                                          frac_dry_flux,     &
@@ -394,11 +416,13 @@ contains
                                          panel_id,          &
                                          panel_edge_dist_W, &
                                          panel_edge_dist_E, &
-                                         stencil_size,      &
+                                         stencil_sizes,     &
+                                         stencil_max,       &
                                          stencil_map,       &
                                          panel_edge_dist_S, &
                                          panel_edge_dist_N, &
-                                         stencil_size,      &
+                                         stencil_sizes,     &
+                                         stencil_max,       &
                                          stencil_map,       &
                                          face_selector_ew,  &
                                          face_selector_ns,  &
@@ -407,7 +431,6 @@ contains
                                          monotone,          &
                                          edge_monotone,     &
                                          min_val,           &
-                                         stencil_extent,    &
                                          ndep,              &
                                          dt,                &
                                          ndf_w2,            &

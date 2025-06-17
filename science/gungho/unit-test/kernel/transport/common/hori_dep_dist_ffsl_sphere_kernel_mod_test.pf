@@ -37,18 +37,19 @@ contains
     real(kind=r_tran),   parameter   :: tol = 1.0e-6_r_tran
 
     integer(kind=i_def)              :: nlayers
-    integer(kind=i_def)              :: stencil_extent, max_stencil_size
+    integer(kind=i_def)              :: stencil_extent
     integer(kind=i_def)              :: ndf_w2h, ndf_w3, ndf_pid, ndf_w3_2d
     integer(kind=i_def)              :: undf_w2h, undf_w3, undf_pid, undf_w3_2d
     integer(kind=i_def)              :: ndf_depk, undf_depk, ndep
     logical(kind=l_def)              :: cap_dep_points
-    integer(kind=i_def)              :: stencil_size
+    integer(kind=i_def)              :: stencil_max
+    integer(kind=i_def), allocatable :: stencil_sizes(:)
     integer(kind=i_def), allocatable :: map_w2h(:)
     integer(kind=i_def), allocatable :: map_w3(:)
     integer(kind=i_def), allocatable :: map_depk(:)
     integer(kind=i_def), allocatable :: map_pid(:)
     integer(kind=i_def), allocatable :: map_w3_2d(:)
-    integer(kind=i_def), allocatable :: stencil_map(:,:)
+    integer(kind=i_def), allocatable :: stencil_map(:,:,:)
     integer(kind=i_def), allocatable :: face_selector_ew(:)
     integer(kind=i_def), allocatable :: face_selector_ns(:)
     integer(kind=i_def), allocatable :: error_flag(:)
@@ -83,14 +84,15 @@ contains
     ndf_w3_2d = 1
     undf_w3_2d = 1
     ndep = 2*stencil_extent + 1
-    max_stencil_size = 2*stencil_extent + 1
+    stencil_max = stencil_extent + 1
     cap_dep_points = .false.
 
     allocate(map_w2h(ndf_w2h))
     allocate(map_w3(ndf_w3))
     allocate(map_depk(ndf_depk))
     allocate(map_pid(ndf_pid))
-    allocate(stencil_map(ndf_w3,max_stencil_size))
+    allocate(stencil_sizes(4))
+    allocate(stencil_map(ndf_w3,stencil_max,4))
     allocate(flux(undf_w2h))
     allocate(detj_x(undf_w3))
     allocate(detj_y(undf_w3))
@@ -119,8 +121,9 @@ contains
     map_pid = (/ 1 /)
     map_w2h = (/ 1,  2,  3,  4 /)
     map_depk = (/ 1,  8,  15,  22 /)
-    stencil_size = 7
-    stencil_map = reshape((/ 4, 3, 2, 1, 5, 6, 7 /), [ndf_w3, stencil_size])
+    stencil_sizes(:) = stencil_max
+    stencil_map = reshape((/ 4, 3, 2, 1,  4, 3, 2, 1,                         &
+                             1, 5, 6, 7,  1, 5, 6, 7 /), [ndf_w3, stencil_max, 4])
 
     face_selector_ew(:) = 1
     face_selector_ns(:) = 1
@@ -164,10 +167,12 @@ contains
                                          frac_flux,             &
                                          flux,                  &
                                          detj_x,                &
-                                         stencil_size,          &
+                                         stencil_sizes,         &
+                                         stencil_max,           &
                                          stencil_map,           &
                                          detj_y,                &
-                                         stencil_size,          &
+                                         stencil_sizes,         &
+                                         stencil_max,           &
                                          stencil_map ,          &
                                          dep_lowest_k,          &
                                          dep_highest_k,         &
@@ -179,7 +184,6 @@ contains
                                          face_selector_ew,      &
                                          face_selector_ns,      &
                                          error_flag,            &
-                                         stencil_extent,        &
                                          ndep,                  &
                                          cap_dep_points,        &
                                          ndf_w2h,               &
@@ -228,10 +232,12 @@ contains
                                          frac_flux,             &
                                          flux,                  &
                                          detj_x,                &
-                                         stencil_size,          &
+                                         stencil_sizes,         &
+                                         stencil_max,           &
                                          stencil_map,           &
                                          detj_y,                &
-                                         stencil_size,          &
+                                         stencil_sizes,         &
+                                         stencil_max,           &
                                          stencil_map ,          &
                                          dep_lowest_k,          &
                                          dep_highest_k,         &
@@ -243,7 +249,6 @@ contains
                                          face_selector_ew,      &
                                          face_selector_ns,      &
                                          error_flag,            &
-                                         stencil_extent,        &
                                          ndep,                  &
                                          cap_dep_points,        &
                                          ndf_w2h,               &
@@ -294,10 +299,12 @@ contains
                                          frac_flux,             &
                                          flux,                  &
                                          detj_x,                &
-                                         stencil_size,          &
+                                         stencil_sizes,         &
+                                         stencil_max,           &
                                          stencil_map,           &
                                          detj_y,                &
-                                         stencil_size,          &
+                                         stencil_sizes,         &
+                                         stencil_max,           &
                                          stencil_map ,          &
                                          dep_lowest_k,          &
                                          dep_highest_k,         &
@@ -309,7 +316,6 @@ contains
                                          face_selector_ew,      &
                                          face_selector_ns,      &
                                          error_flag,            &
-                                         stencil_extent,        &
                                          ndep,                  &
                                          cap_dep_points,        &
                                          ndf_w2h,               &
@@ -339,6 +345,7 @@ contains
     deallocate(map_pid)
     deallocate(map_w3_2d)
     deallocate(stencil_map)
+    deallocate(stencil_sizes)
     deallocate(frac_flux)
     deallocate(dep_pts)
     deallocate(detj_x)

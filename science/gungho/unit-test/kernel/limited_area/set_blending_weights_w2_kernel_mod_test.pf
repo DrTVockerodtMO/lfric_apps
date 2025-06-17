@@ -49,7 +49,9 @@ module set_blending_weights_w2_kernel_mod_test
     use get_unit_test_m3x3_q3x3x3_sizes_mod, only : get_w2_m3x3_q3x3x3_size, &
                                                     get_w3_m3x3_q3x3x3_size
     use feign_config_mod,      only : feign_boundaries_config
-    use boundaries_config_mod, only : lbc_method_onion_layer, blend_frequency_inner
+    use boundaries_config_mod, only : lbc_method_onion_layer,                  &
+                                      blend_frequency_inner,                   &
+                                      transport_overwrite_freq_none
     implicit none
 
     class(set_blending_weights_w2_test_type), intent(inout) :: this
@@ -90,28 +92,29 @@ module set_blending_weights_w2_kernel_mod_test
 
     ! Set boundaries configuration
     ! Only blending_weights is used
-    call feign_boundaries_config( blend_frequency=blend_frequency_inner,  &
-                                  blending_weights=[0.2_r_def], &
-                                  blending_weights_w2v=[0.2_r_def], &
-                                  boundary_e=1,             &
-                                  boundary_n=1,             &
-                                  boundary_s=1,             &
-                                  boundary_w=1,             &
-                                  edge_cells_ew=1,          &
-                                  edge_cells_ns=1,          &
-                                  inner_width_ew=1,         &
-                                  inner_width_ns=1,         &
-                                  lbc_eos_height=100,       &
-                                  lbc_method=lbc_method_onion_layer,      &
-                                  limited_area=.false.,     &
-                                  normal_only=.true.,       &
-                                  outer_width_ew=1,         &
-                                  outer_width_ns=1,         &
-                                  output_lbcs=.false.,      &
-                                  rim_width_ew=1,           &
-                                  rim_width_ns=1,           &
-                                  solver_boundary_depth=1,  &
-                                  transport_boundary_depth=6)
+    call feign_boundaries_config( blend_frequency=blend_frequency_inner,       &
+                                  blending_weights=[0.2_r_def],                &
+                                  blending_weights_w2v=[0.2_r_def],            &
+                                  boundary_e=1,                                &
+                                  boundary_n=1,                                &
+                                  boundary_s=1,                                &
+                                  boundary_w=1,                                &
+                                  edge_cells_ew=1,                             &
+                                  edge_cells_ns=1,                             &
+                                  inner_width_ew=1,                            &
+                                  inner_width_ns=1,                            &
+                                  lbc_eos_height=100,                          &
+                                  lbc_method=lbc_method_onion_layer,           &
+                                  limited_area=.false.,                        &
+                                  normal_only=.true.,                          &
+                                  outer_width_ew=1,                            &
+                                  outer_width_ns=1,                            &
+                                  output_lbcs=.false.,                         &
+                                  rim_width_ew=1,                              &
+                                  rim_width_ns=1,                              &
+                                  solver_boundary_depth=1,                     &
+                                  transport_boundary_depth=6,                  &
+                                  transport_overwrite_freq=transport_overwrite_freq_none)
 
   end subroutine setUp
 

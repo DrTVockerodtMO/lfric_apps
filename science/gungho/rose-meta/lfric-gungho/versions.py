@@ -73,7 +73,6 @@ class vn21_t476(MacroUpgrade):
         self.add_setting(config, ["namelist:physics", "bl_segment"], "0")
         self.add_setting(config, ["namelist:physics", "gw_segment"], "0")
         self.add_setting(config, ["namelist:physics", "ussp_segment"], "0")
-
         return config, self.reports
 
 
@@ -87,7 +86,6 @@ class vn21_t663(MacroUpgrade):
         # Commands From: rose-meta/um-aerosol
         # Commands From: rose-meta/um-aerosol
         self.add_setting(config, ["namelist:aerosol", "murk_lbc"], ".false.")
-
         return config, self.reports
 
 
@@ -102,7 +100,6 @@ class vn21_t708(MacroUpgrade):
         self.add_setting(
             config, ["namelist:logging", "log_to_rank_zero_only"], ".false."
         )
-
         return config, self.reports
 
 
@@ -230,7 +227,6 @@ class vn21_t164(MacroUpgrade):
         self.add_setting(
             config, ["namelist:stochastic_physics", "rp_lsfc_z0v_max"], z0v_io
         )
-
         return config, self.reports
 
 
@@ -247,7 +243,6 @@ class vn21_t657(MacroUpgrade):
         self.remove_setting(config, [nml, "fsd_nonconv_const"])
         self.add_setting(config, [nml, "fsd_nonconv_ice_const"], fsd_nonconv)
         self.add_setting(config, [nml, "fsd_nonconv_liq_const"], fsd_nonconv)
-
         return config, self.reports
 
 
@@ -286,7 +281,6 @@ class vn21_t596(MacroUpgrade):
             ["namelist:surface", "z0m_specified"],
             ["namelist:jules_sea_seaice", "z0m_specified"],
         )
-
         return config, self.reports
 
 
@@ -306,7 +300,6 @@ class vn21_t742(MacroUpgrade):
         else:
             bl_res_inv = "'cosine_inv_flux'"
         self.add_setting(config, ["namelist:blayer", "bl_res_inv"], bl_res_inv)
-
         return config, self.reports
 
 
@@ -324,5 +317,37 @@ class vn21_t4604(MacroUpgrade):
             ["namelist:partitioning", "generate_inner_haloes"],
             ["namelist:partitioning", "generate_inner_halos"],
         )
+        return config, self.reports
+
+
+class vn21_t208(MacroUpgrade):
+    """Upgrade macro for ticket #208 by Thomas Bendall."""
+
+    BEFORE_TAG = "vn2.1_t4604"
+    AFTER_TAG = "vn2.1_t208"
+
+    def upgrade(self, config, meta_config=None):
+        # Commands From: rose-meta/lfric-gungho
+        """
+        Add transport_overwrite_freq to namelist boundaries. This takes the
+        default value of 'final' unless the Method-of-Lines transport scheme is
+        being used for a limited area model, in which case the value is set to
+        'split_step'.
+        """
+        mol_transport = self.get_setting_value(
+            config, ["namelist:transport", "horizontal_method"]
+        )
+        if "1" in mol_transport:
+            self.add_setting(
+                config,
+                ["namelist:boundaries", "transport_overwrite_freq"],
+                "'split_step'",
+            )
+        else:
+            self.add_setting(
+                config,
+                ["namelist:boundaries", "transport_overwrite_freq"],
+                "'final'",
+            )
 
         return config, self.reports

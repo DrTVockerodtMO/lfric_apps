@@ -344,3 +344,36 @@ class vn21_t4604(MacroUpgrade):
         )
 
         return config, self.reports
+
+
+class vn21_t208(MacroUpgrade):
+    """Upgrade macro for ticket #208 by Thomas Bendall."""
+
+    BEFORE_TAG = "vn2.1_t4604"
+    AFTER_TAG = "vn2.1_t208"
+
+    def upgrade(self, config, meta_config=None):
+        # Commands From: rose-meta/lfric-gungho
+        """
+        Add transport_overwrite_freq to namelist boundaries. This takes the
+        default value of 'final' unless the Method-of-Lines transport scheme is
+        being used for a limited area model, in which case the value is set to
+        'split_step'.
+        """
+        mol_transport = self.get_setting_value(
+            config, ["namelist:transport", "horizontal_method"]
+        )
+        if "1" in mol_transport:
+            self.add_setting(
+                config,
+                ["namelist:boundaries", "transport_overwrite_freq"],
+                "'split_step'",
+            )
+        else:
+            self.add_setting(
+                config,
+                ["namelist:boundaries", "transport_overwrite_freq"],
+                "'final'",
+            )
+
+        return config, self.reports

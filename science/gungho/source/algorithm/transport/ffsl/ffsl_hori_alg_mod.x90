@@ -46,6 +46,7 @@ module ffsl_hori_alg_mod
   use ffsl_advective_updates_alg_mod,   only: swift_outer_update_tracer,       &
                                               swift_inner_update_tracer,       &
                                               ffsl_advective_increment
+  use limited_area_lbc_alg_mod,         only: overwrite_blending_zone_rtran
   use remap_on_extended_mesh_alg_mod,   only: remap_on_extended_mesh
 
   ! Kernels
@@ -65,7 +66,9 @@ module ffsl_hori_alg_mod
                                               topology_fully_periodic,         &
                                               geometry, geometry_spherical
   use boundaries_config_mod,            only: limited_area,                    &
-                                              transport_boundary_depth
+                                              transport_boundary_depth,        &
+                                              transport_overwrite_freq,        &
+                                              transport_overwrite_freq_all
   use check_configuration_mod,          only: check_any_eqn_consistent,        &
                                               get_required_stencil_depth
   use io_config_mod,                    only: subroutine_timers
@@ -135,6 +138,7 @@ contains
 
     ! Transport options
     logical(kind=l_def) :: to_compute_field_np1
+    logical(kind=l_def) :: do_overwrite
 
     ! Subroutine name for timer
     character(*), parameter :: routine_name = 'transport.ffsl_horizontal'
@@ -217,6 +221,19 @@ contains
                                        field_n, step_dt, transport_controller )
       call invoke( X_minus_bY(field_x, field_n, half_dt, first_increment_x),   &
                    X_minus_bY(field_y, field_n, half_dt, first_increment_y) )
+    end if
+
+    do_overwrite = (                                                           &
+      limited_area .and. topology == topology_non_periodic .and.               &
+      transport_overwrite_freq == transport_overwrite_freq_all                 &
+    )
+    if (do_overwrite) then
+      call overwrite_blending_zone_rtran(                                      &
+              field_x, field_n, depth=transport_boundary_depth                 &
+      )
+      call overwrite_blending_zone_rtran(                                      &
+              field_y, field_n, depth=transport_boundary_depth                 &
+      )
     end if
 
     ! Final step (advective or conservative) -----------------------------------
@@ -305,7 +322,6 @@ contains
     integer(kind=i_def) :: step
     integer(kind=i_def) :: mesh_id
     integer(kind=i_def) :: stencil_extent
-    integer(kind=i_def) :: stencil_depth
     integer(kind=i_def) :: extra_points
     integer(kind=i_def) :: remap_depth
     integer(kind=i_def) :: ndep
@@ -380,8 +396,6 @@ contains
     ! Set constant values
     extra_points = ffsl_extra_points(special_edges_treatment, special_edges_high_order)
     stencil_extent = dep_stencil_extent + extra_points + ffsl_inner_order
-    ! PSyclone needs these to be different variables to the stencil_extents
-    stencil_depth = stencil_extent
 
     ! The minimum value is required for the quasi-monotone limiter for PPM,
     ! if it is not set we assume positivity.
@@ -396,7 +410,7 @@ contains
     ! If needed remap the field on an extended cubed sphere
     if ( extended_mesh ) then
       monotone_remap = ( monotone /= monotone_none )
-      remap_depth = stencil_depth
+      remap_depth = stencil_extent
       call remap_on_extended_mesh(field_big_halo, field_n, monotone_remap,     &
                                   transport_metadata%get_enforce_min_value(),  &
                                   transport_metadata%get_min_value(),          &
@@ -430,7 +444,7 @@ contains
                                         special_edges_high_order,              &
                                         ffsl_inner_order, monotone,            &
                                         special_edges_monotone, min_val,       &
-                                        stencil_depth, ndep, dt ) )
+                                        ndep, dt ) )
     else if (is_cubed_sphere) then
       ! Sphere requires handling of panel edges --------------------------------
       call invoke( setval_c(flux, 0.0_r_tran),                                 &
@@ -445,7 +459,7 @@ contains
                                         panel_id, panel_edge_dist,             &
                                         face_selector_ew, face_selector_ns,    &
                                         ffsl_inner_order, monotone, min_val,   &
-                                        stencil_depth, ndep, dt ) )
+                                        ndep, dt ) )
     else
       ! Not on the sphere ------------------------------------------------------
       call invoke( setval_c(flux, 0.0_r_tran),                                 &
@@ -459,7 +473,7 @@ contains
                                         dep_lowest_k, dep_highest_k,           &
                                         face_selector_ew, face_selector_ns,    &
                                         ffsl_inner_order, monotone,            &
-                                        min_val, stencil_depth, ndep, dt ) )
+                                        min_val, ndep, dt ) )
     end if
 
     if ( subroutine_timers ) call timer('transport.ffsl_hori_sweeps')
@@ -559,7 +573,6 @@ contains
     integer(kind=i_def) :: mesh_id, step
     integer(kind=i_def) :: extra_points
     integer(kind=i_def) :: stencil_extent
-    integer(kind=i_def) :: stencil_depth
     integer(kind=i_def) :: remap_depth
     integer(kind=i_def) :: ndep
     integer(kind=i_def) :: order
@@ -671,8 +684,6 @@ contains
     ! Set constant values
     extra_points = ffsl_extra_points(special_edges_treatment,special_edges_high_order)
     stencil_extent = dep_stencil_extent + extra_points + order
-    ! PSyclone needs these to be different variables to the stencil_extents
-    stencil_depth = stencil_extent
 
     ! The minimum value is required for the quasi-monotone limiter for PPM,
     ! if it is not set we assume positivity.
@@ -687,7 +698,7 @@ contains
     ! If needed remap the field on an extended cubed sphere
     if ( extended_mesh ) then
       monotone_remap = ( monotone /= monotone_none )
-      remap_depth = stencil_depth
+      remap_depth = stencil_extent
       call remap_on_extended_mesh(field_big_halo, field_n, monotone_remap,     &
                                   transport_metadata%get_enforce_min_value(),  &
                                   transport_metadata%get_min_value(),          &
@@ -718,7 +729,7 @@ contains
                                         face_selector_ew, face_selector_ns,    &
                                         special_edges_high_order, order,       &
                                         monotone, special_edges_monotone,      &
-                                        min_val, stencil_depth, ndep, step_dt ) )
+                                        min_val, ndep, step_dt ) )
     else if (is_cubed_sphere) then
       ! Sphere requires handling of panel edges --------------------------------
       call invoke( setval_c(flux, 0.0_r_tran),                                 &
@@ -733,7 +744,7 @@ contains
                                         panel_id, panel_edge_dist,             &
                                         face_selector_ew, face_selector_ns,    &
                                         order, monotone, min_val,              &
-                                        stencil_depth, ndep, step_dt ) )
+                                        ndep, step_dt ) )
     else
       ! Not special edges ------------------------------------------------------
       call invoke( setval_c(flux, 0.0_r_tran),                                 &
@@ -747,7 +758,7 @@ contains
                                         dep_lowest_k, dep_highest_k,           &
                                         face_selector_ew, face_selector_ns,    &
                                         order, monotone, min_val,              &
-                                        stencil_depth, ndep, step_dt ) )
+                                        ndep, step_dt ) )
 
     end if
 
@@ -871,7 +882,6 @@ contains
     ! Constants
     integer(kind=i_def) :: mesh_id, step
     integer(kind=i_def) :: stencil_extent
-    integer(kind=i_def) :: stencil_depth
     integer(kind=i_def) :: remap_depth
     integer(kind=i_def) :: ndep
     real(kind=r_tran)   :: min_val
@@ -1002,8 +1012,6 @@ contains
     ! Set constant values
     extra_points = ffsl_extra_points(special_edges_treatment,special_edges_high_order)
     stencil_extent = dep_stencil_extent + extra_points + order
-    ! PSyclone needs these to be different variables to the stencil_extents
-    stencil_depth = stencil_extent
 
 
     ! The minimum value is required for the quasi-monotone limiter for PPM,
@@ -1019,7 +1027,7 @@ contains
     ! If needed remap the field on an extended cubed sphere
     if ( extended_mesh ) then
       monotone_remap = ( monotone /= monotone_none )
-      remap_depth = stencil_depth
+      remap_depth = stencil_extent
       call remap_on_extended_mesh(field_x_big_halo, field_x, monotone_remap,   &
                                   transport_metadata%get_enforce_min_value(),  &
                                   transport_metadata%get_min_value(),          &
@@ -1055,7 +1063,7 @@ contains
                                         face_selector_ew, face_selector_ns,    &
                                         special_edges_high_order, order,       &
                                         monotone, special_edges_monotone,      &
-                                        min_val, stencil_depth, ndep, dt ) )
+                                        min_val, ndep, dt ) )
     else if (is_cubed_sphere) then
       ! Sphere requires handling of panel edges --------------------------------
       call invoke( setval_c(flux, 0.0_r_tran),                                 &
@@ -1070,7 +1078,7 @@ contains
                                         panel_id, panel_edge_dist,             &
                                         face_selector_ew, face_selector_ns,    &
                                         order, monotone, min_val,              &
-                                        stencil_depth, ndep, dt ) )
+                                        ndep, dt ) )
     else
       ! Not on the sphere ------------------------------------------------------
       call invoke( setval_c(flux, 0.0_r_tran),                                 &
@@ -1085,7 +1093,7 @@ contains
                                         face_selector_ew,                      &
                                         face_selector_ns, order,               &
                                         monotone, min_val,                     &
-                                        stencil_depth, ndep, dt ) )
+                                        ndep, dt ) )
 
     end if
 

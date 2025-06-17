@@ -15,6 +15,7 @@ vertical_method='trapezoidal',
 /
 &boundaries
 limited_area=.false.,
+transport_overwrite_freq='final'
 /
 &checks
 limit_cfl=.false.,

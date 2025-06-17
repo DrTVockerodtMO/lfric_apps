@@ -53,15 +53,12 @@ contains
     real(kind=r_tran),   allocatable :: field_tmp(:)
     real(kind=r_tran),   allocatable :: increment_x(:)
     real(kind=r_tran),   allocatable :: increment_y(:)
-    integer(kind=i_def), allocatable :: stencil_map_x(:,:)
-    integer(kind=i_def), allocatable :: stencil_map_y(:,:)
+    integer(kind=i_def), allocatable :: stencil_sizes(:)
+    integer(kind=i_def), allocatable :: stencil_map(:,:,:)
 
     real(kind=r_tran)   :: dep_disp
     integer(kind=i_def) :: monotone
-    integer(kind=i_def) :: stencil_size
-    integer(kind=i_def) :: stencil_size_x
-    integer(kind=i_def) :: stencil_size_y
-    integer(kind=i_def) :: extent_size
+    integer(kind=i_def) :: stencil_max
     integer(kind=i_def) :: undf_wf
 
     map_w2(:) = (/ 1, 2, 3, 4 /)
@@ -97,11 +94,8 @@ contains
     panel_edge_dist_W(:) = 1
     panel_edge_dist_E(:) = -ABS(IMDI)
 
-    stencil_size = 9
-    undf_wf = ndf_wf*nlayers*stencil_size
-    stencil_size_x = stencil_size
-    stencil_size_y = stencil_size
-    extent_size = (stencil_size-1)/4
+    undf_wf = 9
+    stencil_max = 3
 
     allocate(field_x(undf_wf))
     allocate(field_y(undf_wf))
@@ -110,12 +104,15 @@ contains
     allocate(increment_y(undf_wf))
     allocate(x(undf_wf))
     allocate(y(undf_wf))
-    allocate(stencil_map_x(ndf_wf,stencil_size))
-    allocate(stencil_map_y(ndf_wf,stencil_size))
+    allocate(stencil_map(ndf_wf,stencil_max,4))
+    allocate(stencil_sizes(4))
 
     ! Set up maps
-    stencil_map_x(1,:) = (/ 1, 2, 3, 4, 5, 6, 7, 8, 9 /)
-    stencil_map_y(1,:) = (/ 1, 2, 3, 4, 5, 6, 7, 8, 9 /)
+    stencil_sizes(:) = stencil_max
+    stencil_map(:,:,:) = reshape(                                              &
+        (/ 1, 2, 3,  1, 4, 5,  1, 6, 7,  1, 8, 9 /),                           &
+        [1,stencil_max,4]                                                      &
+    )
 
     x = (/ 0.0_r_tran, -1.0_r_tran, -2.0_r_tran, &
            0.0_r_tran, 0.0_r_tran, 1.0_r_tran, &
@@ -140,11 +137,13 @@ contains
                                           increment_x,       &
                                           increment_y,       &
                                           field_x,           &
-                                          stencil_size_x,    &
-                                          stencil_map_x,     &
+                                          stencil_sizes,     &
+                                          stencil_max,       &
+                                          stencil_map,       &
                                           field_y,           &
-                                          stencil_size_y,    &
-                                          stencil_map_y,     &
+                                          stencil_sizes,     &
+                                          stencil_max,       &
+                                          stencil_map,       &
                                           dep_pts_xy,        &
                                           panel_id,          &
                                           panel_edge_dist_W, &
@@ -152,7 +151,6 @@ contains
                                           panel_edge_dist_S, &
                                           panel_edge_dist_N, &
                                           monotone,          &
-                                          extent_size,       &
                                           ndf_wf,            &
                                           undf_wf,           &
                                           map_wf,            &
@@ -190,11 +188,13 @@ contains
                                           increment_x,       &
                                           increment_y,       &
                                           field_x,           &
-                                          stencil_size_x,    &
-                                          stencil_map_x,     &
+                                          stencil_sizes,     &
+                                          stencil_max,       &
+                                          stencil_map,       &
                                           field_y,           &
-                                          stencil_size_y,    &
-                                          stencil_map_y,     &
+                                          stencil_sizes,     &
+                                          stencil_max,       &
+                                          stencil_map,       &
                                           dep_pts_xy,        &
                                           panel_id,          &
                                           panel_edge_dist_W, &
@@ -202,7 +202,6 @@ contains
                                           panel_edge_dist_S, &
                                           panel_edge_dist_N, &
                                           monotone,          &
-                                          extent_size,       &
                                           ndf_wf,            &
                                           undf_wf,           &
                                           map_wf,            &
@@ -224,8 +223,8 @@ contains
     deallocate(field_tmp)
     deallocate(increment_x)
     deallocate(increment_y)
-    deallocate(stencil_map_x)
-    deallocate(stencil_map_y)
+    deallocate(stencil_sizes)
+    deallocate(stencil_map)
 
     ! TEST 3: Integer dep dist, positive dep dists -----------------------------
     ! Stencil extent of 3, panel rotation
@@ -233,11 +232,8 @@ contains
     panel_edge_dist_W(:) = 1
     panel_edge_dist_E(:) = -ABS(IMDI)
 
-    stencil_size = 13
-    undf_wf = ndf_wf*nlayers*stencil_size
-    stencil_size_x = stencil_size
-    stencil_size_y = stencil_size
-    extent_size = (stencil_size-1)/4
+    stencil_max = 4
+    undf_wf = 13
 
     allocate(field_x(undf_wf))
     allocate(field_y(undf_wf))
@@ -246,12 +242,15 @@ contains
     allocate(increment_y(undf_wf))
     allocate(x(undf_wf))
     allocate(y(undf_wf))
-    allocate(stencil_map_x(ndf_wf,stencil_size))
-    allocate(stencil_map_y(ndf_wf,stencil_size))
+    allocate(stencil_map(ndf_wf,stencil_max,4))
+    allocate(stencil_sizes(4))
 
     ! Set up maps
-    stencil_map_x(1,:) = (/ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 /)
-    stencil_map_y(1,:) = (/ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 /)
+    stencil_sizes(:) = stencil_max
+    stencil_map(:,:,:) = reshape(                                              &
+        (/ 1, 2, 3, 4,  1, 5, 6, 7,  1, 8, 9, 10,  1, 11, 12, 13 /),           &
+        [1,stencil_max,4]                                                      &
+    )
 
     x = (/ 0.0_r_tran, -1.0_r_tran, -2.0_r_tran, -3.0_r_tran, &
            0.0_r_tran, 0.0_r_tran, 0.0_r_tran, &
@@ -287,11 +286,13 @@ contains
                                           increment_x,       &
                                           increment_y,       &
                                           field_x,           &
-                                          stencil_size_x,    &
-                                          stencil_map_x,     &
+                                          stencil_sizes,     &
+                                          stencil_max,       &
+                                          stencil_map,       &
                                           field_y,           &
-                                          stencil_size_y,    &
-                                          stencil_map_y,     &
+                                          stencil_sizes,     &
+                                          stencil_max,       &
+                                          stencil_map,       &
                                           dep_pts_xy,        &
                                           panel_id,          &
                                           panel_edge_dist_W, &
@@ -299,7 +300,6 @@ contains
                                           panel_edge_dist_S, &
                                           panel_edge_dist_N, &
                                           monotone,          &
-                                          extent_size,       &
                                           ndf_wf,            &
                                           undf_wf,           &
                                           map_wf,            &
@@ -321,8 +321,8 @@ contains
     deallocate(field_tmp)
     deallocate(increment_x)
     deallocate(increment_y)
-    deallocate(stencil_map_x)
-    deallocate(stencil_map_y)
+    deallocate(stencil_sizes)
+    deallocate(stencil_map)
 
   end subroutine horizontal_cubic_sl_sphere_kernel_test
 

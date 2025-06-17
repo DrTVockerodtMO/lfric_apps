@@ -34,6 +34,7 @@ module horizontal_sl_advective_alg_mod
   use horizontal_cubic_sl_sphere_kernel_mod,                                   &
                                         only: horizontal_cubic_sl_sphere_kernel_type
   use horizontal_linear_sl_kernel_mod,  only: horizontal_linear_sl_kernel_type
+  use limited_area_lbc_alg_mod,         only: overwrite_blending_zone_rtran
   use remap_on_extended_mesh_alg_mod,   only: remap_on_extended_mesh
 
   ! Pointers to other objects
@@ -43,7 +44,12 @@ module horizontal_sl_advective_alg_mod
   ! Configs
   use base_mesh_config_mod,             only: topology, geometry,              &
                                               topology_fully_periodic,         &
+                                              topology_non_periodic,           &
                                               geometry_spherical
+  use boundaries_config_mod,            only: limited_area,                    &
+                                              transport_boundary_depth,        &
+                                              transport_overwrite_freq,        &
+                                              transport_overwrite_freq_all
   use io_config_mod,                    only: subroutine_timers
   use transport_config_mod,             only: extended_mesh
 
@@ -100,10 +106,10 @@ module horizontal_sl_advective_alg_mod
     integer(kind=i_def) :: splitting
     integer(kind=i_def) :: step
     integer(kind=i_def) :: stencil_extent
-    integer(kind=i_def) :: cfl_stencil_extent
     integer(kind=i_def) :: hori_monotone
     logical(kind=l_def) :: monotone_remap
     logical(kind=l_def) :: is_cubed_sphere
+    logical(kind=l_def) :: do_overwrite
     real(kind=r_tran)   :: dt_frac, dt
     real(kind=r_tran)   :: one_over_dt, half_dt
 
@@ -158,7 +164,6 @@ module horizontal_sl_advective_alg_mod
 
     ! Get stencil size
     stencil_extent  = dep_stencil_extent_xy + 1_i_def
-    cfl_stencil_extent = int(stencil_extent)
 
 
     ! Initialise fields
@@ -190,8 +195,7 @@ module horizontal_sl_advective_alg_mod
                                                    field_yp,                   &
                                                    field_big_halo,             &
                                                    stencil_extent,             &
-                                                   dep_dist_xy,                &
-                                                   cfl_stencil_extent ) )
+                                                   dep_dist_xy ) )
 
     ! Constants to get increments
     one_over_dt = 1.0_r_tran / dt
@@ -204,9 +208,21 @@ module horizontal_sl_advective_alg_mod
                  inc_a_times_X(one_over_dt, half_increment_y),                 &
                  X_minus_bY(field_y, field_n, half_dt, half_increment_y) )
 
+    do_overwrite = (                                                           &
+      limited_area .and. topology == topology_non_periodic .and.               &
+      transport_overwrite_freq == transport_overwrite_freq_all                 &
+    )
+    if (do_overwrite) then
+      call overwrite_blending_zone_rtran(                                      &
+              field_x, field_n, depth=transport_boundary_depth                 &
+      )
+      call overwrite_blending_zone_rtran(                                      &
+              field_y, field_n, depth=transport_boundary_depth                 &
+      )
+    end if
+
     ! Final advective step with cubic interpolation
     stencil_extent = stencil_extent + 1
-    cfl_stencil_extent = int(stencil_extent)
 
     ! If needed remap the field on an extended cubed sphere
     if ( extended_mesh ) then
@@ -239,8 +255,7 @@ module horizontal_sl_advective_alg_mod
                                                 dep_dist_xy,                   &
                                                 panel_id,                      &
                                                 panel_edge_dist,               &
-                                                hori_monotone,                 &
-                                                cfl_stencil_extent) )
+                                                hori_monotone ) )
     else
       call invoke( horizontal_cubic_sl_kernel_type(                            &
                                                 increment_x,                   &
@@ -250,8 +265,7 @@ module horizontal_sl_advective_alg_mod
                                                 field_y_big_halo,              &
                                                 stencil_extent,                &
                                                 dep_dist_xy,                   &
-                                                hori_monotone,                 &
-                                                cfl_stencil_extent) )
+                                                hori_monotone ) )
     end if
 
     ! Collect the increments

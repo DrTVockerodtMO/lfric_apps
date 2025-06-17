@@ -38,6 +38,7 @@ zhloc_depth_fac=0.4,
 /
 &boundaries
 limited_area=.false.,
+transport_overwrite_freq='final'
 /
 &checks
 limit_cfl=.false.,

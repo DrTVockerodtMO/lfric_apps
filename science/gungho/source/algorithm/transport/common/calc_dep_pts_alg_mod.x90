@@ -160,7 +160,6 @@ contains
     ! Internal variables
     real(kind=r_tran)       :: max_hori_dep, min_hori_dep
     logical(kind=l_def)     :: cap_dep_points
-    integer(kind=i_def)     :: stencil_extent, cfl_stencil_extent
     type(r_tran_field_type) :: wind_adv
     type(r_tran_field_type) :: dep_wind
     type(r_tran_field_type) :: dep_wind_np1
@@ -260,8 +259,6 @@ contains
       case ( horizontal_method_ffsl )
         ! Use time-averaged wind
         cap_dep_points = (horizontal_limit == horizontal_limit_cap)
-        stencil_extent = dep_pt_stencil_extent
-        cfl_stencil_extent = dep_pt_stencil_extent
         face_selector_ew => get_face_selector_ew(mesh%get_id())
         face_selector_ns => get_face_selector_ns(mesh%get_id())
         ! Require copy of detj as Psyclone doesn't allow the same field to be
@@ -358,7 +355,7 @@ contains
     type(integer_field_type)           :: error_flag_field
     integer(kind=i_def)                :: error_flag_min, error_flag_max
     integer(kind=i_def)                :: stencil_extent
-    integer(kind=i_def)                :: cfl_stencil_extent, ndep
+    integer(kind=i_def)                :: ndep
     logical(kind=l_def)                :: cap_dep_points
     logical(kind=l_def)                :: is_cubed_sphere
     real(kind=r_tran)                  :: dep_min, dep_max
@@ -368,9 +365,7 @@ contains
     face_selector_ns => get_face_selector_ns(mesh%get_id())
     call error_flag_field%initialise( face_selector_ew%get_function_space() )
 
-    ! Psyclone requires these two variables to be identified differently
     stencil_extent = dep_pt_stencil_extent
-    cfl_stencil_extent = stencil_extent
     ndep = 2*dep_pt_stencil_extent + 1
     cap_dep_points = (horizontal_limit == horizontal_limit_cap)
 
@@ -401,7 +396,6 @@ contains
                                                   face_selector_ew,            &
                                                   face_selector_ns,            &
                                                   error_flag_field,            &
-                                                  cfl_stencil_extent,          &
                                                   ndep,                        &
                                                   cap_dep_points) )
     else
@@ -422,7 +416,6 @@ contains
                                                   face_selector_ew,            &
                                                   face_selector_ns,            &
                                                   error_flag_field,            &
-                                                  cfl_stencil_extent,          &
                                                   ndep,                        &
                                                   cap_dep_points) )
     end if

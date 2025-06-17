@@ -9,6 +9,7 @@ topology='fully_periodic',
 /
 &boundaries
 limited_area=.false.,
+transport_overwrite_freq='final'
 /
 &energy_correction
 encorr_usage='none',

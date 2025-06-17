@@ -225,7 +225,7 @@ contains
       ! If this is not the final step, field_np1 already includes the *advective*
       ! increment, and may be adjusted to enforce min value or in blending zone
       call end_of_consistent_step_alg(                                         &
-              field_np1, mass_flux, flux_precomputations,                      &
+              field_np1, field_n, mass_flux, flux_precomputations,             &
               transport_counter, transport_metadata, compute_field_np1=.false. &
       )
 

@@ -29,7 +29,11 @@ module flux_precomputations_alg_mod
                                             topology_fully_periodic,           &
                                             geometry_spherical
   use boundaries_config_mod,          only: limited_area,                      &
-                                            transport_boundary_depth
+                                            transport_boundary_depth,          &
+                                            transport_overwrite_freq,          &
+                                            transport_overwrite_freq_all,      &
+                                            transport_overwrite_freq_final,    &
+                                            transport_overwrite_freq_split_step
   use constants_mod,                  only: i_def, l_def, str_def, imdi,       &
                                             r_tran, EPS_R_TRAN
   use extrusion_mod,                  only: PRIME_EXTRUSION, SHIFTED, TWOD
@@ -916,10 +920,10 @@ contains
   !> @return The reference mass for the given mesh and step
   recursive function get_ref_mass(self, mesh_id, step) result(ref_mass)
 
-    use fv_difference_z_kernel_mod,  only: fv_difference_z_kernel_type
-    use fv_difference_2d_kernel_mod, only: fv_difference_2d_kernel_type
-    use fv_difference_3d_kernel_mod, only: fv_difference_3d_kernel_type
-    use split_transport_utils_mod,   only: get_next_step_hori
+    use fv_difference_z_kernel_mod,     only: fv_difference_z_kernel_type
+    use fv_difference_2d_kernel_mod,    only: fv_difference_2d_kernel_type
+    use fv_difference_3d_kernel_mod,    only: fv_difference_3d_kernel_type
+    use split_transport_utils_mod,      only: get_next_step_hori
 
     implicit none
 
@@ -932,6 +936,7 @@ contains
     integer(kind=i_def)                :: halo_depth
     integer(kind=i_def)                :: num_split_steps
     logical(kind=l_def)                :: next_step_hori
+    logical(kind=l_def)                :: do_overwrite
     type(mesh_type),           pointer :: mesh
     type(function_space_type), pointer :: w3_fs
     type(r_tran_field_type),   pointer :: ref_mass
@@ -1016,7 +1021,22 @@ contains
                                  ref_mass_prev, increment) )
         end if
 
-        if ( limited_area .and. topology == topology_non_periodic ) then
+        do_overwrite = (                                                       &
+          ! Only overwrite when we have a LAM, and one of the following...
+          limited_area .and. topology == topology_non_periodic .and. (         &
+            transport_overwrite_freq == transport_overwrite_freq_split_step    &
+            .or. transport_overwrite_freq == transport_overwrite_freq_all      &
+            .or. ( step == self%num_steps + 1                                  &
+              .and. transport_overwrite_freq == transport_overwrite_freq_final &
+            )                                                                  &
+          )                                                                    &
+        )
+
+        if ( do_overwrite ) then
+        ! Only overwrite the final step
+          if (transport_overwrite_freq == transport_overwrite_freq_final) then
+            ref_mass_prev => self%get_ref_mass(mesh_id, 1)
+          end if
           call overwrite_blending_zone_rtran(self%ref_mass(mesh_idx, step),    &
                                              ref_mass_prev,                    &
                                              depth=transport_boundary_depth)
@@ -1570,6 +1590,7 @@ contains
     integer(kind=i_def)                :: halo_depth
     integer(kind=i_def)                :: direction
     integer(kind=i_def)                :: step_of_substep
+    logical(kind=l_def)                :: do_overwrite
     type(mesh_type),           pointer :: mesh
     type(function_space_type), pointer :: w3_fs
     type(r_tran_field_type),   pointer :: ref_mass_prev
@@ -1646,13 +1667,20 @@ contains
                                  self%ref_field_y(mesh_idx, step_idx), detj_w3)
     end if
 
-    if ( limited_area .and. topology == topology_non_periodic ) then
-      call overwrite_blending_zone_rtran(self%ref_mass_x(mesh_idx, step_idx),  &
-                                         ref_mass_prev,                        &
-                                         depth=transport_boundary_depth)
-      call overwrite_blending_zone_rtran(self%ref_mass_y(mesh_idx, step_idx),  &
-                                         ref_mass_prev,                        &
-                                         depth=transport_boundary_depth)
+    do_overwrite = (                                                           &
+      limited_area .and. topology == topology_non_periodic .and.               &
+      transport_overwrite_freq == transport_overwrite_freq_all                 &
+    )
+
+    if (do_overwrite) then
+      call overwrite_blending_zone_rtran(                                      &
+              self%ref_mass_x(mesh_idx, step), ref_mass_prev,                  &
+              depth=transport_boundary_depth                                   &
+      )
+      call overwrite_blending_zone_rtran(                                      &
+              self%ref_mass_y(mesh_idx, step), ref_mass_prev,                  &
+              depth=transport_boundary_depth                                   &
+      )
     end if
 
     ! Check that mass isn't negative in tracer case

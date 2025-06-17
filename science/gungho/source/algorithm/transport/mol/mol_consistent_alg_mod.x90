@@ -328,7 +328,7 @@ module mol_consistent_alg_mod
     ! If this is not the final step, mr_np1 already includes the *advective*
     ! increment, and may be adjusted to enforce min value or in blending zone
     call end_of_consistent_step_alg(                                           &
-            mr_np1, flux_X, flux_precomputations,                              &
+            mr_np1, mr_in, flux_X, flux_precomputations,                       &
             transport_counter, transport_metadata                              &
     )
 

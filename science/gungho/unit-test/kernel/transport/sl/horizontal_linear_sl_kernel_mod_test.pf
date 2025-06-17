@@ -30,16 +30,15 @@ contains
     integer(kind=i_def), parameter :: nlayers = 1
     integer(kind=i_def), parameter :: ndf_wf = 1
     integer(kind=i_def), parameter :: ndf_w2 = 4
-    integer(kind=i_def), parameter :: stencil_size = 9
-    integer(kind=i_def), parameter :: stencil_size_c = stencil_size
-    integer(kind=i_def), parameter :: extent_size = (stencil_size-1)/4
+    integer(kind=i_def), parameter :: stencil_max = 3
     integer(kind=i_def), parameter :: undf_w2  = ndf_w2*nlayers
     integer(kind=i_def), parameter :: undf_wf  = ndf_wf*nlayers
-    integer(kind=i_def), parameter :: undf_wfs = ndf_wf*nlayers*stencil_size
+    integer(kind=i_def), parameter :: undf_wfs = ndf_wf*nlayers*(1 + 4*(stencil_max-1))
 
     integer(kind=i_def), dimension(ndf_wf) :: map_wf
     integer(kind=i_def), dimension(ndf_w2) :: map_w2
-    integer(kind=i_def), dimension(ndf_wf,stencil_size_c) :: stencil_map
+    integer(kind=i_def), dimension(4)      :: stencil_sizes
+    integer(kind=i_def), dimension(ndf_wf,stencil_max,4) :: stencil_map
 
     real(kind=r_tran),   dimension(undf_wf)  :: field_x
     real(kind=r_tran),   dimension(undf_wf)  :: field_y
@@ -54,7 +53,11 @@ contains
     !         | 5 |
 
     ! Set up maps
-    stencil_map(1,:) = (/ 1, 2, 3, 4, 5, 6, 7, 8, 9 /)
+    stencil_sizes(:) = stencil_max
+    stencil_map(:,:,:) = reshape(                                              &
+        (/ 1, 2, 3,  1, 4, 5,  1, 6, 7,  1, 8, 9 /),                           &
+        [1,stencil_max,4]                                                      &
+    )
     map_w2(:) = (/ 1, 2, 3, 4 /)
     map_wf(1) = 1
 
@@ -84,10 +87,10 @@ contains
                                     field_x,        &
                                     field_y,        &
                                     field,          &
-                                    stencil_size_c, &
+                                    stencil_sizes,  &
+                                    stencil_max,    &
                                     stencil_map,    &
                                     dep_pts,        &
-                                    extent_size,    &
                                     ndf_wf,         &
                                     undf_wfs,       &
                                     map_wf,         &
@@ -111,10 +114,10 @@ contains
                                     field_x,        &
                                     field_y,        &
                                     field,          &
-                                    stencil_size_c, &
+                                    stencil_sizes,  &
+                                    stencil_max,    &
                                     stencil_map,    &
                                     dep_pts,        &
-                                    extent_size,    &
                                     ndf_wf,         &
                                     undf_wfs,       &
                                     map_wf,         &
