@@ -9,9 +9,11 @@ module physics_mappings_alg_mod
 
   use base_mesh_config_mod,             only: geometry, &
                                               geometry_spherical
-  use constants_mod,                    only: r_def, i_def
+  use constants_mod,                    only: r_def, i_def, l_def
   use sci_fem_constants_mod,            only: get_rmultiplicity
   use field_mod,                        only: field_type
+  use finite_element_config_mod,        only: coord_system, &
+                                              coord_system_native
   use fs_continuity_mod,                only: W3, WTHETA, W2, W2H
   use function_space_mod,               only: function_space_type
   use function_space_collection_mod,    only: function_space_collection
@@ -36,6 +38,10 @@ module physics_mappings_alg_mod
                                         only: convert_hdiv_field_kernel_type
   use sci_dg_convert_hdiv_field_kernel_mod, &
                                         only: dg_convert_hdiv_field_kernel_type
+  use sci_convert_hdiv_native_kernel_mod, &
+                                        only: convert_hdiv_native_kernel_type
+  use sci_dg_convert_hdiv_native_kernel_mod, &
+                                        only: dg_convert_hdiv_native_kernel_type
   use sci_nodal_xyz_coordinates_kernel_mod, &
                                         only: nodal_xyz_coordinates_kernel_type
   use sci_psykal_builtin_light_mod,     only: invoke_convert_cart2sphere_vector
@@ -151,6 +157,7 @@ contains
     type( field_type )                    :: projected_field(3)
     type( mesh_type ), pointer            :: mesh
     integer( kind=i_def )                 :: nqp_h_exact, nqp_v_exact
+    logical( kind=l_def )                 :: optimised_conversion
 
     mesh =>  source_field%get_mesh()
 
@@ -168,7 +175,16 @@ contains
                    setval_c(wind_map(3), 0.0_r_def)  &
                    )
 
-      call invoke( dg_convert_hdiv_field_kernel_type(wind_map, source_field, chi, panel_id) )
+      optimised_conversion = (                                                 &
+        coord_system == coord_system_native                                    &
+        .and. u1_field%get_element_order_h() == 0                              &
+        .and. u1_field%get_element_order_v() == 0                              &
+      )
+      if (optimised_conversion) then
+        call invoke( dg_convert_hdiv_native_kernel_type(wind_map, source_field, chi, panel_id) )
+      else
+        call invoke( dg_convert_hdiv_field_kernel_type(wind_map, source_field, chi, panel_id) )
+      end if
 
       if ( geometry == geometry_spherical ) then
         call u1_field%copy_field_properties(physical_chi(1))
@@ -234,7 +250,7 @@ contains
     type(integer_field_type), pointer :: face_selector_ns
 
     integer(i_def)               :: i, fs_id
-
+    logical(l_def)               :: optimised_conversion
 
     ! get chi field
     chi => get_coordinates(mesh%get_id())
@@ -259,7 +275,16 @@ contains
 
     ! Convert 3D wind field to 3 components using the Piola transform
 
-    call invoke( convert_hdiv_field_kernel_type(physical_wind, wind, chi, panel_id) )
+    optimised_conversion = (                                                   &
+      coord_system == coord_system_native                                      &
+      .and. wind%get_element_order_h() == 0                                    &
+      .and. wind%get_element_order_v() == 0                                    &
+    )
+    if (optimised_conversion) then
+      call invoke( convert_hdiv_native_kernel_type(physical_wind, wind, chi, panel_id) )
+    else
+      call invoke( convert_hdiv_field_kernel_type(physical_wind, wind, chi, panel_id) )
+    end if
 
     ! Scale fields by the reciprocal of multiplicity
     do i = 1,3

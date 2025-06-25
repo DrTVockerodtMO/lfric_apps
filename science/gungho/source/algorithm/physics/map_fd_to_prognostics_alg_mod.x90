@@ -61,6 +61,7 @@ module map_fd_to_prognostics_alg_mod
                                        topology,           &
                                        topology_fully_periodic
   use formulation_config_mod,    only: rotating, shallow
+  use finite_element_config_mod, only: coord_system, coord_system_native
   use io_config_mod,             only: subroutine_timers
   use physics_config_mod,        only: sample_physics_winds, &
                                        sample_physics_winds_correction
@@ -349,6 +350,8 @@ contains
     use matrix_vector_kernel_mod,      only : matrix_vector_kernel_type
     use sci_dg_convert_hdiv_field_kernel_mod, &
                                        only : dg_convert_hdiv_field_kernel_type
+    use sci_dg_convert_hdiv_native_kernel_mod, &
+                                       only : dg_convert_hdiv_native_kernel_type
     use sci_nodal_xyz_coordinates_kernel_mod, &
                                        only : nodal_xyz_coordinates_kernel_type
     use sci_psykal_builtin_light_mod,  only : invoke_convert_cart2sphere_vector
@@ -384,6 +387,7 @@ contains
     type(field_type),      pointer :: mask
     type(field_type),      target  :: dummy_mask
     integer(i_def)                 :: i, eos_level
+    logical(l_def)                 :: optimised_conversion
 
     nullify(geopotential, w2_rmultiplicity, chi, panel_id, height_w3, &
             height_wth, coriolis, mesh, mask )
@@ -435,8 +439,20 @@ contains
       ! safe to use the discontinuous version of this kernel to avoid
       ! an unnecessary halo exchange, however if the horizontal DoFs are
       ! ever wanted, it should be changed for the continuous version.
-      call invoke( dg_convert_hdiv_field_kernel_type( c_terms, coriolis_term, &
-                                                      chi, panel_id ) )
+      optimised_conversion = (                                                 &
+        coord_system == coord_system_native                                    &
+        .and. u%get_element_order_h() == 0                                     &
+        .and. u%get_element_order_v() == 0                                     &
+      )
+      if (optimised_conversion) then
+        call invoke( dg_convert_hdiv_native_kernel_type( c_terms,              &
+                                                         coriolis_term, chi,   &
+                                                         panel_id ) )
+      else
+        call invoke( dg_convert_hdiv_field_kernel_type( c_terms,               &
+                                                        coriolis_term, chi,    &
+                                                        panel_id ) )
+      end if
 
       do i = 1,3
         call invoke( inc_X_times_Y(c_terms(i), w2_rmultiplicity) )

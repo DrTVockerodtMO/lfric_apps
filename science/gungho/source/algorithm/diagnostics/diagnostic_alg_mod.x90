@@ -8,7 +8,8 @@
 module diagnostic_alg_mod
 
   use constants_mod,                 only: i_def, r_def, l_def, str_max_filename
-  use finite_element_config_mod,     only: element_order_h, element_order_v
+  use finite_element_config_mod,     only: element_order_h, element_order_v,   &
+                                           coord_system, coord_system_native
   use base_mesh_config_mod,          only: geometry, &
                                            geometry_spherical
   use planet_config_mod,             only: cp
@@ -272,6 +273,8 @@ contains
 
     use sci_convert_hdiv_field_kernel_mod, &
                                           only: convert_hdiv_field_kernel_type
+    use sci_convert_hdiv_native_kernel_mod, &
+                                          only: convert_hdiv_native_kernel_type
     use sci_convert_hcurl_field_kernel_mod, &
                                           only: convert_hcurl_field_kernel_type
 
@@ -291,8 +294,7 @@ contains
     integer(i_def)                  :: output_fs
     type(field_type), pointer       :: rmultiplicity
     type(mesh_type),  pointer       :: mesh
-
-
+    logical(l_def)                  :: optimised_conversion
 
     ! Get chi field
     mesh     => field%get_mesh()
@@ -321,7 +323,16 @@ contains
       call invoke( convert_hcurl_field_kernel_type(output_field, field, chi, panel_id) )
       output_dim = 3
     else if ( output_fs == W2 ) then
-      call invoke( convert_hdiv_field_kernel_type(output_field, field, chi, panel_id) )
+      optimised_conversion = (                                                 &
+        coord_system == coord_system_native                                    &
+        .and. field%get_element_order_h() == 0                                 &
+        .and. field%get_element_order_v() == 0                                 &
+      )
+      if (optimised_conversion) then
+        call invoke( convert_hdiv_native_kernel_type(output_field, field, chi, panel_id) )
+      else
+        call invoke( convert_hdiv_field_kernel_type(output_field, field, chi, panel_id) )
+      end if
       output_dim = 3
     else
       ! If we didn't get a W1 or W2 field, just pass it through

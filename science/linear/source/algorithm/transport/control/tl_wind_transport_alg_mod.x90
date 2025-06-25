@@ -147,6 +147,7 @@ contains
         end do
         call log_field_minmax( LOG_LEVEL_INFO, 'advected u', wind_n )
         ! Linear part
+        ! TODO: add optimised conversions to W3 components
         call invoke( setval_c(ls_u_w3_n(1), 0.0_r_def),                        &
                      setval_c(ls_u_w3_n(2), 0.0_r_def),                        &
                      setval_c(ls_u_w3_n(3), 0.0_r_def),                        &
