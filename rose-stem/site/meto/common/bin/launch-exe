@@ -25,7 +25,7 @@
 # MEMORY_PROFILE (bool)
 
 EXEC_PATH="${BIN_DIR}/${EXEC_NAME}${PAT_EXE_EXTEN}"
-NAMELIST_FILE=configuration.nml
+NAMELIST_FILE=${EXTRA_NAMELIST_FILES:=configuration.nml}
 XIOS_SERVER_EXEC_PATH="xios_server.exe"
 SLURM_MPMD_FILE="lfric_xios_mpmd"
 
