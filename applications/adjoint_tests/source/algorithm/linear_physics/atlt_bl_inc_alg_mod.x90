@@ -22,7 +22,7 @@ module atlt_bl_inc_alg_mod
   use function_space_collection_mod,       only : function_space_collection
   use finite_element_config_mod,           only : element_order_h, element_order_v
   use fs_continuity_mod,                   only : W2, W3, Wtheta
-  use constants_mod,                       only : i_def, r_def
+  use constants_mod,                       only : i_def, r_def, EPS
   use quadrature_face_mod,                 only : quadrature_face_type
   use quadrature_rule_gaussian_mod,        only : quadrature_rule_gaussian_type
   use reference_element_mod,               only : reference_element_type
@@ -92,7 +92,6 @@ module atlt_bl_inc_alg_mod
     real(kind=r_def), parameter :: overall_tolerance = 3000.0_r_def
     real(kind=r_def)            :: machine_tol
     real(kind=r_def)            :: relative_diff
-    real(kind=r_def), parameter :: eps = 1e-30_r_def
 
     integer(kind=tik) :: id
 
@@ -134,8 +133,8 @@ module atlt_bl_inc_alg_mod
     call invoke ( x_innerproduct_x( ip1(1), u_inc ), &
                   x_innerproduct_x( ip1(2), u ) )
 
-    sf(1) = 1.0_r_def / (ip1(1) + eps)
-    sf(2) = 1.0_r_def / (ip1(2) + eps)
+    sf(1) = 1000.0_r_def / (ip1(1) + EPS)
+    sf(2) = 1000.0_r_def / (ip1(2) + EPS)
 
     inner1 = 0.0_r_def
     inner1 = inner1 + ip1(1) * sf(1)
@@ -161,7 +160,7 @@ module atlt_bl_inc_alg_mod
     inner2 = inner2 + ip2(2)
 
     write( log_scratch_space, * ) 'atlt_bl_inc_alg: ad test for atl_bl_inc_kernel_type: ip1=', &
-      ip1(1) * sf(1), ip1(2) * sf(2)
+      ip1(1), ip1(2)
     call log_event( log_scratch_space, LOG_LEVEL_DEBUG )
     write( log_scratch_space, * ) 'atlt_bl_inc_alg: ad test for atl_bl_inc_kernel_type: ip2=', ip2
     call log_event( log_scratch_space, LOG_LEVEL_DEBUG )

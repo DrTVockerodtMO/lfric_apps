@@ -87,25 +87,25 @@ subroutine atl_bl_inc_code( nlayers,                 &
   real(kind=r_def),    dimension(undf_w2),    intent(inout) :: u
   integer(kind=i_def),                        intent(in)    :: ndf_w2
   integer(kind=i_def), dimension(ndf_w2),     intent(in)    :: map_w2
-  real(kind=r_def),    dimension(undf_w2),    intent(in)    :: auv
-  real(kind=r_def),    dimension(undf_w2),    intent(in)    :: buv_inv
+  real(kind=r_def),    dimension(undf_w2),    intent(in)    :: Auv
+  real(kind=r_def),    dimension(undf_w2),    intent(in)    :: Buv_inv
   integer(kind=i_def),                        intent(in)    :: ndf_w3_2d
   integer(kind=i_def),                        intent(in)    :: undf_w3_2d
   integer(kind=i_def), dimension(ndf_w3_2d),  intent(in)    :: map_w3_2d
   integer(kind=i_def), dimension(undf_w3_2d), intent(in)    :: face_selector_ew
   integer(kind=i_def), dimension(undf_w3_2d), intent(in)    :: face_selector_ns
-  integer(kind=i_def),                        intent(in)    :: blevs_m
+  integer(kind=i_def),                        intent(in)    :: Blevs_m
 
   ! Internal variables
   integer(kind=i_def) :: df
   integer(kind=i_def) :: k
   integer(kind=i_def) :: j
-  real(kind=r_def), dimension(blevs_m) :: a0 ! Coefficient
-  real(kind=r_def), dimension(blevs_m) :: a1 ! Coefficient
-  real(kind=r_def), dimension(blevs_m) :: a2 ! Coefficient
-  real(kind=r_def), dimension(blevs_m) :: u_rhs ! Local perturbation velocity variable
-  real(kind=r_def), dimension(blevs_m) :: u_out ! Local perturbation velocity variable
-  real(kind=r_def), dimension(blevs_m) :: factor_u
+  real(kind=r_def), dimension(Blevs_m) :: a0 ! Coefficient
+  real(kind=r_def), dimension(Blevs_m) :: a1 ! Coefficient
+  real(kind=r_def), dimension(Blevs_m) :: a2 ! Coefficient
+  real(kind=r_def), dimension(Blevs_m) :: u_rhs ! Local perturbation velocity variable
+  real(kind=r_def), dimension(Blevs_m) :: u_out ! Local perturbation velocity variable
+  real(kind=r_def), dimension(Blevs_m) :: factor_u
 
   do j = face_selector_ew(map_w3_2d(1)) + face_selector_ns(map_w3_2d(1)), 1, -1
 
@@ -137,7 +137,7 @@ subroutine atl_bl_inc_code( nlayers,                 &
     end do
 
     ! (Adjoint of) solve for u_inc and transform to upper triangular form
-    do k = 1, blevs_m - 1
+    do k = 1, Blevs_m - 1
       u_out(k) = u_out(k) + u_inc(map_w2(df) + k - 1)
       u_inc(map_w2(df) + k - 1) = 0.0_r_def
 
@@ -145,30 +145,30 @@ subroutine atl_bl_inc_code( nlayers,                 &
       u_rhs(k) = a0(k) * u_out(k)
     end do
 
-    u_out(blevs_m) = u_out(blevs_m) + u_inc(map_w2(df) + blevs_m - 1)
-    u_inc(map_w2(df) + blevs_m - 1) = 0.0_r_def
+    u_out(Blevs_m) = u_out(Blevs_m) + u_inc(map_w2(df) + Blevs_m - 1)
+    u_inc(map_w2(df) + Blevs_m - 1) = 0.0_r_def
 
-    u_rhs(blevs_m) = a0(blevs_m) * u_out(blevs_m)
+    u_rhs(Blevs_m) = a0(Blevs_m) * u_out(Blevs_m)
 
-    do k = blevs_m, 2, -1
+    do k = Blevs_m, 2, -1
       u_rhs(k - 1) = u_rhs(k - 1) + (-factor_u(k) * u_rhs(k))
     end do
 
-    u(blevs_m + map_w2(df) - 2) = u(blevs_m + map_w2(df) - 2) + &
-    auv(blevs_m + map_w2(df) - 1) * u_rhs(blevs_m) / buv_inv(blevs_m + map_w2(df))
-    u(blevs_m + map_w2(df) - 1) = u(blevs_m + map_w2(df) - 1) - &
-    auv(blevs_m + map_w2(df) - 1) * u_rhs(blevs_m) / buv_inv(blevs_m + map_w2(df))
+    u(Blevs_m + map_w2(df) - 2) = u(Blevs_m + map_w2(df) - 2) + &
+    Auv(Blevs_m + map_w2(df) - 1) * u_rhs(Blevs_m) / Buv_inv(Blevs_m + map_w2(df))
+    u(Blevs_m + map_w2(df) - 1) = u(Blevs_m + map_w2(df) - 1) - &
+    Auv(Blevs_m + map_w2(df) - 1) * u_rhs(Blevs_m) / Buv_inv(Blevs_m + map_w2(df))
 
-    do k = blevs_m - 1, 2, -1
-      u(k + map_w2(df)) = u(k + map_w2(df)) + auv(k + map_w2(df)) * u_rhs(k) / buv_inv(k + map_w2(df))
-      u(k + map_w2(df) - 1) = u(k + map_w2(df) - 1) - auv(k + map_w2(df)) * u_rhs(k) / buv_inv(k + map_w2(df))
-      u(k + map_w2(df) - 2) = u(k + map_w2(df) - 2) + auv(k + map_w2(df) - 1) * u_rhs(k) / buv_inv(k + map_w2(df))
-      u(k + map_w2(df) - 1) = u(k + map_w2(df) - 1) - auv(k + map_w2(df) - 1) * u_rhs(k) / buv_inv(k + map_w2(df))
+    do k = Blevs_m - 1, 2, -1
+      u(k + map_w2(df)) = u(k + map_w2(df)) + Auv(k + map_w2(df)) * u_rhs(k) / Buv_inv(k + map_w2(df))
+      u(k + map_w2(df) - 1) = u(k + map_w2(df) - 1) - Auv(k + map_w2(df)) * u_rhs(k) / Buv_inv(k + map_w2(df))
+      u(k + map_w2(df) - 2) = u(k + map_w2(df) - 2) + Auv(k + map_w2(df) - 1) * u_rhs(k) / Buv_inv(k + map_w2(df))
+      u(k + map_w2(df) - 1) = u(k + map_w2(df) - 1) - Auv(k + map_w2(df) - 1) * u_rhs(k) / Buv_inv(k + map_w2(df))
     end do
 
-    u(map_w2(df) + 1) = u(map_w2(df) + 1) + auv(map_w2(df) + 1) * u_rhs(1) / buv_inv(map_w2(df) + 1)
-    u(map_w2(df)) = u(map_w2(df)) - auv(map_w2(df) + 1) * u_rhs(1) / buv_inv(map_w2(df) + 1)
-    u(map_w2(df)) = u(map_w2(df)) - auv(map_w2(df)) * u_rhs(1) / buv_inv(map_w2(df) + 1)
+    u(map_w2(df) + 1) = u(map_w2(df) + 1) + Auv(map_w2(df) + 1) * u_rhs(1) / Buv_inv(map_w2(df) + 1)
+    u(map_w2(df)) = u(map_w2(df)) - Auv(map_w2(df) + 1) * u_rhs(1) / Buv_inv(map_w2(df) + 1)
+    u(map_w2(df)) = u(map_w2(df)) - Auv(map_w2(df)) * u_rhs(1) / Buv_inv(map_w2(df) + 1)
 
   end do
 
