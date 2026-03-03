@@ -241,7 +241,8 @@ module adj_lookup_table_mod
     ! Arguments
     class(adj_lookup_table_type), intent(inout) :: self
 
-    ! Pass
+    call self%lookup_field%clear()
+    call self%set_count_field%clear()
 
   end subroutine adj_lookup_table_finaliser
 
