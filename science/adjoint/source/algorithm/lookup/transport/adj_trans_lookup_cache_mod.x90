@@ -394,21 +394,8 @@ module adj_trans_lookup_cache_mod
     ! Arguments
     class(adj_trans_lookup_cache_type), intent(inout) :: self
 
-    ! Internal variables
-    integer(kind=i_def)                               :: fspace_index
-
-    if (self%is_initialised) then
-      call self%lookup_poly1d%finalise()
-      do fspace_index = 1_i_def, self%n_fs_poly2d
-        call self%lookup_poly2d(fspace_index)%finalise()
-      end do
-      call self%lookup_poly_adv_upd%finalise()
-      do fspace_index = 1_i_def, self%n_fs_w3h_adv_upd
-        call self%lookup_w3h_adv_upd(fspace_index)%finalise()
-      end do
-      if (allocated(self%lookup_poly2d)) deallocate(self%lookup_poly2d)
-      if (allocated(self%lookup_w3h_adv_upd)) deallocate(self%lookup_w3h_adv_upd)
-    end if
+    if (allocated(self%lookup_poly2d)) deallocate(self%lookup_poly2d)
+    if (allocated(self%lookup_w3h_adv_upd)) deallocate(self%lookup_w3h_adv_upd)
 
   end subroutine adj_trans_lookup_cache_final
 

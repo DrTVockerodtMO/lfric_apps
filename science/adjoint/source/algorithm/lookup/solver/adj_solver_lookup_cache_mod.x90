@@ -147,15 +147,7 @@ module adj_solver_lookup_cache_mod
     ! Arguments
     class(adj_solver_lookup_cache_type), intent(inout) :: self
 
-    ! Internal variables
-    integer(kind=i_def)                                :: level
-
-    if (self%is_initialised) then
-      do level = 1, self%multigrid_levels + 1
-        call self%lookup_apply_hho(level)%finalise()
-      end do
-      if (allocated(self%lookup_apply_hho)) deallocate(self%lookup_apply_hho)
-    end if
+    if (allocated(self%lookup_apply_hho)) deallocate(self%lookup_apply_hho)
 
   end subroutine adj_solver_lookup_cache_final
 

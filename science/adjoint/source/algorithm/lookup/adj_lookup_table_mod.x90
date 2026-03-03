@@ -47,7 +47,6 @@ module adj_lookup_table_mod
     procedure,  public :: get_nsets_max
     procedure,  public :: get_nindices
     procedure,  public :: get_ndata
-    procedure,  public :: finalise => adj_lookup_table_finaliser
   end type adj_lookup_table_type
 
   contains
@@ -230,20 +229,5 @@ module adj_lookup_table_mod
     ndata = self%ndata
 
   end function get_ndata
-
-  !=============================================================================
-  !> @brief Destructor.
-  !> @param [in,out]     self           Lookup table
-  subroutine adj_lookup_table_finaliser( self )
-
-    implicit none
-
-    ! Arguments
-    class(adj_lookup_table_type), intent(inout) :: self
-
-    call self%lookup_field%clear()
-    call self%set_count_field%clear()
-
-  end subroutine adj_lookup_table_finaliser
 
 end module adj_lookup_table_mod
