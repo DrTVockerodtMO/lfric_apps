@@ -66,6 +66,9 @@ module adj_sci_psykal_builtin_light_mod
      ! Set-up all of the loop bounds
      !
      loop0_start = 1
+     ! Need namelist variable to replicate COMPUTE_ANNEXED_DOFS
+     ! from PSyclone config. This is a workaround until
+     ! https://github.com/stfc/PSyclone/issues/2674 is fixed.
      if (l_compute_annexed_dofs) then
        if (fsrce_32_proxy%is_dirty(depth=1)) then
          ! only copy the owned + annexed dofs
@@ -137,6 +140,9 @@ module adj_sci_psykal_builtin_light_mod
      ! Set-up all of the loop bounds
      !
      loop0_start = 1
+     ! Need namelist variable to replicate COMPUTE_ANNEXED_DOFS
+     ! from PSyclone config. This is a workaround until
+     ! https://github.com/stfc/PSyclone/issues/2674 is fixed.
      if (l_compute_annexed_dofs) then
        if (fsrce_32_proxy%is_dirty(depth=1)) then
          ! only copy the owned + annexed dofs
@@ -208,6 +214,9 @@ module adj_sci_psykal_builtin_light_mod
      ! Set-up all of the loop bounds
      !
      loop0_start = 1
+     ! Need namelist variable to replicate COMPUTE_ANNEXED_DOFS
+     ! from PSyclone config. This is a workaround until
+     ! https://github.com/stfc/PSyclone/issues/2674 is fixed.
      if (l_compute_annexed_dofs) then
        if (fsrce_64_proxy%is_dirty(depth=1)) then
          ! only copy the owned + annexed dofs
