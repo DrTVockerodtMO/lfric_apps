@@ -54,13 +54,13 @@ class vn31_t322(MacroUpgrade):
           source = re.sub(
               r"namelist:base_mesh",
               r"namelist:adjoint" + "\n" + " namelist:base_mesh",
-              source
+              source,
           )
         else:
           source = re.sub(
               r"(namelist:aerosol)",
               r"namelist:adjoint" + "\n" + " (namelist:aerosol)",
-              source
+              source,
           )
         self.change_setting_value(
             config, ["file:configuration.nml", "source"], source
