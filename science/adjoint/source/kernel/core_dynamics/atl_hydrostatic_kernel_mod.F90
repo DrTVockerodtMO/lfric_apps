@@ -170,12 +170,13 @@ module atl_hydrostatic_kernel_mod
   real(kind=r_def) :: grad_theta_v_at_quad(3), ls_grad_theta_v_at_quad(3), v(3)
   real(kind=r_def) :: exner_at_quad, theta_v_at_quad,       &
                       ls_exner_at_quad, ls_theta_v_at_quad, &
-                      grad_term, dv, res_dot_product
+                      grad_term, dv
 
   theta_v_e = 0.0_r_def
   grad_theta_v_at_quad = 0.0_r_def
   exner_at_quad = 0.0_r_def
   theta_v_at_quad = 0.0_r_def
+  exner_e = 0.0_r_def
   do k = nlayers - 1, 0, -1
 
     ! Linearisation state
@@ -223,10 +224,10 @@ module atl_hydrostatic_kernel_mod
         end do
         grad_theta_v_at_quad = 0.0_r_def
         theta_v_at_quad = 0.0_r_def
-        exner_e(:) = exner_at_quad * w3_basis(1,:,qp1,qp2)
+        exner_e = exner_e + exner_at_quad * w3_basis(1,:,qp1,qp2)
         exner_at_quad = 0.0_r_def
-      end do
-    end do
+      end do ! qp1
+    end do   ! qp2
 
     do df = ndf_wt, 1, -1
       theta(k + map_wt(df)) = theta(k + map_wt(df)) +                     &
@@ -243,8 +244,9 @@ module atl_hydrostatic_kernel_mod
 
     do df = ndf_w3, 1, -1
       exner(map_w3(df) + k) = exner(map_w3(df) + k) + exner_e(df)
+      exner_e(df) = 0.0_r_def
     end do
-  end do
+  end do ! k
 
   end subroutine atl_hydrostatic_code
 
