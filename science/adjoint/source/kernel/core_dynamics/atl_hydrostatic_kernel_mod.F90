@@ -14,7 +14,7 @@ module atl_hydrostatic_kernel_mod
                                 GH_BASIS, GH_DIFF_BASIS, &
                                 CELL_COLUMN,             &
                                 GH_QUADRATURE_XYoZ,      &
-                                ANY_W2 
+                                ANY_W2
   use constants_mod,     only : r_def
   use fs_continuity_mod, only : W3, Wtheta
   use kernel_mod,        only : kernel_type

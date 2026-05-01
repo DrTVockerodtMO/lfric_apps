@@ -194,7 +194,7 @@ module atl_kinetic_energy_gradient_kernel_mod
 
         end do ! qp1
       end do   ! qp2
-      
+
       do df = ndf_w2, 1, -1
         u(map_w2(df) + k) = u(map_w2(df) + k) + u_e(df)
         u_e(df) = 0.0_r_def
