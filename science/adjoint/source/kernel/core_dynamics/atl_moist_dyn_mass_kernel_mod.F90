@@ -45,11 +45,11 @@ module atl_moist_dyn_mass_kernel_mod
   !! @param[in]      nlayers        Integer the number of layers
   !! @param[in,out]  moist_dyn_tot  Change in Total mass factor (sum m_x)
   !! @param[in,out]  mr_v           Change in Water vapour mixing ratio
-  !! @param[in]      mr_cl          Change in Liquid cloud mixing ratio
-  !! @param[in]      mr_r           Change in Rain mixing ratio
-  !! @param[in]      mr_s           Change in Snow mixing ratio
-  !! @param[in]      mr_g           Change in Graupel mixing ratio
-  !! @param[in]      mr_ci          Change in Ice cloud mixing ratio
+  !! @param[in,out]  mr_cl          Change in Liquid cloud mixing ratio
+  !! @param[in,out]  mr_r           Change in Rain mixing ratio
+  !! @param[in,out]  mr_s           Change in Snow mixing ratio
+  !! @param[in,out]  mr_g           Change in Graupel mixing ratio
+  !! @param[in,out]  mr_ci          Change in Ice cloud mixing ratio
   !! @param[in]      ndf_wtheta     The number of degrees of freedom per cell
   !!                                for wtheta
   !! @param[in]      udf_wtheta     The number of total degrees of freedom for
@@ -66,8 +66,8 @@ module atl_moist_dyn_mass_kernel_mod
     integer(kind=i_def), intent(in) :: nlayers, ndf_wtheta, undf_wtheta
 
     real(kind=r_def), dimension(undf_wtheta),   intent(inout) :: moist_dyn_tot
-    real(kind=r_def), dimension(undf_wtheta),   intent(in)    :: mr_v, mr_cl, mr_r
-    real(kind=r_def), dimension(undf_wtheta),   intent(in)    :: mr_ci, mr_s, mr_g
+    real(kind=r_def), dimension(undf_wtheta),   intent(inout) :: mr_v, mr_cl, mr_r
+    real(kind=r_def), dimension(undf_wtheta),   intent(inout) :: mr_ci, mr_s, mr_g
     integer(kind=i_def), dimension(ndf_wtheta), intent(in)    :: map_wtheta
 
     ! Internal variables

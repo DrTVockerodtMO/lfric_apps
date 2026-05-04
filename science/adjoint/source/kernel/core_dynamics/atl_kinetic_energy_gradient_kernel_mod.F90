@@ -149,7 +149,6 @@ module atl_kinetic_energy_gradient_kernel_mod
     real(kind=r_def) :: ls_u_at_quad(3), u_at_quad(3)
     real(kind=r_def) :: ke_at_quad, dv
 
-    u_e = 0.0_r_def
     ipanel = int(panel_id(map_pid(1)), i_def)
     do k = nlayers - 1, 0, -1
       do df = 1, ndf_chi, 1
@@ -169,6 +168,7 @@ module atl_kinetic_energy_gradient_kernel_mod
         ru_e(df) = r_u(map_w2(df) + k)
       end do
 
+      u_e = 0.0_r_def
       do qp2 = nqp_v, 1, -1
         do qp1 = nqp_h, 1, -1
 
@@ -197,7 +197,6 @@ module atl_kinetic_energy_gradient_kernel_mod
 
       do df = ndf_w2, 1, -1
         u(map_w2(df) + k) = u(map_w2(df) + k) + u_e(df)
-        u_e(df) = 0.0_r_def
       end do
     end do ! k
 

@@ -172,11 +172,6 @@ module atl_hydrostatic_kernel_mod
                       ls_exner_at_quad, ls_theta_v_at_quad, &
                       grad_term, dv
 
-  theta_v_e = 0.0_r_def
-  grad_theta_v_at_quad = 0.0_r_def
-  exner_at_quad = 0.0_r_def
-  theta_v_at_quad = 0.0_r_def
-  exner_e = 0.0_r_def
   do k = nlayers - 1, 0, -1
 
     ! Linearisation state
@@ -189,6 +184,8 @@ module atl_hydrostatic_kernel_mod
                          ls_moist_dyn_tot( map_wt(df) + k )
     end do
 
+    theta_v_e = 0.0_r_def
+    exner_e = 0.0_r_def
     do qp2 = nqp_v, 1, -1
       do qp1 = nqp_h, 1, -1
 
@@ -207,6 +204,9 @@ module atl_hydrostatic_kernel_mod
         end do
 
         ! Perturbation
+        grad_theta_v_at_quad = 0.0_r_def
+        theta_v_at_quad = 0.0_r_def
+        exner_at_quad = 0.0_r_def
         do df = ndf_w2, 1, -1
           v = w2_basis(:,df,qp1,qp2)
           dv = w2_diff_basis(1,df,qp1,qp2)
@@ -222,10 +222,8 @@ module atl_hydrostatic_kernel_mod
                                                       wt_diff_basis(:,df,qp1,qp2)) &
                                         + theta_v_at_quad * wt_basis(1,df,qp1,qp2)
         end do
-        grad_theta_v_at_quad = 0.0_r_def
-        theta_v_at_quad = 0.0_r_def
+
         exner_e = exner_e + exner_at_quad * w3_basis(1,:,qp1,qp2)
-        exner_at_quad = 0.0_r_def
       end do ! qp1
     end do   ! qp2
 
@@ -240,11 +238,9 @@ module atl_hydrostatic_kernel_mod
                                       ls_theta_v_e(df) * theta_v_e(df) /  &
                                       ls_moist_dyn_gas(k + map_wt(df))
     end do
-    theta_v_e = 0.0_r_def
 
     do df = ndf_w3, 1, -1
       exner(map_w3(df) + k) = exner(map_w3(df) + k) + exner_e(df)
-      exner_e(df) = 0.0_r_def
     end do
   end do ! k
 
