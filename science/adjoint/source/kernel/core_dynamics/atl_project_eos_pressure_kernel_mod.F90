@@ -19,12 +19,12 @@ module atl_project_eos_pressure_kernel_mod
   use fs_continuity_mod,         only : W3, Wtheta
   use kernel_mod,                only : kernel_type
 
-  use base_mesh_config_mod,      only: geometry, topology
-  use finite_element_config_mod, only: coord_system
-  use planet_config_mod,         only: scaled_radius, &
-                                       kappa,         &
-                                       rd,            &
-                                       p_zero
+  use base_mesh_config_mod,      only : geometry, topology
+  use finite_element_config_mod, only : coord_system
+  use planet_config_mod,         only : scaled_radius, &
+                                        kappa,         &
+                                        rd,            &
+                                        p_zero
 
   implicit none
 
