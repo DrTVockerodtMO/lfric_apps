@@ -114,6 +114,7 @@ contains
     use adjt_compute_vorticity_alg_mod,             only : adjt_compute_vorticity_alg
     use atlt_derive_exner_from_eos_alg_mod,         only : atlt_derive_exner_from_eos_alg
     use atlt_moist_dyn_factors_alg_mod,             only : atlt_moist_dyn_factors_alg
+    use adjt_assemble_w2h_from_w2hb_alg_mod,        only : adjt_assemble_w2h_from_w2hb_alg
 
     ! ./solver
     use adjt_pressure_precon_alg_mod,               only : adjt_pressure_precon_alg
@@ -176,6 +177,7 @@ contains
     call atlt_rhs_sample_eos_alg( mesh )
     call atlt_sample_eos_pressure_alg( mesh )
     call atlt_pressure_gradient_bd_alg( mesh )
+    call adjt_assemble_w2h_from_w2hb_alg( mesh )
 
     ! ./linear_physics
     call atlt_bl_inc_alg( mesh )
