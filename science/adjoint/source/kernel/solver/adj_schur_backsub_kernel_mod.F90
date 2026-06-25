@@ -7,11 +7,11 @@
 !!        complement preconditioner when using a split W2 field (W2h, W2v).
 module adj_schur_backsub_kernel_mod
 
-  use argument_mod,      only : arg_type,              &
-                                GH_FIELD, GH_OPERATOR, &
-                                GH_READ, GH_INC,       &
-                                GH_WRITE,              &
-                                GH_REAL, CELL_COLUMN,  &
+  use argument_mod,      only : arg_type,               &
+                                GH_FIELD, GH_OPERATOR,  &
+                                GH_READ, GH_READINC,    &
+                                GH_INC, GH_READWRITE,   &
+                                GH_REAL, CELL_COLUMN,   &
                                 GH_SCALAR, GH_LOGICAL
   use constants_mod,     only : r_solver, i_def, l_def
   use fs_continuity_mod, only : W2h, W2v, W2, W3
@@ -28,15 +28,15 @@ module adj_schur_backsub_kernel_mod
   ! Kernel metadata for PSyclone
   type, public, extends(kernel_type) :: adj_schur_backsub_kernel_type
     private
-    type(arg_type) :: meta_args(8) = (/                       &
-         arg_type(GH_FIELD,    GH_REAL,    GH_INC,   W2h),    & ! lhs_h
-         arg_type(GH_FIELD,    GH_REAL,    GH_WRITE, W2v),    & ! lhs_v
-         arg_type(GH_FIELD,    GH_REAL,    GH_WRITE, W2),     & ! rhs
-         arg_type(GH_FIELD,    GH_REAL,    GH_INC,   W3),     & ! exner_inc
-         arg_type(GH_OPERATOR, GH_REAL,    GH_READ,  W2, W3), & ! div
-         arg_type(GH_FIELD,    GH_REAL,    GH_READ,  W2),     & ! norm
-         arg_type(GH_SCALAR,   GH_LOGICAL, GH_READ),          & ! lam
-         arg_type(GH_FIELD,    GH_REAL,    GH_READ,  W2)      & ! mask
+    type(arg_type) :: meta_args(8) = (/                           &
+         arg_type(GH_FIELD,    GH_REAL,    GH_READINC,   W2h),    & ! lhs_h
+         arg_type(GH_FIELD,    GH_REAL,    GH_READWRITE, W2v),    & ! lhs_v
+         arg_type(GH_FIELD,    GH_REAL,    GH_INC,       W2),     & ! rhs
+         arg_type(GH_FIELD,    GH_REAL,    GH_READWRITE, W3),     & ! exner_inc
+         arg_type(GH_OPERATOR, GH_REAL,    GH_READ,      W2, W3), & ! div
+         arg_type(GH_FIELD,    GH_REAL,    GH_READ,      W2),     & ! norm
+         arg_type(GH_SCALAR,   GH_LOGICAL, GH_READ),              & ! lam
+         arg_type(GH_FIELD,    GH_REAL,    GH_READ,      W2)      & ! mask
          /)
     integer :: operates_on = CELL_COLUMN
   contains
@@ -58,7 +58,6 @@ contains
 !> @param[in]     ncell_3d  Total number of cells
 !> @param[in]     div       Local matrix assembly form of the weighted diverence operator
 !> @param[in]     norm      Normalisation field to scale output by
-!> @param[in]     Hb_inv    Second field to scale output by
 !> @param[in]     lam       Flag to apply lateral boundary conditions
 !> @param[in]     mask      Boundary condition mask for lam domains
 !> @param[in]     ndfh      Number of degrees of freedom per cell for the horizontal output field
@@ -67,11 +66,11 @@ contains
 !> @param[in]     ndfv      Number of degrees of freedom per cell for the vertical output field
 !> @param[in]     undfv     Unique number of degrees of freedom for the vertical output field
 !> @param[in]     mapv      Dofmap for the cell at the base of the column for the vertical output field
-!> @param[in]     ndf1      Number of degrees of freedom per cell for the norm, Hb_inv and rhs
+!> @param[in]     ndf1      Number of degrees of freedom per cell for the norm and rhs
 !!                          fields (W2)
-!> @param[in]     undf1     Unique number of degrees of freedom for the norm, Hb_inv and rhs
+!> @param[in]     undf1     Unique number of degrees of freedom for the norm and rhs
 !!                          fields (W2)
-!> @param[in]     map1      Dofmap for the cell at the base of the column for the norm, Hb_inv and rhs
+!> @param[in]     map1      Dofmap for the cell at the base of the column for the norm and rhs
 !!                          fields (W2)
 !> @param[in]     ndf2      Number of degrees of freedom per cell for the exner_inc field (W3)
 !> @param[in]     undf2     Unique number of degrees of freedom for the exner_inc field (W3)
@@ -133,9 +132,10 @@ subroutine adj_schur_backsub_code(cell,              &
   end if
 
   ! Vertical boundary conditions
-  lhs_v(mapv(1))    = 0.0_r_solver
   lhs_v(mapv(2)+nl) = 0.0_r_solver
+  lhs_v(mapv(1))    = 0.0_r_solver
 
+  ! Vertical terms
   do df = ndfv, 1, -1
     iv = mapv(df)
     i1 = map1(ndfh+df)
@@ -146,7 +146,6 @@ subroutine adj_schur_backsub_code(cell,              &
     end do
   end do
 
-  ! Vertical terms
   iv = mapv(1)
   i1 = map1(ndfh+1)
   rhs(i1:i1+nl+1) = rhs(i1:i1+nl+1) + lhs_v(iv:iv+nl+1)

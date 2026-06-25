@@ -121,6 +121,7 @@ contains
     use adjt_mixed_operator_alg_mod,                only : adjt_mixed_operator_alg
     use adjt_apply_mixed_u_operator_alg_mod,        only : adjt_apply_mixed_u_operator_alg
     use adjt_apply_mixed_wp_operator_alg_mod,       only : adjt_apply_mixed_wp_operator_alg
+    use adjt_schur_backsub_alg_mod,                 only : adjt_schur_backsub_alg
     use adjt_mixed_schur_preconditioner_alg_mod,    only : adjt_mixed_schur_preconditioner_alg
     use adjt_mixed_solver_alg_mod,                  only : adjt_mixed_solver_alg
     use adjt_semi_implicit_solver_step_alg_mod,     only : adjt_semi_implicit_solver_step_alg
@@ -194,6 +195,7 @@ contains
     ! ./solver
     call adjt_apply_mixed_u_operator_alg( mesh )
     call adjt_apply_mixed_wp_operator_alg( mesh )
+    call adjt_schur_backsub_alg( mesh )
 
     call log_event( "TESTING misc adjoints", LOG_LEVEL_INFO )
     ! ./
