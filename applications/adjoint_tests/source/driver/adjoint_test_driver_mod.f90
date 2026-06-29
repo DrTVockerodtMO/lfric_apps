@@ -52,6 +52,9 @@ contains
     ! ./inter_function_space
     use adjt_sci_convert_hdiv_field_alg_mod,        only : adjt_sci_convert_hdiv_field_alg
 
+    !./transport/ffsl
+    use atlt_ffsl_flux_z_constant_alg_mod,          only : atlt_ffsl_flux_z_constant_alg
+
     ! ./transport/mol
     use atlt_poly_adv_update_alg_mod,               only : atlt_poly_adv_update_alg
     use atlt_poly1d_vert_w3_recon_alg_mod,          only : atlt_poly1d_vert_w3_recon_alg
@@ -152,6 +155,9 @@ contains
     call run_gen_adj_kernel_tests( mesh, chi, panel_id )
 
     call log_event( "TESTING adjoint kernels", LOG_LEVEL_INFO )
+
+    ! ./transport/ffsl
+    call atlt_ffsl_flux_z_constant_alg( mesh )
 
     ! ./transport/mol
     call atlt_poly_adv_update_alg( mesh )
