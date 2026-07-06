@@ -161,8 +161,8 @@ contains
     call log_event( "TESTING adjoint kernels", LOG_LEVEL_INFO )
 
     ! ./transport/ffsl
-    call atlt_ffsl_flux_z_constant_alg( mesh )
-    call atlt_ffsl_flux_z_nirvana_alg( mesh )
+    call atlt_ffsl_flux_z_constant_alg( modeldb%config, mesh )
+    call atlt_ffsl_flux_z_nirvana_alg( modeldb%config, mesh )
 
     ! ./transport/mol
     call atlt_poly_adv_update_alg( mesh )

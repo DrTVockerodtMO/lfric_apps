@@ -6,6 +6,7 @@
 !> @brief Module containing adjoint test for atl_ffsl_flux_z_nirvana_kernel
 module atlt_ffsl_flux_z_nirvana_alg_mod
 
+  use config_mod,                    only : config_type
   use field_mod,                     only : field_type
   use function_space_mod,            only : function_space_type
   use mesh_mod,                      only : mesh_type
@@ -35,8 +36,9 @@ module atlt_ffsl_flux_z_nirvana_alg_mod
   !> @details Passes if adjoint is transpose of tangent linear.
   !>          Determined by testing the equality of inner products <Mx, Mx> and <AMx, x>,
   !>          where M is the tangent linear and A is the adjoint.
-  !> @param[in] mesh        Mesh object
-  subroutine atlt_ffsl_flux_z_nirvana_alg(mesh)
+  !> @param[in]  config  Application namelist configuration object
+  !> @param[in]  mesh    Mesh object
+  subroutine atlt_ffsl_flux_z_nirvana_alg(config, mesh)
 
     use tl_ffsl_flux_z_nirvana_kernel_mod,  only : tl_ffsl_flux_z_nirvana_kernel_type
     use atl_ffsl_flux_z_nirvana_kernel_mod, only : atl_ffsl_flux_z_nirvana_kernel_type
@@ -44,6 +46,7 @@ module atlt_ffsl_flux_z_nirvana_alg_mod
     implicit none
 
     ! Arguments
+    type(config_type),        intent(in) :: config
     type(mesh_type), pointer, intent(in) :: mesh
 
     ! Arguments for tl and adj calls
@@ -109,11 +112,11 @@ module atlt_ffsl_flux_z_nirvana_alg_mod
     call ls_frac_wind%initialise(vector_space=vector_space_w2v_ptr, name='ls_frac_wind')
     call dep_dist%initialise(vector_space=vector_space_w2v_ptr, name='dep_dist')
     call ls_field%initialise(vector_space=vector_space_w3_ptr, name='ls_field')
-    dla_dz => get_third_dla_dz(mesh%get_id())
-    dlb_dz => get_third_dlb_dz(mesh%get_id())
-    dz_w3_rdef => get_dz_w3(mesh%get_id())
+    dla_dz => get_third_dla_dz(config, mesh)
+    dlb_dz => get_third_dlb_dz(config, mesh)
+    dz_w3_rdef => get_dz_w3(config, mesh)
     call dz%initialise( vector_space = vector_space_w3_ptr )
-    detj => get_detj_at_w3_r_tran(mesh%get_id())
+    detj => get_detj_at_w3_r_tran(config, mesh)
     dt = 1.0_r_tran
     log_space = .false._l_def
 
