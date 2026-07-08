@@ -62,11 +62,11 @@ module adj_lookup_table_mod
   !> @param [in]     fs             Functionspace to initialise the lookup table on.
   !> @param [in]     stencil_depth  Depth of this stencil into the halo.
   !> @param [in]     ndata          Optional - number of multidata points per dof.
-  subroutine adj_lookup_table_initialiser( self, &
-                                           nindices, &
-                                           nsets_max, &
-                                           mesh, &
-                                           fs, &
+  subroutine adj_lookup_table_initialiser( self,          &
+                                           nindices,      &
+                                           nsets_max,     &
+                                           mesh,          &
+                                           fs,            &
                                            stencil_depth, &
                                            ndata )
 

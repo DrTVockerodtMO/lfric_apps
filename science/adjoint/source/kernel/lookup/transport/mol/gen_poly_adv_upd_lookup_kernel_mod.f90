@@ -16,8 +16,8 @@ use argument_mod,      only : arg_type, func_type,         &
                               GH_FIELD, GH_SCALAR,         &
                               GH_REAL, GH_INTEGER,         &
                               GH_READWRITE, GH_READ,       &
-                              STENCIL, CROSS2D,              &
-                              OWNED_AND_HALO_CELL_COLUMN,                 &
+                              STENCIL, CROSS2D,            &
+                              OWNED_AND_HALO_CELL_COLUMN,  &
                               ANY_DISCONTINUOUS_SPACE_1,   &
                               ANY_DISCONTINUOUS_SPACE_2,   &
                               ANY_DISCONTINUOUS_SPACE_3
@@ -35,16 +35,16 @@ private
 !       The script looks for `gen_*_lookup_code` - if this naming scheme changes then
 !       the script must be updated.
 type, public, extends(kernel_type) :: gen_poly_adv_upd_lookup_kernel_type
-type(arg_type) :: meta_args(9) = (/                                                            &
-     arg_type(GH_FIELD,  GH_REAL,    GH_READ,      Wtheta), & ! advective_dummy
+type(arg_type) :: meta_args(9) = (/                                                              &
+     arg_type(GH_FIELD,  GH_REAL,    GH_READ,      Wtheta),                                      & ! advective_dummy
      arg_type(GH_FIELD,  GH_REAL,    GH_READ,      ANY_DISCONTINUOUS_SPACE_1, STENCIL(CROSS2D)), & ! reconstruction_dummy
-     arg_type(GH_FIELD,  GH_REAL,    GH_READ,      W2, STENCIL(CROSS2D)), & ! wind_dummy
-     arg_type(GH_FIELD,  GH_INTEGER, GH_READWRITE, ANY_DISCONTINUOUS_SPACE_2), & ! lookup_poly_adv_upd
-     arg_type(GH_FIELD,  GH_INTEGER, GH_READWRITE, ANY_DISCONTINUOUS_SPACE_3), & ! set_count_poly_adv_upd
-     arg_type(GH_FIELD,  GH_INTEGER, GH_READ, ANY_DISCONTINUOUS_SPACE_2, STENCIL(CROSS2D)), & ! lookup_poly_adv_upd_dummy
-     arg_type(GH_FIELD,  GH_INTEGER, GH_READ, ANY_DISCONTINUOUS_SPACE_3, STENCIL(CROSS2D)), & ! set_count_poly_adv_upd_dummy
-     arg_type(GH_SCALAR, GH_INTEGER, GH_READ),                                              & ! nsets_max
-     arg_type(GH_SCALAR, GH_INTEGER, GH_READ)                                               & ! nindices
+     arg_type(GH_FIELD,  GH_REAL,    GH_READ,      W2, STENCIL(CROSS2D)),                        & ! wind_dummy
+     arg_type(GH_FIELD,  GH_INTEGER, GH_READWRITE, ANY_DISCONTINUOUS_SPACE_2),                   & ! lookup_poly_adv_upd
+     arg_type(GH_FIELD,  GH_INTEGER, GH_READWRITE, ANY_DISCONTINUOUS_SPACE_3),                   & ! set_count_poly_adv_upd
+     arg_type(GH_FIELD,  GH_INTEGER, GH_READ,      ANY_DISCONTINUOUS_SPACE_2, STENCIL(CROSS2D)), & ! lookup_poly_adv_upd_dummy
+     arg_type(GH_FIELD,  GH_INTEGER, GH_READ,      ANY_DISCONTINUOUS_SPACE_3, STENCIL(CROSS2D)), & ! set_count_poly_adv_upd_dummy
+     arg_type(GH_SCALAR, GH_INTEGER, GH_READ),                                                   & ! nsets_max
+     arg_type(GH_SCALAR, GH_INTEGER, GH_READ)                                                    & ! nindices
      /)
 integer :: operates_on = OWNED_AND_HALO_CELL_COLUMN
 contains
@@ -97,42 +97,42 @@ contains
 !> @param[in]     ndf_sc                        Number of degrees of freedom per cell (set counter)
 !> @param[in]     undf_sc                       Number of unique degrees of freedom (set counter)
 !> @param[in]     map_sc                        Dofmap for set_count space.
-subroutine gen_poly_adv_upd_lookup_code( nlayers,                &
-                                         advective_dummy,        &
-                                         reconstruction_dummy,   &
-                                         smap_md_size, &
-                                         smap_md_max, &
-                                         smap_md, &
-                                         wind_dummy, &
-                                         smap_w2_size, &
-                                         smap_w2_max, &
-                                         smap_w2, &
-                                         lookup_poly_adv_upd,    &
-                                         set_count_poly_adv_upd, &
-                                         lookup_poly_adv_upd_dummy, &
-                                         smap_lu_size, &
-                                         smap_lu_max,            &
-                                         smap_lu,                &
+subroutine gen_poly_adv_upd_lookup_code( nlayers,                      &
+                                         advective_dummy,              &
+                                         reconstruction_dummy,         &
+                                         smap_md_size,                 &
+                                         smap_md_max,                  &
+                                         smap_md,                      &
+                                         wind_dummy,                   &
+                                         smap_w2_size,                 &
+                                         smap_w2_max,                  &
+                                         smap_w2,                      &
+                                         lookup_poly_adv_upd,          &
+                                         set_count_poly_adv_upd,       &
+                                         lookup_poly_adv_upd_dummy,    &
+                                         smap_lu_size,                 &
+                                         smap_lu_max,                  &
+                                         smap_lu,                      &
                                          set_count_poly_adv_upd_dummy, &
-                                         smap_sc_size,           &
-                                         smap_sc_max,            &
-                                         smap_sc,                &
-                                         nsets_max, &
-                                         nindices, &
-                                         ndf_wt, &
-                                         undf_wt, &
-                                         map_wt, &
-                                         ndf_md, &
-                                         undf_md, &
-                                         map_md, &
-                                         ndf_w2, &
-                                         undf_w2, &
-                                         map_w2, &
-                                         ndf_lu, &
-                                         undf_lu, &
-                                         map_lu, &
-                                         ndf_sc, &
-                                         undf_sc, &
+                                         smap_sc_size,                 &
+                                         smap_sc_max,                  &
+                                         smap_sc,                      &
+                                         nsets_max,                    &
+                                         nindices,                     &
+                                         ndf_wt,                       &
+                                         undf_wt,                      &
+                                         map_wt,                       &
+                                         ndf_md,                       &
+                                         undf_md,                      &
+                                         map_md,                       &
+                                         ndf_w2,                       &
+                                         undf_w2,                      &
+                                         map_w2,                       &
+                                         ndf_lu,                       &
+                                         undf_lu,                      &
+                                         map_lu,                       &
+                                         ndf_sc,                       &
+                                         undf_sc,                      &
                                          map_sc )
 
 

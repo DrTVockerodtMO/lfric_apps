@@ -61,7 +61,7 @@ contains
 
     ! Internal variables
     type(mesh_type),           pointer :: mesh
-    type(function_space_type), pointer :: recon_fspace
+    type(function_space_type), pointer :: tracer_fspace
     type(integer_field_type),  pointer :: lookup_poly1d_field
     type(integer_field_type),  pointer :: set_counts_poly1d_field
     type(integer_field_type)           :: lookup_poly1d_field_dummy
@@ -72,16 +72,16 @@ contains
     integer(kind=i_def),     parameter :: nindices = 2
     integer(kind=i_def),     parameter :: nfaces = 4
 
-    nullify( mesh, recon_fspace, lookup_poly1d_field, set_counts_poly1d_field )
+    nullify( mesh, tracer_fspace, lookup_poly1d_field, set_counts_poly1d_field )
 
     !=============================================================================
     ! Generating lookup_polynd
     nsets_max = nfaces*(order + 1)   ! Derived from the looping within the generation code.
 
-    recon_fspace => reconstruction%get_function_space()
-    mesh => recon_fspace%get_mesh()
+    tracer_fspace => tracer%get_function_space()
+    mesh => tracer_fspace%get_mesh()
 
-    call lookup%initialise( nindices, nsets_max, mesh, recon_fspace%which(), stencil_extent )
+    call lookup%initialise( nindices, nsets_max, mesh, tracer_fspace%which(), stencil_extent )
     lookup_poly1d_field => lookup%get_lookup_field()
     set_counts_poly1d_field => lookup%get_set_count_field()
 
@@ -133,7 +133,7 @@ contains
 
     ! Internal variables
     type(mesh_type),           pointer :: mesh
-    type(function_space_type), pointer :: recon_fspace
+    type(function_space_type), pointer :: tracer_fspace
     type(integer_field_type),  pointer :: lookup_poly2d_field
     type(integer_field_type),  pointer :: set_counts_poly2d_field
     type(integer_field_type)           :: lookup_poly2d_field_dummy
@@ -144,16 +144,16 @@ contains
     integer(kind=i_def),    parameter :: nindices = 2
     integer(kind=i_def),    parameter :: nfaces = 4
 
-    nullify( mesh, recon_fspace, lookup_poly2d_field, set_counts_poly2d_field )
+    nullify( mesh, tracer_fspace, lookup_poly2d_field, set_counts_poly2d_field )
 
     !=============================================================================
     ! Generating lookup_polynd
     nsets_max = nfaces*stencil_size  ! Derived from the looping within the generation code.
 
-    recon_fspace => reconstruction%get_function_space()
-    mesh => recon_fspace%get_mesh()
+    tracer_fspace => tracer%get_function_space()
+    mesh => tracer_fspace%get_mesh()
 
-    call lookup%initialise( nindices, nsets_max, mesh, recon_fspace%which(), stencil_extent )
+    call lookup%initialise( nindices, nsets_max, mesh, tracer_fspace%which(), stencil_extent )
     lookup_poly2d_field => lookup%get_lookup_field()
     set_counts_poly2d_field => lookup%get_set_count_field()
 
@@ -202,7 +202,7 @@ contains
     type(r_tran_field_type) :: reconstruction_big_halo, wind_big_halo
 
     type(mesh_type),           pointer :: mesh
-    type(function_space_type), pointer :: advective_fspace
+    type(function_space_type), pointer :: recon_fspace
     type(integer_field_type),  pointer :: lookup_field
     type(integer_field_type),  pointer :: set_counts_field
 
@@ -213,11 +213,11 @@ contains
     integer(kind=i_def), parameter :: nindices = 7
     integer(kind=i_def), parameter :: nsets_max = 1
 
-    nullify( mesh, advective_fspace, lookup_field, set_counts_field )
+    nullify( mesh, recon_fspace, lookup_field, set_counts_field )
 
-    advective_fspace => advective%get_function_space()
-    mesh => advective_fspace%get_mesh()
-    call lookup%initialise( nindices, nsets_max, mesh, advective_fspace%which(), stencil_extent, &
+    recon_fspace => reconstruction%get_function_space()
+    mesh => recon_fspace%get_mesh()
+    call lookup%initialise( nindices, nsets_max, mesh, recon_fspace%which(), stencil_extent, &
                             ndata=nfaces )
     lookup_field => lookup%get_lookup_field()
     set_counts_field => lookup%get_set_count_field()
