@@ -55,6 +55,8 @@ contains
     !./transport/ffsl
     use adjt_subgrid_common_support_mod,            only : adjt_subgrid_quadratic_recon
     use adjt_subgrid_vertical_support_mod,          only : adjt_third_order_vertical_edge
+    use adjt_subgrid_horizontal_support_mod,        only : adjt_fourth_order_horizontal_edge, &
+                                                           adjt_nirvana_horizontal_edge
     use atlt_ffsl_flux_z_constant_alg_mod,          only : atlt_ffsl_flux_z_constant_alg
     use atlt_ffsl_flux_z_nirvana_alg_mod,           only : atlt_ffsl_flux_z_nirvana_alg
 
@@ -205,6 +207,8 @@ contains
     ! ./transport/ffsl
     call adjt_subgrid_quadratic_recon( mesh%get_nlayers() )
     call adjt_third_order_vertical_edge( mesh%get_nlayers() )
+    call adjt_fourth_order_horizontal_edge( mesh%get_nlayers() )
+    call adjt_nirvana_horizontal_edge( mesh%get_nlayers() )
 
     call log_event( "TESTING adjoint algorithms", LOG_LEVEL_INFO )
     ! ./interpolation
