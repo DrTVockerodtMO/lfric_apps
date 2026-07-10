@@ -380,8 +380,6 @@ contains
     ! Fields and increments
     type(r_tran_field_type) :: flux_pert
     type(r_tran_field_type) :: flux_ls
-    type(r_tran_field_type) :: field_md_x
-    type(r_tran_field_type) :: field_md_y
     type(r_tran_field_type) :: ones
     type(r_tran_field_type) :: flux_ones
     type(r_tran_field_type) :: flux_dummy
@@ -404,7 +402,6 @@ contains
 
     ! Function spaces
     type(function_space_type), pointer :: field_fs
-    type(function_space_type), pointer :: field_md_fs
     type(function_space_type), pointer :: w2h_fs
     type(function_space_type), pointer :: ndepk_fs
 
@@ -419,7 +416,6 @@ contains
     integer(kind=i_def) :: ndep
     logical(kind=l_def) :: is_cubed_sphere
     integer(tik)        :: id
-    integer(kind=i_def) :: max_md_size
 
     ! Get pre-computed objects and set pointers --------------------------------
     config => ls_transport_controller%get_config()
@@ -474,12 +470,6 @@ contains
     ! Function spaces
     w2h_fs => dep_dist%get_function_space()
     field_fs => field_n%get_function_space()
-    max_md_size = 2*order+1
-    field_md_fs => function_space_collection%get_fs( mesh,                           &
-                                                     field_fs%get_element_order_h(), &
-                                                     field_fs%get_element_order_v(), &
-                                                     field_fs%which(),               &
-                                                     ndata=max_md_size )
     ndepk_fs => dep_lowest_k%get_function_space()
 
     ! Initialise fields
@@ -487,10 +477,6 @@ contains
     call increment_y%initialise( vector_space = field_fs )
     call flux_pert%initialise( vector_space = w2h_fs )
     call flux_ls%initialise( vector_space = w2h_fs )
-    call field_md_x%initialise( vector_space = field_md_fs, &
-                                halo_depth = mesh%get_halo_depth() )
-    call field_md_y%initialise( vector_space = field_md_fs, &
-                                halo_depth = mesh%get_halo_depth() )
 
     ! Set constant values
     extra_points = ffsl_extra_points(panel_edge_treatment, panel_edge_high_order)
@@ -540,15 +526,11 @@ contains
       ! Not on the sphere ------------------------------------------------------
       call invoke( setval_c(flux_pert, 0.0_r_tran),                            &
                    setval_c(flux_ls, 0.0_r_tran),                              &
-                   setval_c(field_md_x, 0.0_r_tran),                           &
-                   setval_c(field_md_y, 0.0_r_tran),                           &
                    tl_ffsl_flux_xy_kernel_type(                                &
                                     flux_pert, flux_ls,                        &
                                     field_big_halo, stencil_extent,            &
-                                    field_md_x,                                &
                                     detj_at_w3, dep_stencil_extent,            &
                                     field_ptr_copy, stencil_extent,            &
-                                    field_md_y,                                &
                                     detj_at_w3_copy, dep_stencil_extent,       &
                                     ls_field_big_halo, stencil_extent,         &
                                     ls_field_ptr_copy, stencil_extent,         &
@@ -580,15 +562,11 @@ contains
     ! Compute unity advection with second flux term
     call invoke( setval_c(flux_ones, 0.0_r_tran),                              &
                  setval_c(flux_dummy, 0.0_r_tran),                             &
-                 setval_c(field_md_x, 0.0_r_tran),                             &
-                 setval_c(field_md_y, 0.0_r_tran),                             &
                  tl_ffsl_flux_xy_kernel_type(                                  &
                                   flux_dummy, flux_ones,                       &
                                   ones_ptr_copy_1, stencil_extent,             &
-                                  field_md_x,                                  &
                                   detj_at_w3, dep_stencil_extent,              &
                                   ones_ptr_copy_2, stencil_extent,             &
-                                  field_md_y,                                  &
                                   detj_at_w3_copy, dep_stencil_extent,         &
                                   ones_big_halo, stencil_extent,               &
                                   ones_ptr_copy_3, stencil_extent,             &
@@ -689,13 +667,10 @@ contains
     type(r_tran_field_type) :: field_y_big_halo
     type(r_tran_field_type) :: ls_field_x_big_halo
     type(r_tran_field_type) :: ls_field_y_big_halo
-    type(r_tran_field_type) :: field_md_x
-    type(r_tran_field_type) :: field_md_y
 
     ! Function spaces
     type(function_space_type), pointer :: field_fs
     type(function_space_type), pointer :: ndepk_fs
-    type(function_space_type), pointer :: field_md_fs
 
     ! Transport options
     integer(kind=i_def) :: splitting
@@ -706,7 +681,6 @@ contains
     integer(kind=i_def) :: stencil_extent
     integer(kind=i_def) :: ndep
     integer(tik)        :: id
-    integer(kind=i_def) :: max_md_size
 
     integer(kind=i_def) :: extra_points
     logical(kind=l_def) :: is_cubed_sphere
@@ -766,12 +740,6 @@ contains
     ! Function spaces
     field_fs => field_x%get_function_space()
     ndepk_fs => dep_lowest_k%get_function_space()
-    max_md_size = 2*order+1
-    field_md_fs => function_space_collection%get_fs( mesh,                           &
-                                                     field_fs%get_element_order_h(), &
-                                                     field_fs%get_element_order_v(), &
-                                                     field_fs%which(),               &
-                                                     ndata=max_md_size )
 
     ! Set constant values
     extra_points = ffsl_extra_points(panel_edge_treatment, panel_edge_high_order)
@@ -789,10 +757,6 @@ contains
     end if
     call field_x_big_halo%initialise(field_fs, halo_depth=mesh%get_halo_depth())
     call field_y_big_halo%initialise(field_fs, halo_depth=mesh%get_halo_depth())
-    call field_md_x%initialise( vector_space = field_md_fs, &
-                                halo_depth = mesh%get_halo_depth() )
-    call field_md_y%initialise( vector_space = field_md_fs, &
-                                halo_depth = mesh%get_halo_depth() )
     call ls_field_x_big_halo%initialise(field_fs, halo_depth=mesh%get_halo_depth())
     call ls_field_y_big_halo%initialise(field_fs, halo_depth=mesh%get_halo_depth())
     call invoke( setval_x(field_x_big_halo, field_x),                        &
@@ -824,15 +788,11 @@ contains
       ! Not on the sphere ------------------------------------------------------
       call invoke( setval_c(mass_flux_pert, 0.0_r_tran),                       &
                    setval_c(mass_flux_ls, 0.0_r_tran),                         &
-                   setval_c(field_md_y, 0.0_r_tran),                           &
-                   setval_c(field_md_x, 0.0_r_tran),                           &
                    tl_ffsl_flux_xy_kernel_type(                                &
                                     mass_flux_pert, mass_flux_ls,              &
                                     field_y_big_halo, stencil_extent,          &
-                                    field_md_y,                                &
                                     dry_mass_y, dep_stencil_extent,            &
                                     field_x_big_halo, stencil_extent,          &
-                                    field_md_x,                                &
                                     dry_mass_x, dep_stencil_extent,            &
                                     ls_field_y_big_halo, stencil_extent,       &
                                     ls_field_x_big_halo, stencil_extent,       &
