@@ -23,7 +23,8 @@ module atlt_vorticity_advection_alg_mod
 
 
   implicit none
-  public
+
+  public :: atlt_vorticity_advection_alg
 
   contains
   !=============================================================================
@@ -98,9 +99,10 @@ module atlt_vorticity_advection_alg_mod
     call ls_wind%initialise(vector_space=vector_space_w2_ptr, name='ls_wind')
     call ls_vorticity%initialise(vector_space=vector_space_w1_ptr, name='ls_vorticity')
     qr_xyoz = quadrature_xyoz_type(element_order_h + 3, element_order_h + 3, element_order_v + 3, quadrature_rule)
-    call r_u_input%initialise(vector_space=vector_space_w2_ptr, name='r_u_input')
-    call wind_input%initialise(vector_space=vector_space_w2_ptr, name='wind_input')
-    call vorticity_input%initialise(vector_space=vector_space_w1_ptr, name='vorticity_input')
+
+    call r_u%copy_field_properties(r_u_input)
+    call wind%copy_field_properties(wind_input)
+    call vorticity%copy_field_properties(vorticity_input)
     r_u_inner_prod = 0.0_r_def
     wind_inner_prod = 0.0_r_def
     vorticity_inner_prod = 0.0_r_def
