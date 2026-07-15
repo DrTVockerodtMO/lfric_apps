@@ -13,7 +13,6 @@ module atlt_poly1d_vert_adv_alg_mod
   use function_space_collection_mod, only : function_space_collection
   use fs_continuity_mod,             only : W2v, W3, Wtheta
   use constants_mod,                 only : i_def, l_def, r_def, EPS
-
   use log_mod,                       only : log_event,         &
                                             log_scratch_space, &
                                             LOG_LEVEL_ERROR,   &
@@ -27,15 +26,13 @@ module atlt_poly1d_vert_adv_alg_mod
 
   contains
   !=============================================================================
-  !> @brief   Adjoint test for atl_vorticity_advection.
+  !> @brief   Adjoint test for atl_poly1d_vert_adv.
   !> @details Passes if adjoint is transpose of tangent linear.
   !>          Determined by testing the equality of inner products <Mx, Mx> and <AMx, x>,
   !>          where M is the tangent linear and A is the adjoint.
   !> @param[in]  config       Application namelist configuration object
   !> @param[in]  mesh         Mesh object
   subroutine atlt_poly1d_vert_adv_alg(config, mesh)
-
-
 
     implicit none
 
@@ -184,13 +181,13 @@ module atlt_poly1d_vert_adv_alg_mod
                  x_innerproduct_x(tracer_inner_prod, tracer) )
 
     write( log_scratch_space, * ) "atlt_poly1d_vert_adv inner products:"
-    call log_event( log_scratch_space, log_level_debug )
+    call log_event( log_scratch_space, LOG_LEVEL_DEBUG )
     write( log_scratch_space, * ) "advective inner product = ", advective_inner_prod
-    call log_event( log_scratch_space, log_level_debug )
+    call log_event( log_scratch_space, LOG_LEVEL_DEBUG )
     write( log_scratch_space, * ) "wind inner product = ", wind_inner_prod
-    call log_event( log_scratch_space, log_level_debug )
+    call log_event( log_scratch_space, LOG_LEVEL_DEBUG )
     write( log_scratch_space, * ) "tracer inner product = ", tracer_inner_prod
-    call log_event( log_scratch_space, log_level_debug )
+    call log_event( log_scratch_space, LOG_LEVEL_DEBUG )
 
     advective_sf = 1.0_r_def / (advective_inner_prod + EPS)
     wind_sf = 1.0_r_def / (wind_inner_prod + EPS)

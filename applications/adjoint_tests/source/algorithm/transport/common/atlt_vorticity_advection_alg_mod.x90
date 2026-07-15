@@ -120,13 +120,13 @@ module atlt_vorticity_advection_alg_mod
                  x_innerproduct_x(vorticity_inner_prod, vorticity) )
 
     write( log_scratch_space, * ) "atlt_vorticity_advection inner products:"
-    call log_event( log_scratch_space, log_level_debug )
+    call log_event( log_scratch_space, LOG_LEVEL_DEBUG )
     write( log_scratch_space, * ) "r_u inner product = ", r_u_inner_prod
-    call log_event( log_scratch_space, log_level_debug )
+    call log_event( log_scratch_space, LOG_LEVEL_DEBUG )
     write( log_scratch_space, * ) "wind inner product = ", wind_inner_prod
-    call log_event( log_scratch_space, log_level_debug )
+    call log_event( log_scratch_space, LOG_LEVEL_DEBUG )
     write( log_scratch_space, * ) "vorticity inner product = ", vorticity_inner_prod
-    call log_event( log_scratch_space, log_level_debug )
+    call log_event( log_scratch_space, LOG_LEVEL_DEBUG )
 
     r_u_sf = 1.0_r_def / (r_u_inner_prod + EPS)
     wind_sf = 1.0_r_def / (wind_inner_prod + EPS)
