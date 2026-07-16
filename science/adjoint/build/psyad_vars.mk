@@ -24,5 +24,3 @@ all: export ACTIVE_sci_extract_w_kernel_mod             := velocity_w2v u_physic
 all: export ACTIVE_sci_combine_multidata_field_kernel_mod := field1_in field2_in field_out
 all: export ACTIVE_w3v_advective_update_kernel_mod        := advective_increment tracer dtdz t_U t_D
 all: export ACTIVE_tl_w3v_advective_update_kernel_mod     := advective_increment wind w
-all: export ACTIVE_horizontal_mass_flux_kernel_mod        := mass_flux reconstruction
-all: export ACTIVE_vertical_mass_flux_kernel_mod          := mass_flux reconstruction
