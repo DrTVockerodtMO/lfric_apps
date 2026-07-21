@@ -21,7 +21,7 @@ module atlt_vertical_mass_flux_alg_mod
 
   implicit none
 
-  public
+  public :: atlt_vertical_mass_flux_alg
 
   contains
 
