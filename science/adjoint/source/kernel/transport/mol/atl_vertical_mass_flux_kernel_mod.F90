@@ -116,7 +116,6 @@ subroutine atl_vertical_mass_flux_code( nlayers,                &
                          + mass_flux(map_w2(df) + k)*( &
                            wgt*reconstruction(ijp1) &
                            + (1.0_r_def-wgt)*reconstruction(ijp2))
-                
   end do
   mass_flux( map_w2(df) ) = 0.0_r_def
 

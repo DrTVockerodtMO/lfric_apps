@@ -102,7 +102,6 @@ module adj_horizontal_mass_flux_kernel_mod
           ijp = map_md(1) + (df-1)*nlayers
           reconstruction(ijp + k) = reconstruction(ijp + k) &
                                   + mass_flux(map_w2(df) + k)*wind(map_w2(df)+k)
-                                       
         end if
       end do
     end do

@@ -22,7 +22,7 @@ module adjt_vertical_mass_flux_alg_mod
 
   implicit none
 
-  public
+  public :: adjt_vertical_mass_flux_alg
 
   contains
 

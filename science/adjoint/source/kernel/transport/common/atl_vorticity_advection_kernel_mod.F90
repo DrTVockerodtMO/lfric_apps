@@ -7,16 +7,16 @@
 !> @brief Adjoint to the vorticity advection component
 !>        of the rhs of the momentum equation.
 module atl_vorticity_advection_kernel_mod
-use kernel_mod,              only: kernel_type
-use argument_mod,            only: arg_type, func_type,                 &
-                                   GH_FIELD, GH_REAL,                   &
-                                   GH_READ, GH_INC,                     &
-                                   ANY_SPACE_9,                         &
-                                   ANY_DISCONTINUOUS_SPACE_3,           &
-                                   GH_BASIS, GH_DIFF_BASIS,             &
-                                   CELL_COLUMN, GH_QUADRATURE_XYoZ
-use constants_mod,           only: r_def, i_def
-use fs_continuity_mod,       only: W1, W2, Wchi
+use kernel_mod,                only: kernel_type
+use argument_mod,              only: arg_type, func_type,                 &
+                                     GH_FIELD, GH_REAL,                   &
+                                     GH_READ, GH_INC,                     &
+                                     ANY_SPACE_9,                         &
+                                     ANY_DISCONTINUOUS_SPACE_3,           &
+                                     GH_BASIS, GH_DIFF_BASIS,             &
+                                     CELL_COLUMN, GH_QUADRATURE_XYoZ
+use constants_mod,             only: r_def, i_def
+use fs_continuity_mod,         only: W1, W2, Wchi
 
 use base_mesh_config_mod,      only: geometry, topology
 use finite_element_config_mod, only: coord_system
@@ -30,13 +30,13 @@ implicit none
 !> The type declaration for the kernel. Contains the metadata needed by the Psy layer
 type, public, extends(kernel_type) :: atl_vorticity_advection_kernel_type
   private
-  type(arg_type) :: meta_args(7) = (/                                  &
-       arg_type(GH_FIELD,   GH_REAL, GH_READ, W2),                     &
-       arg_type(GH_FIELD,   GH_REAL, GH_INC,  W2),                     &
-       arg_type(GH_FIELD,   GH_REAL, GH_INC,  W1),                     &
-       arg_type(GH_FIELD,   GH_REAL, GH_READ, W2),                     &
-       arg_type(GH_FIELD,   GH_REAL, GH_READ, W1),                     &
-       arg_type(GH_FIELD*3, GH_REAL, GH_READ, WChi),                   &
+  type(arg_type) :: meta_args(7) = (/                                    &
+       arg_type(GH_FIELD,   GH_REAL, GH_READ, W2),                       &
+       arg_type(GH_FIELD,   GH_REAL, GH_INC,  W2),                       &
+       arg_type(GH_FIELD,   GH_REAL, GH_INC,  W1),                       &
+       arg_type(GH_FIELD,   GH_REAL, GH_READ, W2),                       &
+       arg_type(GH_FIELD,   GH_REAL, GH_READ, W1),                       &
+       arg_type(GH_FIELD*3, GH_REAL, GH_READ, WChi),                     &
        arg_type(GH_FIELD,   GH_REAL, GH_READ, ANY_DISCONTINUOUS_SPACE_3) &
        /)
   type(func_type) :: meta_funcs(3) = (/                                &

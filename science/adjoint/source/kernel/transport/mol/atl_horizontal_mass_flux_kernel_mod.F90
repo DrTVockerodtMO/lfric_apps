@@ -112,4 +112,4 @@ module atl_horizontal_mass_flux_kernel_mod
 
   end subroutine atl_horizontal_mass_flux_code
 
-end module atl_horizontal_mass_flux_kernel_mod          
+end module atl_horizontal_mass_flux_kernel_mod
