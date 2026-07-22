@@ -155,6 +155,14 @@ contains
     call adj_solver_lookup_cache%initialise(mesh)
     call adj_trans_lookup_cache%initialise(modeldb%config, mesh)
 
+    call log_event( "TESTING misc adjoints", LOG_LEVEL_INFO )
+    ! ./
+    call adjt_convert_cart2sphere_vector_alg( mesh )
+
+    ! ./transport/ffsl
+    call adjt_subgrid_quadratic_recon( mesh%get_nlayers() )
+    call adjt_third_order_vertical_edge( mesh%get_nlayers() )
+
     call log_event( "TESTING generated adjoint kernels", LOG_LEVEL_INFO )
     call run_gen_adj_kernel_tests( mesh, chi, panel_id )
 
@@ -197,14 +205,6 @@ contains
     call adjt_dg_matrix_vector_alg( mesh )
     call adjt_dg_inc_matrix_vector_alg( mesh )
     call adjt_transpose_matrix_vector_alg( mesh )
-
-    call log_event( "TESTING misc adjoints", LOG_LEVEL_INFO )
-    ! ./
-    call adjt_convert_cart2sphere_vector_alg( mesh )
-
-    ! ./transport/ffsl
-    call adjt_subgrid_quadratic_recon( mesh%get_nlayers() )
-    call adjt_third_order_vertical_edge( mesh%get_nlayers() )
 
     call log_event( "TESTING adjoint algorithms", LOG_LEVEL_INFO )
     ! ./interpolation
