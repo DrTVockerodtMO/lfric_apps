@@ -13,7 +13,7 @@ module atlt_w3v_advective_update_alg_mod
   use function_space_collection_mod, only : function_space_collection
   use fs_continuity_mod,             only : W2, W3
   use constants_mod,                 only : i_def, r_def, &
-                                            r_tran, EPS_R_TRAN
+                                            r_tran, EPS
   use operator_mod,                  only : operator_type
   use setop_random_alg_mod,          only : setop_random_alg
   use log_mod,                       only : log_event,         &
@@ -116,8 +116,8 @@ module atlt_w3v_advective_update_alg_mod
     write( log_scratch_space, * ) "wind inner product = ", wind_inner_prod
     call log_event( log_scratch_space, LOG_LEVEL_DEBUG )
 
-    advective_increment_sf = 1.0_r_tran / ( real(advective_increment_inner_prod, kind=r_tran) + EPS_R_TRAN )
-    wind_sf = 1.0_r_tran / ( real(wind_inner_prod, kind=r_tran) + EPS_R_TRAN )
+    advective_increment_sf = 1.0_r_tran / real(advective_increment_inner_prod + EPS, kind=r_tran)
+    wind_sf = 1.0_r_tran / real(wind_inner_prod + EPS, kind=r_tran)
 
     inner1 = 0.0_r_tran
     inner1 = inner1 + real(advective_increment_inner_prod, kind=r_tran) * advective_increment_sf
