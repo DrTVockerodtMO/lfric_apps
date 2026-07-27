@@ -191,19 +191,18 @@ module adjt_apply_mixed_wp_operator_alg_mod
     inner1 = inner1 + real(wind_w_inner_prod, kind = r_solver) * wind_w_sf
     inner1 = inner1 + real(exner_inner_prod, kind = r_solver) * exner_sf
 
-    call invoke( inc_a_times_X( lhs_w_sf, lhs_w ),     &
-                 inc_a_times_X( lhs_p_sf, lhs_p ),     &
-                 inc_a_times_X( wind_uv_sf, wind_uv ), &
-                 inc_a_times_X( wind_w_sf, wind_w ),   &
-                 inc_a_times_X( exner_sf, exner )  )
-
     lhs_w_lhs_w_input_inner_prod = 0.0_r_def
     lhs_p_lhs_p_input_inner_prod = 0.0_r_def
     wind_uv_wind_uv_input_inner_prod = 0.0_r_def
     wind_w_wind_w_input_inner_prod = 0.0_r_def
     exner_exner_input_inner_prod = 0.0_r_def
 
-    call invoke( adj_apply_mixed_wp_operator_kernel_type(lhs_w, lhs_p,                       &
+    call invoke( inc_a_times_X( lhs_w_sf, lhs_w ),                                           &
+                 inc_a_times_X( lhs_p_sf, lhs_p ),                                           &
+                 inc_a_times_X( wind_uv_sf, wind_uv ),                                       &
+                 inc_a_times_X( wind_w_sf, wind_w ),                                         &
+                 inc_a_times_X( exner_sf, exner ),                                           &
+                 adj_apply_mixed_wp_operator_kernel_type(lhs_w, lhs_p,                       &
                                                          wind_uv, wind_w,                    &
                                                          exner,                              &
                                                          pt2, mt_lumped_inv,                 &

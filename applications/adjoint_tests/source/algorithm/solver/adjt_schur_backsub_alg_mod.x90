@@ -214,17 +214,16 @@ module adjt_schur_backsub_alg_mod
     inner1 = inner1 + real(rhs_inner_prod, kind = r_solver) * rhs_sf
     inner1 = inner1 + real(exner_inc_inner_prod, kind = r_solver) * exner_inc_sf
 
-    call invoke( inc_a_times_X( lhs_h_sf, lhs_h ), &
-                 inc_a_times_X( lhs_v_sf, lhs_v ), &
-                 inc_a_times_X( rhs_sf, rhs ),     &
-                 inc_a_times_X( exner_inc_sf, exner_inc )  )
-
     lhs_h_lhs_h_input_inner_prod = 0.0_r_def
     lhs_v_lhs_v_input_inner_prod = 0.0_r_def
     rhs_rhs_input_inner_prod = 0.0_r_def
     exner_inc_exner_inc_input_inner_prod = 0.0_r_def
 
-    call invoke( adj_schur_backsub_kernel_type(lhs_h, lhs_v, rhs, exner_inc,         &
+    call invoke( inc_a_times_X( lhs_h_sf, lhs_h ),                                   &
+                 inc_a_times_X( lhs_v_sf, lhs_v ),                                   &
+                 inc_a_times_X( rhs_sf, rhs ),                                       &
+                 inc_a_times_X( exner_inc_sf, exner_inc ),                           &
+                 adj_schur_backsub_kernel_type(lhs_h, lhs_v, rhs, exner_inc,         &
                                                div, norm, lam, mask),                &
                  x_innerproduct_y(lhs_h_lhs_h_input_inner_prod, lhs_h, lhs_h_input), &
                  x_innerproduct_y(lhs_v_lhs_v_input_inner_prod, lhs_v, lhs_v_input), &
