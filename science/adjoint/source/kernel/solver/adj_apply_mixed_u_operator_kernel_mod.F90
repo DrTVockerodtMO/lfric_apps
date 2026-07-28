@@ -11,7 +11,8 @@ module adj_apply_mixed_u_operator_kernel_mod
 use argument_mod,      only : arg_type,              &
                               GH_FIELD, GH_OPERATOR, &
                               GH_READ,               &
-                              GH_WRITE,              &
+                              GH_READWRITE,          &
+                              GH_INC,                &
                               GH_REAL, CELL_COLUMN
 use constants_mod,     only : r_solver, i_def
 use kernel_mod,        only : kernel_type
@@ -26,14 +27,14 @@ private
 
 type, public, extends(kernel_type) :: adj_apply_mixed_u_operator_kernel_type
   private
-  type(arg_type) :: meta_args(7) = (/                       &
-       arg_type(GH_FIELD,    GH_REAL, GH_WRITE, W2broken),  & ! lhs_uv
-       arg_type(GH_FIELD,    GH_REAL, GH_WRITE, W2h),       & ! uv'
-       arg_type(GH_FIELD,    GH_REAL, GH_WRITE, W2v),       & ! w'
-       arg_type(GH_FIELD,    GH_REAL, GH_WRITE, W3),        & ! exner'
-       arg_type(GH_OPERATOR, GH_REAL, GH_READ,  W2, W2),    & ! Mu^{c,d}
-       arg_type(GH_OPERATOR, GH_REAL, GH_READ,  W2, W3),    & ! grad
-       arg_type(GH_FIELD,    GH_REAL, GH_READ,  W2)         & ! norm_u
+  type(arg_type) :: meta_args(7) = (/                           &
+       arg_type(GH_FIELD,    GH_REAL, GH_READWRITE, W2broken),  & ! lhs_uv
+       arg_type(GH_FIELD,    GH_REAL, GH_INC,       W2h),       & ! uv'
+       arg_type(GH_FIELD,    GH_REAL, GH_READWRITE, W2v),       & ! w'
+       arg_type(GH_FIELD,    GH_REAL, GH_READWRITE, W3),        & ! exner'
+       arg_type(GH_OPERATOR, GH_REAL, GH_READ,      W2, W2),    & ! Mu^{c,d}
+       arg_type(GH_OPERATOR, GH_REAL, GH_READ,      W2, W3),    & ! grad
+       arg_type(GH_FIELD,    GH_REAL, GH_READ,      W2)         & ! norm_u
        /)
   integer :: operates_on = CELL_COLUMN
   contains
