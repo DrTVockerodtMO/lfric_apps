@@ -147,7 +147,7 @@ contains
     type(mesh_type),                   pointer :: twod_mesh
     type(adj_solver_lookup_cache_type)         :: adj_solver_lookup_cache
     type(adj_trans_lookup_cache_type)          :: adj_trans_lookup_cache
-    integer(kind=i_def),             parameter :: nlayers_lite = 2_i_def
+    integer(kind=i_def),             parameter :: nlayers_lite = 5_i_def
 
     mesh => mesh_collection%get_mesh( prime_mesh_name )
     chi      => get_coordinates(mesh)
