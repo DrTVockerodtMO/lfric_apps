@@ -6,4 +6,3 @@ components/science/source/kernel/inter_function_space/w2_to_w1_projection_kernel
 components/science/source/kernel/inter_function_space/sample_field_kernel_mod.F90
 components/science/source/kernel/inter_function_space/sample_flux_kernel_mod.F90
 components/science/source/kernel/inter_function_space/split_w2_field_kernel_mod.F90
-components/science/source/kernel/fem/strong_curl_kernel_mod.F90

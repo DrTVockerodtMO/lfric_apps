@@ -49,6 +49,9 @@ contains
     use adjt_dg_inc_matrix_vector_alg_mod,          only : adjt_dg_inc_matrix_vector_alg
     use adjt_transpose_matrix_vector_alg_mod,       only : adjt_transpose_matrix_vector_alg
 
+    ! ./fem
+    use adjt_strong_curl_alg_mod,                   only : adjt_strong_curl_alg
+
     ! ./inter_function_space
     use adjt_sci_convert_hdiv_field_alg_mod,        only : adjt_sci_convert_hdiv_field_alg
 
@@ -64,6 +67,7 @@ contains
 
     ! ./linear_physics
     use atlt_bl_inc_alg_mod,                        only : atlt_bl_inc_alg
+    use adjt_stabilise_bl_u_alg_mod,                only : adjt_stabilise_bl_u_alg
 
     ! Handwritten algorithm tests
     ! ./interpolation
@@ -178,6 +182,10 @@ contains
 
     ! ./linear_physics
     call atlt_bl_inc_alg( mesh )
+    call adjt_stabilise_bl_u_alg( modeldb%config, mesh )
+
+    ! ./fem
+    call adjt_strong_curl_alg( modeldb%config, mesh )
 
     ! ./inter_function_space
     call adjt_sci_convert_hdiv_field_alg( mesh, chi, panel_id )
