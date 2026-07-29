@@ -85,14 +85,11 @@ module adj_horizontal_mass_flux_kernel_mod
     real(kind=r_tran), dimension(undf_w2), intent(in)    :: mass_flux
 
     ! Internal variables
-    integer(kind=i_def)                    :: k, df, ijp
-    integer(kind=i_def), parameter         :: nfaces = 4
-    real(kind=r_tran)                      :: direction
-    real(kind=r_tran), dimension(nfaces)   :: v_dot_n
-
-    ! Implied direction of outward normals dotted with basis functions.
-    ! If u*u_dot_n > 0 then this is the upwind cell
-    v_dot_n = (/ -1.0_r_tran, 1.0_r_tran, 1.0_r_tran, -1.0_r_tran /)
+    integer(kind=i_def)                             :: k, df, ijp
+    integer(kind=i_def),                  parameter :: nfaces = 4
+    real(kind=r_tran)                               :: direction
+    real(kind=r_tran), dimension(nfaces), parameter :: v_dot_n = (/ -1.0_r_tran, 1.0_r_tran, &
+                                                                    1.0_r_tran, -1.0_r_tran /)
 
     do df = nfaces, 1, -1
       do k = nlayers - 1, 0, -1

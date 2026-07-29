@@ -89,15 +89,11 @@ module atl_horizontal_mass_flux_kernel_mod
     real(kind=r_def), dimension(undf_w2), intent(in)    :: mass_flux
 
     ! Internal variables
-    integer(kind=i_def)                    :: k, df, ijp
-    integer(kind=i_def), parameter         :: nfaces = 4
-    real(kind=r_def)                       :: direction
-    real(kind=r_def), dimension(nfaces)    :: v_dot_n
-
-    ! Implied direction of outward normals dotted with basis functions.
-    ! If u*u_dot_n > 0 then this is the upwind cell
-    v_dot_n = (/ -1.0_r_def, 1.0_r_def, 1.0_r_def, -1.0_r_def /)
-
+    integer(kind=i_def)                            :: k, df, ijp
+    integer(kind=i_def),                 parameter :: nfaces = 4
+    real(kind=r_def)                               :: direction
+    real(kind=r_def), dimension(nfaces), parameter :: v_dot_n = (/ -1.0_r_def, 1.0_r_def, &
+                                                                    1.0_r_def, -1.0_r_def /)
     do df = nfaces, 1, -1
       do k = nlayers - 1, 0, -1
         direction = ls_wind(map_w2(df) + k)*v_dot_n(df)
