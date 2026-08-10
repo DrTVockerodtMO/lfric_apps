@@ -42,7 +42,7 @@ module adj_assemble_w2h_from_w2hb_kernel_mod
 
 contains
 
-!> @brief Converts a broken W2h field into a continuous W2h field
+!> @brief Adjoint of the conversion of a broken W2h field into a continuous W2h field
 !>
 !> @param[in] nlayers Number of layers in the mesh
 !> @param[in] field_w2h Field in the W2h space to be returned.

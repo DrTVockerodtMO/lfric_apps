@@ -4,17 +4,15 @@
 ! under which the code may be used.
 !-----------------------------------------------------------------------------
 
-!> @brief Compute the LHS of the semi-implicit system for the
-!!         vertical velocity and pressure equations:
-!!        (lhs_w) = norm_u*(Mu*u - P2t*t - grad*p),
-!!        lhs_p = M3p*p - P3t*t + Q32*u,
-!!        with t = -Mt^(-1) * Pt2*u
+!> @brief Compute the adjoint of LHS of the semi-implicit system
+!!        for the vertical velocity and pressure equations.
 module adj_apply_mixed_wp_operator_kernel_mod
 
 use argument_mod,      only : arg_type,              &
                               GH_FIELD, GH_OPERATOR, &
                               GH_READ,               &
-                              GH_WRITE,              &
+                              GH_INC,                &
+                              GH_READWRITE,          &
                               GH_REAL, CELL_COLUMN
 use constants_mod,     only : r_solver, i_def
 use kernel_mod,        only : kernel_type
@@ -28,21 +26,21 @@ private
 !-------------------------------------------------------------------------------
 type, public, extends(kernel_type) :: adj_apply_mixed_wp_operator_kernel_type
   private
-  type(arg_type) :: meta_args(14) = (/                       &
-       arg_type(GH_FIELD,    GH_REAL, GH_WRITE, W2v),        & ! lhs_w
-       arg_type(GH_FIELD,    GH_REAL, GH_WRITE, W3),         & ! lhs_p
-       arg_type(GH_FIELD,    GH_REAL, GH_WRITE, W2h),        & ! uv'
-       arg_type(GH_FIELD,    GH_REAL, GH_WRITE, W2v),        & ! w'
-       arg_type(GH_FIELD,    GH_REAL, GH_WRITE, W3),         & ! exner'
-       arg_type(GH_OPERATOR, GH_REAL, GH_READ,  Wtheta, W2), & ! Ptheta2
-       arg_type(GH_FIELD,    GH_REAL, GH_READ,  Wtheta),     & ! Mtheta^-1
-       arg_type(GH_OPERATOR, GH_REAL, GH_READ,  W2, W2),     & ! Mu^{c,d}
-       arg_type(GH_OPERATOR, GH_REAL, GH_READ,  W2, Wtheta), & ! P2theta
-       arg_type(GH_OPERATOR, GH_REAL, GH_READ,  W2, W3),     & ! grad
-       arg_type(GH_FIELD,    GH_REAL, GH_READ,  W2),         & ! norm_u
-       arg_type(GH_OPERATOR, GH_REAL, GH_READ,  W3, W3),     & ! m3p
-       arg_type(GH_OPERATOR, GH_REAL, GH_READ,  W3, W2),     & ! q32
-       arg_type(GH_OPERATOR, GH_REAL, GH_READ,  W3, Wtheta)  & ! p3t
+  type(arg_type) :: meta_args(14) = (/                           &
+       arg_type(GH_FIELD,    GH_REAL, GH_READWRITE, W2v),        & ! lhs_w
+       arg_type(GH_FIELD,    GH_REAL, GH_READWRITE, W3),         & ! lhs_p
+       arg_type(GH_FIELD,    GH_REAL, GH_INC,       W2h),        & ! uv'
+       arg_type(GH_FIELD,    GH_REAL, GH_READWRITE, W2v),        & ! w'
+       arg_type(GH_FIELD,    GH_REAL, GH_READWRITE, W3),         & ! exner'
+       arg_type(GH_OPERATOR, GH_REAL, GH_READ,      Wtheta, W2), & ! Ptheta2
+       arg_type(GH_FIELD,    GH_REAL, GH_READ,      Wtheta),     & ! Mtheta^-1
+       arg_type(GH_OPERATOR, GH_REAL, GH_READ,      W2, W2),     & ! Mu^{c,d}
+       arg_type(GH_OPERATOR, GH_REAL, GH_READ,      W2, Wtheta), & ! P2theta
+       arg_type(GH_OPERATOR, GH_REAL, GH_READ,      W2, W3),     & ! grad
+       arg_type(GH_FIELD,    GH_REAL, GH_READ,      W2),         & ! norm_u
+       arg_type(GH_OPERATOR, GH_REAL, GH_READ,      W3, W3),     & ! m3p
+       arg_type(GH_OPERATOR, GH_REAL, GH_READ,      W3, W2),     & ! q32
+       arg_type(GH_OPERATOR, GH_REAL, GH_READ,      W3, Wtheta)  & ! p3t
        /)
   integer :: operates_on = CELL_COLUMN
   contains
@@ -56,7 +54,7 @@ public :: adj_apply_mixed_wp_operator_code
 
 contains
 
-!> @brief Compute the LHS of the semi-implicit system
+!> @brief Compute the adjoint of the LHS of the semi-implicit system
 !> @param[in]     cell          Horizontal cell index
 !> @param[in]     nlayers       Number of layers
 !> @param[in,out] lhs_w         Mixed operator applied to the vertical momentum equation
@@ -179,8 +177,8 @@ subroutine adj_apply_mixed_wp_operator_code(cell,                       &
   lhs_p(iw3:iw3+nm1) = 0.0_r_solver
 
   ! Set BC for lhs_w
-  lhs_w(map_w2v(1)) = 0.0_r_solver
   lhs_w(map_w2v(2)+nlayers-1) = 0.0_r_solver
+  lhs_w(map_w2v(1)) = 0.0_r_solver
 
   ! LHS W
   do df2 = ndf_w2, 1, -1
@@ -193,7 +191,7 @@ subroutine adj_apply_mixed_wp_operator_code(cell,                       &
     end do
   end do
 
-  do df = 1, ndf_w2v
+  do df = ndf_w2v, 1, -1
     iw2v = map_w2v(df)
     iw2  = map_w2(ndf_w2h+df)
     exner(iw3:iw3+nm1) = exner(iw3:iw3+nm1)   &
@@ -223,13 +221,11 @@ subroutine adj_apply_mixed_wp_operator_code(cell,                       &
   do df = ndf_w2v, 1, -1
     iw2v = map_w2v(df)
     wind_w(iw2v:iw2v+nm1) = wind_w(iw2v:iw2v+nm1) + u_e(:,ndf_w2h+df)
-    u_e(:,ndf_w2h+df) = 0.0_r_solver
   end do
 
   do df = ndf_w2h, 1, -1
     iw2h = map_w2h(df)
     wind_uv(iw2h:iw2h+nm1) = wind_uv(iw2h:iw2h+nm1) + u_e(:,df)
-    u_e(:,df) = 0.0_r_solver
   end do
 
 end subroutine adj_apply_mixed_wp_operator_code
