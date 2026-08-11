@@ -6,23 +6,24 @@
 !> @brief Module containing adjoint test for adj_schur_backsub_kernel
 module adjt_schur_backsub_alg_mod
 
-  use base_mesh_config_mod,          only : prime_mesh_name
-  use config_mod,                    only : config_type
-  use function_space_mod,            only : function_space_type
-  use mesh_mod,                      only : mesh_type
-  use function_space_collection_mod, only : function_space_collection
-  use fs_continuity_mod,             only : W2, W2h, W2v, W3
-  use operator_mod,                  only : r_solver_operator_type
-  use r_solver_field_mod,            only : r_solver_field_type
-  use constants_mod,                 only : i_def, r_def, &
-                                            r_solver, l_def, EPS
-  use setop_random_alg_mod,          only : setop_random_rsol_alg
-  use limited_area_constants_mod,    only : get_mask_r_solver
-  use log_mod,                       only : log_event,         &
-                                            log_scratch_space, &
-                                            LOG_LEVEL_ERROR,   &
-                                            LOG_LEVEL_INFO,    &
-                                            LOG_LEVEL_DEBUG
+  use base_mesh_config_mod,             only : prime_mesh_name
+  use config_mod,                       only : config_type
+  use function_space_mod,               only : function_space_type
+  use mesh_mod,                         only : mesh_type
+  use function_space_collection_mod,    only : function_space_collection
+  use fs_continuity_mod,                only : W2, W2h, W2v, W3
+  use operator_mod,                     only : r_solver_operator_type
+  use r_solver_field_mod,               only : r_solver_field_type
+  use constants_mod,                    only : i_def, r_def, &
+                                               r_solver, l_def, EPS
+  use setop_random_alg_mod,             only : setop_random_rsol_alg
+  use set_mask_by_threshold_kernel_mod, only : set_mask_by_threshold_kernel_type
+  use limited_area_constants_mod,       only : get_mask_r_solver
+  use log_mod,                          only : log_event,         &
+                                               log_scratch_space, &
+                                               LOG_LEVEL_ERROR,   &
+                                               LOG_LEVEL_INFO,    &
+                                               LOG_LEVEL_DEBUG
 
   implicit none
   private :: run_adjt_schur_backsub_alg
@@ -48,7 +49,8 @@ module adjt_schur_backsub_alg_mod
     type(r_solver_operator_type)       :: div
     type(r_solver_field_type)          :: norm
     logical(kind=l_def)                :: lam
-    type(r_solver_field_type), pointer :: mask
+    type(r_solver_field_type)          :: mask
+    real(kind=r_solver),     parameter :: threshold = 0.5_r_solver
 
     ! Variables for initialising fields
     type(function_space_type), pointer :: vector_space_w2_ptr
@@ -57,7 +59,6 @@ module adjt_schur_backsub_alg_mod
     type(function_space_type), pointer :: vector_space_w3_ptr
     integer(kind=i_def)                :: element_order_h
     integer(kind=i_def)                :: element_order_v
-    type(r_solver_field_type), target  :: dummy_w2
 
     element_order_h = config%finite_element%element_order_h()
     element_order_v = config%finite_element%element_order_v()
@@ -68,13 +69,15 @@ module adjt_schur_backsub_alg_mod
 
     call div%initialise(vector_space_w2_ptr, vector_space_w3_ptr)
     call norm%initialise(vector_space=vector_space_w2_ptr, name='norm')
+    call mask%initialise(vector_space_w2_ptr, name='mask')
 
     ! Initialise arguments and call the tangent-linear kernel.
-    call invoke(setval_random(norm))
-    ! Curiously, this does not work with setval_random mask and lam = .true._l_def...
-    ! But we will not use it with a randomised mask in the alg layer so this is okay.
-    call dummy_w2%initialise(vector_space_w2_ptr)
-    mask => dummy_w2
+    ! Applying the mask needs to be idempotent 
+    ! since it applies to the same dofs
+    ! in different cell calls.
+    call invoke(setval_random(norm), &
+                setval_random(mask), &
+                set_mask_by_threshold_kernel_type(mask, threshold))
     call setop_random_rsol_alg(div)
 
     lam = .false._l_def
@@ -87,16 +90,22 @@ module adjt_schur_backsub_alg_mod
                                     lam,                  &
                                     mask)
 
-    ! We would like to test with lam = .true._l_def but there are some problems
-    ! getting the mask with get_mask_r_solver with the adjoint_tests psyclone.cfg...
-    ! mask => get_mask_r_solver(W2, mesh%get_id(), prime_mesh_name)
+    lam = .true._l_def
+    call run_adjt_schur_backsub_alg(vector_space_w2h_ptr, &
+                                    vector_space_w2v_ptr, &
+                                    vector_space_w2_ptr,  &
+                                    vector_space_w3_ptr,  &
+                                    div,                  &
+                                    norm,                 &
+                                    lam,                  &
+                                    mask)
 
   end subroutine adjt_schur_backsub_alg
 
   !=============================================================================
   !> @brief Runs the adjoint test for adj_schur_backsub_kernel
   !!        for a given set of parameters
-  !> @param[in]     v ector_space_w2h_ptr     W2h function space pointer
+  !> @param[in]      vector_space_w2h_ptr     W2h function space pointer
   !> @param[in]      vector_space_w2v_ptr     W2v function space pointer
   !> @param[in]      vector_space_w2_ptr      W2 function space pointer
   !> @param[in]      vector_space_w3_ptr      W3 function space pointer
@@ -229,17 +238,6 @@ module adjt_schur_backsub_alg_mod
                  x_innerproduct_y(lhs_v_lhs_v_input_inner_prod, lhs_v, lhs_v_input), &
                  x_innerproduct_y(rhs_rhs_input_inner_prod, rhs, rhs_input),         &
                  x_innerproduct_y(exner_inc_exner_inc_input_inner_prod, exner_inc, exner_inc_input) )
-
-    write( log_scratch_space, * ) "adjt_schur_backsub inner products, post adjoint:"
-    call log_event( log_scratch_space, log_level_debug )
-    write( log_scratch_space, * ) "lhs_h inner product = ", lhs_h_lhs_h_input_inner_prod
-    call log_event( log_scratch_space, log_level_debug )
-    write( log_scratch_space, * ) "lhs_v inner product = ", lhs_v_lhs_v_input_inner_prod
-    call log_event( log_scratch_space, log_level_debug )
-    write( log_scratch_space, * ) "rhs inner product = ", rhs_rhs_input_inner_prod
-    call log_event( log_scratch_space, log_level_debug )
-    write( log_scratch_space, * ) "exner_inc inner product = ", exner_inc_exner_inc_input_inner_prod
-    call log_event( log_scratch_space, log_level_debug )
 
     inner2 = 0.0_r_solver
     inner2 = inner2 + real(lhs_h_lhs_h_input_inner_prod, kind = r_solver)
