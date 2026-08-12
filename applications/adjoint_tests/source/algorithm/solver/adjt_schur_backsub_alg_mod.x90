@@ -72,9 +72,8 @@ module adjt_schur_backsub_alg_mod
     call mask%initialise(vector_space_w2_ptr, name='mask')
 
     ! Initialise arguments and call the tangent-linear kernel.
-    ! Applying the mask needs to be idempotent 
-    ! since it applies to the same dofs
-    ! in different cell calls.
+    ! Applying the mask may need to be idempotent
+    ! since it applies to the same dofs in different cell calls.
     call invoke(setval_random(norm), &
                 setval_random(mask), &
                 set_mask_by_threshold_kernel_type(mask, threshold))

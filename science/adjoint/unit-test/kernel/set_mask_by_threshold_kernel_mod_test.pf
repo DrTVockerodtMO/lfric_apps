@@ -3,7 +3,7 @@
 ! The file LICENCE, distributed with this code, contains details of the terms
 ! under which the code may be used.
 !-----------------------------------------------------------------------------
-!> Tests that sset_mask_by_threshold_kernel_mod properly initialises mask
+!> Tests that set_mask_by_threshold_kernel_mod properly initialises mask
 module set_mask_by_threshold_kernel_mod_test
 
   use constants_mod, only: i_def, r_def
