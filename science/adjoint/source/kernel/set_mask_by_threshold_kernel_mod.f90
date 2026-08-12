@@ -11,7 +11,7 @@ module set_mask_by_threshold_kernel_mod
   use argument_mod,                          only : ANY_SPACE_1,           &
                                                     arg_type, CELL_COLUMN, &
                                                     GH_FIELD, GH_SCALAR,   &
-                                                    GH_REAL, GH_WRITE,     &
+                                                    GH_REAL, GH_READWRITE, &
                                                     GH_READ
   use kernel_mod,                            only : kernel_type
   use constants_mod,                         only : i_def, r_single, r_double
@@ -20,7 +20,7 @@ module set_mask_by_threshold_kernel_mod
 
   type, extends(kernel_type) :: set_mask_by_threshold_kernel_type
      type(arg_type), dimension(2) :: meta_args = (/                      &
-       arg_type(GH_FIELD,  GH_REAL, GH_WRITE, ANY_SPACE_1),              & ! mask
+       arg_type(GH_FIELD,  GH_REAL, GH_READWRITE, ANY_SPACE_1),          & ! mask
        arg_type(GH_SCALAR, GH_REAL, GH_READ)                             & ! threshold
      /)
      integer :: operates_on = CELL_COLUMN
