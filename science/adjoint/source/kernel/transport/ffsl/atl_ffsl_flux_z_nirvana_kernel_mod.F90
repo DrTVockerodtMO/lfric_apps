@@ -144,19 +144,33 @@ subroutine atl_ffsl_flux_z_nirvana_code( nlayers,         &
   logical(kind=l_def), intent(in)    :: log_space
 
   ! Local arrays
-  integer(kind=i_def) :: sign_displacement(nlayers-1)
-  integer(kind=i_def) :: sign_offset(nlayers-1)
-  integer(kind=i_def) :: dep_cell_idx(nlayers-1)
-  real(kind=r_tran)   :: reconstruction(nlayers-1)
-  real(kind=r_tran)   :: edge_above(0:nlayers-1)
-  real(kind=r_tran)   :: edge_below(0:nlayers-1)
-  real(kind=r_tran)   :: edge_left(nlayers-1)
-  real(kind=r_tran)   :: edge_right(nlayers-1)
-  real(kind=r_tran)   :: field_local(nlayers-1)
-  real(kind=r_tran)   :: ls_reconstruction(nlayers-1)
-  real(kind=r_tran)   :: displacement(nlayers-1)
-  real(kind=r_tran)   :: frac_dist(nlayers-1)
-  real(kind=r_tran)   :: mass(nlayers)
+!  integer(kind=i_def) :: sign_displacement(nlayers-1)
+!  integer(kind=i_def) :: sign_offset(nlayers-1)
+!  integer(kind=i_def) :: dep_cell_idx(nlayers-1)
+!  real(kind=r_tran)   :: reconstruction(nlayers-1)
+!  real(kind=r_tran)   :: edge_above(0:nlayers-1)
+!  real(kind=r_tran)   :: edge_below(0:nlayers-1)
+!  real(kind=r_tran)   :: edge_left(nlayers-1)
+!  real(kind=r_tran)   :: edge_right(nlayers-1)
+!  real(kind=r_tran)   :: field_local(nlayers-1)
+!  real(kind=r_tran)   :: ls_reconstruction(nlayers-1)
+!  real(kind=r_tran)   :: displacement(nlayers-1)
+!  real(kind=r_tran)   :: frac_dist(nlayers-1)
+!  real(kind=r_tran)   :: mass(nlayers)
+
+  integer(kind=i_def), dimension(:), allocatable :: sign_displacement
+  integer(kind=i_def), dimension(:), allocatable :: sign_offset
+  integer(kind=i_def), dimension(:), allocatable :: dep_cell_idx
+  real(kind=r_tran),   dimension(:), allocatable :: reconstruction
+  real(kind=r_tran),   dimension(:), allocatable :: edge_above
+  real(kind=r_tran),   dimension(:), allocatable :: edge_below
+  real(kind=r_tran),   dimension(:), allocatable :: edge_left
+  real(kind=r_tran),   dimension(:), allocatable :: edge_right
+  real(kind=r_tran),   dimension(:), allocatable :: field_local
+  real(kind=r_tran),   dimension(:), allocatable :: ls_reconstruction
+  real(kind=r_tran),   dimension(:), allocatable :: displacement
+  real(kind=r_tran),   dimension(:), allocatable :: frac_dist
+  real(kind=r_tran),   dimension(:), allocatable :: mass
 
   ! Local scalars
   integer(kind=i_def) :: k, w2v_idx, w3_idx
@@ -164,6 +178,20 @@ subroutine atl_ffsl_flux_z_nirvana_code( nlayers,         &
   integer(kind=i_def) :: lowest_whole_cell, highest_whole_cell
   integer(kind=i_def) :: whole_cell
   real(kind=r_tran)   :: inv_dt
+
+  allocate(sign_displacement(nlayers-1), &
+           sign_offset(nlayers-1),       &
+           dep_cell_idx(nlayers-1),      &
+           reconstruction(nlayers-1),    &
+           edge_above(0:nlayers-1),      &
+           edge_below(0:nlayers-1),      &
+           edge_left(nlayers-1),         &
+           edge_right(nlayers-1),        &
+           field_local(nlayers-1),       &
+           ls_reconstruction(nlayers-1), &
+           displacement(nlayers-1),      &
+           frac_dist(nlayers-1),         &
+           mass(nlayers))
 
   w3_idx = map_w3(1)
   w2v_idx = map_w2v(1)
@@ -270,6 +298,20 @@ subroutine atl_ffsl_flux_z_nirvana_code( nlayers,         &
           dz(w3_idx : w3_idx+nlayers-1),                                       &
           edge_above, edge_below, log_space, nlayers                           &
   )
+
+  deallocate(sign_displacement, &
+             sign_offset,       &
+             dep_cell_idx,      &
+             reconstruction,    &
+             edge_above,        &
+             edge_below,        &
+             edge_left,         &
+             edge_right,        &
+             field_local,       &
+             ls_reconstruction, &
+             displacement,      &
+             frac_dist,         &
+             mass)
 
 end subroutine atl_ffsl_flux_z_nirvana_code
 
