@@ -76,7 +76,7 @@ module adj_mixed_operator_alg_mod
 contains
 
   !> @brief Applies the adjoint mixed operator to the vector.
-  !> @param[in,out] x Field vector that is read in the forward
+  !> @param[in]     x Field vector that is read in the forward
   !> @param[in,out] y Field vector that is written in the forward
   subroutine apply_adj_mixed_operator(self, x, y)
 
