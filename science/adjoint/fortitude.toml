@@ -21,6 +21,7 @@ output-format = "grouped"                #group results by file
 
 "setop_average_two_fields_kernel_mod_test.pf" = ["E001", "C121"]
 "setop_random_kernel_mod_test.pf" = ["E001", "C121"]
+"set_mask_by_threshold_kernel_mod_test.pf" = ["E001", "C121"]
 "adj_mixed_operator_alg_mod.x90" = ["C061"]
 "atl_hydrostatic_kernel_mod.F90" = ["C031"]
 "atl_kinetic_energy_gradient_kernel_mod.F90" = ["C031"]
@@ -54,6 +55,7 @@ output-format = "grouped"                #group results by file
 "atl_poly1d_vert_adv_kernel_mod.F90" = ["C031"]
 "atl_vertical_mass_flux_kernel_mod.F90" = ["C031"]
 "atl_w3v_advective_update_kernel_mod.F90" = ["C031"]
+"set_mask_by_threshold_kernel_mod.f90" = ["C031"]
 
 
 
