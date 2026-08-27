@@ -172,12 +172,6 @@ subroutine atl_vorticity_advection_code(nlayers,         &
       chi_3_e(df) = chi_3( loc )
     end do
 
-    ! The nonlinear term is:
-    ! v.( [(J^-1 * J^-T) * vorticity] cross u )
-    ! The corresponding linear term is:
-    ! v.( ( [(J^-1 * J^-T) * ls_vorticity] cross u )
-    ! + ( [(J^-1 * J^-T) * vorticity] cross u_ls ) )
-
     do qp2 = 1, nqp_v
       do qp1 = 1, nqp_h
 
@@ -212,17 +206,15 @@ subroutine atl_vorticity_advection_code(nlayers,         &
            vorticity_term(:) = vorticity_term(:) - w2_basis(:,df,qp1,qp2) * r_u( map_w2(df) + k )
         end do
 
-        j_vorticity(:) = 0.0_r_def
-        u_at_quad(:) = 0.0_r_def
-        j_vorticity(1) = j_vorticity(1) + vorticity_term(3) * u_ls_at_quad(2)
-        j_vorticity(2) = j_vorticity(2) - vorticity_term(3) * u_ls_at_quad(1)
-        u_at_quad(2) = u_at_quad(2) + vorticity_term(3) * j_ls_vorticity(1)
-        u_at_quad(1) = u_at_quad(1) - vorticity_term(3) * j_ls_vorticity(2)
+        j_vorticity(1) = vorticity_term(3) * u_ls_at_quad(2)
+        j_vorticity(2) = -vorticity_term(3) * u_ls_at_quad(1)
+        u_at_quad(2) = vorticity_term(3) * j_ls_vorticity(1)
+        u_at_quad(1) = -vorticity_term(3) * j_ls_vorticity(2)
 
-        j_vorticity(3) = j_vorticity(3) + vorticity_term(2) * u_ls_at_quad(1)
+        j_vorticity(3) = vorticity_term(2) * u_ls_at_quad(1)
         j_vorticity(1) = j_vorticity(1) - vorticity_term(2) * u_ls_at_quad(3)
         u_at_quad(1) = u_at_quad(1) + vorticity_term(2) * j_ls_vorticity(3)
-        u_at_quad(3) = u_at_quad(3) - vorticity_term(2) * j_ls_vorticity(1)
+        u_at_quad(3) = -vorticity_term(2) * j_ls_vorticity(1)
 
         j_vorticity(2) = j_vorticity(2) + vorticity_term(1) * u_ls_at_quad(3)
         j_vorticity(3) = j_vorticity(3) - vorticity_term(1) * u_ls_at_quad(2)
