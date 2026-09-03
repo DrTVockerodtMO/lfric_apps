@@ -3,7 +3,7 @@
 ! The file LICENCE, distributed with this code, contains details of the terms
 ! under which the code may be used.
 !-----------------------------------------------------------------------------
-!> Test the vertical advective wind update computation
+!> Test file for the adjoint vertical advective wind update computation
 module adj_w3v_advective_update_kernel_mod_test
 
   use adj_w3v_advective_update_kernel_mod, only : adj_w3v_advective_update_code

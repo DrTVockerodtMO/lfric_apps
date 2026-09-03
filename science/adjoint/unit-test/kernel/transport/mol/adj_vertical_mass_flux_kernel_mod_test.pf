@@ -3,7 +3,7 @@
 ! The file LICENCE, distributed with this code, contains details of the terms
 ! under which the code may be used.
 !-----------------------------------------------------------------------------
-!> Test the vertical mass flux computation
+!> Test file for the adjoint vertical mass flux computation
 module adj_vertical_mass_flux_kernel_mod_test
 
   use adj_vertical_mass_flux_kernel_mod, only : adj_vertical_mass_flux_code
